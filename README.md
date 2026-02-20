@@ -24,6 +24,7 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 | `BLOCKERS.md` | Registry of impediments and escalation paths. |
 | `BRANCHING_MODEL.md` | Git branching strategy (based on GitFlow). |
 | `WIP_GUIDELINES.md` | Policies on concurrent task limits. |
+| `CONTRIBUTING.md` | Contribution guidelines, code of conduct, and PR workflow |
 | `projects/_template.project.yml` | Machine-readable project schema. |
 
 ## Additional Documentation
