@@ -15,6 +15,7 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `ms-06` | Tool System & OS Integration | 2026-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
 | `ms-07` | Memory & Knowledge Systems | 2026-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
 | `ms-08` | Interface & Distribution | 2026-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
+| ms-voice-01 | Voice UI Prototype | 2024-05-22 | Create a functional prototype with UI and Voice-to-Text capabilities. | App runs; UI accepts input; Transcription works. |
 
 ## Task Backlog Table
 
@@ -35,13 +36,16 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `task-501` | `ms-07` | Integrate LiteLLM Provider | Jules | 5 | done | Model abstraction. `src/magnetar/llm/provider.py` implemented. |
 | `task-502` | `ms-07` | Setup ChromaDB for Memory | Jules | 8 | done | Vector store integration. `src/magnetar/memory/chroma.py` implemented. |
 | `task-601` | `ms-08` | Build CLI with Typer | Jules | 5 | done | Command line interface. `src/magnetar/cli.py` implemented. |
+| task-voice-101 | ms-voice-01 | Setup Project Structure | Jules | 3 | in_progress | Setup poetry, deps, dirs. |
+| task-voice-102 | ms-voice-01 | Implement Voice UI & Logic | Jules | 5 | planned | Gradio UI + SR Logic. |
 
 ## Effort Summary
 
-- **Total effort**: 67 pts
+- **Total effort**: 75 pts
 - **Completed**: 53 pts
-- **In progress**: 6 pts
-- **Remaining**: 8 pts
+- **In progress**: 9 pts
+- **Remaining**: 13 pts
+
 
 ## State Definitions
 

@@ -1,8 +1,8 @@
 # Status of MagnetarEidolon
 
 ## Progress Summary
-**Overall completion:** 79%
-`[████████████████░░░░] 79%`
+**Overall completion:** 71%
+`[███████████████░░░░░] 71%`
 
 ## Current Milestones
 
@@ -16,6 +16,7 @@
 | `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
 | `ms-07` | Memory & Knowledge Systems | Completed | 2026-07-01 |
 | `ms-08` | Interface & Distribution | Completed | 2026-07-15 |
+| ms-voice-01 | Voice UI Prototype | In Progress | 2024-05-22 |
 
 ## Risks and Mitigations
 
@@ -31,6 +32,8 @@
     -   **Mitigation**: `LLMProvider` is model-agnostic and can switch to stronger models if needed.
 6.  **Risk**: Memory management (context window limits) may impact long conversations.
     -   **Mitigation**: Implemented `ChromaMemoryStore` for long-term storage and retrieval.
+7.  **Risk**: Audio input capture in sandbox environment.
+    -   **Mitigation**: Focus on verifying logic and UI launch; support file upload as fallback.
 
 ## Reporting Cadence
 Update at least once per day and immediately after each merged PR.
