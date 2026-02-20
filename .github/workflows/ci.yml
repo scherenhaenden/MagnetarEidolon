@@ -39,7 +39,7 @@ jobs:
 
       - name: Run tests
         run: >-
-          python -m poetry run pytest
+          poetry run pytest
           --junitxml=pytest-report.xml
           -vv
 
