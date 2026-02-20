@@ -185,13 +185,13 @@ class SystemInteractionModule:
         connector = self.desktop_connectors.get(app_name.lower())
         if connector is None:
             self.audit.record(
-        connector = self.desktop_connectors.get(app_name.lower())
-        if connector is None:
-            self._audit(
-                action="desktop_message_connector_missing",
-                target=app_name,
-                allowed=False,
-                reason="No connector registered for app",
+                AuditEvent(
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    action="desktop_message_connector_missing",
+                    target=app_name,
+                    allowed=False,
+                    reason="No connector registered for app",
+                )
             )
             return None
         return connector.send_message(channel=channel, message=message)
