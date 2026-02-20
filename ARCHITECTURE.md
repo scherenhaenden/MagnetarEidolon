@@ -9,9 +9,40 @@ The system is composed of the following key layers:
 
 1.  **Agent Core (Reasoning Engine)**: The stateless execution logic.
 2.  **MagnetarModel (Cognition State)**: The serializable data structure holding the agent's state.
-3.  **Tool System (Action Layer)**: The interface for interacting with the environment.
+3.  **Tool System (Action Layer)**: The interface for aintercting with the environment.
 4.  **Memory System**: The storage for short-term and long-term knowledge.
 5.  **Model Provider Layer**: The abstraction for LLM backends.
+
+## High-Level Diagram
+```text
++-------------------------+
+| Markdown Governance     |
+| (RULES/PLAN/STATUS/...) |
++-----------+-------------+
+            |
+            v
++-------------------------+
+| MagnetarEidolon State   |
+| (Pydantic cognition)    |
++-----------+-------------+
+            |
+            v
++-------------------------+
+| MagnetarAgent Core      |
+| (reasoning + loop)      |
++----+--------------+-----+
+     |              |
+     v              v
++---------+    +----------------+
+| Tools   |    | Model Provider |
+| (OS/Web)|    | LiteLLM/Ollama |
++----+----+    +--------+-------+
+     |                  |
+     v                  v
++-------------------------------+
+| Environment + Memory (Chroma) |
++-------------------------------+
+```
 
 ## Component Descriptions
 
@@ -52,3 +83,17 @@ The system is composed of the following key layers:
 - **Pydantic for State**: Ensures strict typing and validation for the complex agent state.
 - **Local-First Memory**: `ChromaDB` allows offline operation and privacy.
 - **Model Agnosticism**: `LiteLLM` prevents vendor lock-in.
+- Keep cognition state externalized and portable.
+- Keep execution logic model-agnostic and cross-platform.
+- Keep behavior and policy editable in Markdown, independent from code.
+- Keep governance artifacts aligned with machine-readable project YAML.
+
+## Technologies
+- Python 3.x
+- Pydantic
+- LiteLLM + Ollama
+- pathlib/os/subprocess/platform (+ optional psutil)
+- httpx/requests + BeautifulSoup + Trafilatura
+- ChromaDB
+- Typer
+- logging or Loguru

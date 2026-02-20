@@ -34,10 +34,23 @@ This document describes the Git branching strategy used in the MagnetarEidolon p
 - **Naming**: `hotfix/<version>-<description>`
 - **Lifecycle**: Urgent fixes for production issues. Triggers a `STATUS.md` update.
 
-## Workflow Rules
+### Chore Branches (`chore/<short-description>`)
+- **Source**: `master` (or `develop`)
+- **Target**: `master` (or `develop`)
+- **Naming**: `chore/<short-description>`
+- **Lifecycle**: For maintenance, refactoring, documentation, or other non-feature changes.
+
+### Experiment Branches (`experiment/<short-description>`)
+- **Source**: `master` (or `develop`)
+- **Target**: `master` (or `develop`)
+- **Naming**: `experiment/<short-description>`
+- **Lifecycle**: For exploratory work that may or may not be merged.
+
+## Workflow & Merge Rules
 1.  **Start**: Create a branch from `master` (or `develop`).
 2.  **Work**: Commit changes frequently with clear messages.
-3.  **Sync**: Rebase on `master` regularly to avoid conflicts.
-4.  **PR**: Open a Pull Request when ready for review. Link relevant tasks.
-5.  **Review**: Address feedback and obtain approval.
-6.  **Merge**: Squash and merge into the target branch. Delete the feature branch.
+3.  **Sync**: Rebase your branch on `master` (or `develop`) regularly to avoid conflicts before opening a PR.
+4.  **PR**: Open a Pull Request when ready for review. The PR must reference relevant task IDs from `PLAN.md` and include updates to `BITACORA.md` if applicable.
+5.  **Review**: Address feedback and obtain approval from the required number of reviewers.
+6.  **Merge**: Squash and merge into the target branch. Delete the source branch after merging.
+7.  **CI/CD**: All merges to `master` must pass the full CI suite, including tests and governance documentation checks.

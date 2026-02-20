@@ -13,10 +13,26 @@ This document is a logbook that records decisions, state changes, discoveries, a
 - **Decision**: Key architectural or process decision.
 - **Blocker**: Creation or resolution of a blocker.
 - **Discovery**: Significant finding or new idea.
-- **PR Merge**: Pull Request merged.
+-- **PR Merge**: Pull Request merged.
 - **Exception**: Documented deviation from canonical rules.
 
 ## Log Entries
+
+- **Timestamp:** 2026-02-20 11:20 UTC
+  **Author:** Codex
+  **Entry:** State Change: `task-101` moved from `in_progress` to `done` after creating canonical Magnetar project documentation baseline.
+
+- **Timestamp:** 2026-02-20 11:10 UTC
+  **Author:** Codex
+  **Entry:** Decision: Adopted Magnetar canonical file set and initialized governance documents (`RULES.md`, `BRANCHING_MODEL.md`, `WIP_GUIDELINES.md`, `CONTRIBUTING.md`).
+
+- **Timestamp:** 2026-02-20 11:00 UTC
+  **Author:** Codex
+  **Entry:** Discovery: Repository only contained `README.md`; canonical structure had to be bootstrapped from scratch.
+
+- **Timestamp:** 2026-02-20 10:55 UTC
+  **Author:** Codex
+  **Entry:** Exception: No prior project YAML existed; initialized `projects/_template.project.yml` as canonical seed.
 
 ### 2026-02-20 08:43 UTC
 - **Author**: Codex (AI Agent)
@@ -37,3 +53,6 @@ This document is a logbook that records decisions, state changes, discoveries, a
 ### 2024-05-22 09:50 UTC
 - **Author**: Jules (AI Agent)
 - **Entry**: **Discovery**: Identified the need for a strict separation between Agent Core (stateless logic) and MagnetarModel (cognition state) to enable cross-platform portability.
+
+## Immutability
+Do not alter historical entries. Corrections must be appended as new entries that clarify prior records.

@@ -1,17 +1,14 @@
 # Canonical Project Model of MagnetarEidolon
 
 ## Purpose
-MagnetarEidolon is a cross-OS autonomous agent framework designed to enable portable, persistent, and intelligent agents. It is built around a clear separation between the agent's cognition state (`MagnetarModel`) and its execution logic (`Agent Core`).
-
-This repository follows the **Magnetar Canonical Project Model**, a rigorous standard for documentation, planning, and governance to ensure consistency, transparency, and AI-readiness.
+MagnetarEidolon exists to provide a canonical, reusable project governance and execution model for building Magnetar-aligned agent systems with transparent planning, traceable delivery, and cross-platform portability. This repository solves the problem of fragmented project standards by consolidating documentation, planning artifacts, and operational controls into a single, reproducible baseline. It follows the Magnetar standard for documentation, planning, and governance.
 
 ## How to Use This Repository
-
-1.  **Clone the Canonical Model**: Start by cloning this repository to your local machine.
-2.  **Initialize Project**: Copy `projects/_template.project.yml` to `projects/your-project.yml` and fill in the details.
-3.  **Consult Documentation**: Familiarize yourself with the required documentation set listed below.
-4.  **Follow Governance**: Adhere to the rules in `RULES.md`, `BRANCHING_MODEL.md`, and `WIP_GUIDELINES.md`.
-5.  **Log Progress**: Update `BITACORA.md` with every significant event or decision.
+1. Clone this canonical model repository.
+2. Copy and complete `projects/_template.project.yml` for your concrete project instance.
+3. Replicate and maintain the required documentation set in the repository root.
+4. Follow WIP, branching, and blocker handling rules from governance documents.
+5. Consult the example project artifacts to resolve process or formatting questions.
 
 ## Project Contents
 
@@ -30,14 +27,22 @@ This repository follows the **Magnetar Canonical Project Model**, a rigorous sta
 | `projects/_template.project.yml` | Machine-readable project schema. |
 
 ## Progress Model Overview
-Projects progress through defined states: `planned` -> `ready` -> `in_progress` -> `in_review` -> `done`.
-- **Planning**: Tasks are defined in `PLAN.md` and the project YAML.
-- **Execution**: Active tasks are tracked in `PLAN.md`.
-- **Logging**: Every state transition (e.g., `ready` to `in_progress`) must be recorded in `BITACORA.md`.
-- **Status**: `STATUS.md` provides a high-level snapshot for stakeholders.
+Progress is tracked through milestones and tasks that move through explicit lifecycle states:
+
+`planned -> ready -> in_progress -> in_review -> done`
+
+When blocked, a task transitions to `blocked` and is linked to an entry in `BLOCKERS.md`. Every state transition and significant decision must be recorded in `BITACORA.md`.
 
 ## YAML Project Schema
-The `projects/_template.project.yml` file contains the canonical machine-readable schema. It defines metadata, stakeholders, milestones, tasks, and risks. This file allows AI agents and tools to parse the project structure programmatically.
+The `projects/_template.project.yml` file is the canonical machine-readable schema. It captures:
+- metadata
+- stakeholders
+- milestones
+- tasks
+- risks
+- reporting hooks
+
+This schema is the authoritative bridge between human planning artifacts and automation-ready project state.
 
 ## Guidance for AI Collaborators
 AI agents working on this project must:
@@ -46,17 +51,34 @@ AI agents working on this project must:
 3.  **Respect** strict constraints in `RULES.md`, `WIP_GUIDELINES.md`, and `BRANCHING_MODEL.md`.
 4.  **Log** all actions and decisions in `BITACORA.md` immediately after completion.
 
+## Architecture Diagram (Recommended)
+```text
+[RULES + BRANCHING + WIP + BLOCKERS]
+                 |
+                 v
+              [PLAN]
+                 |
+                 v
+[REQUIREMENTS] [ARCHITECTURE] [TESTING] [STATUS]
+                 |
+                 v
+             [BITACORA]
+                 |
+                 v
+   [projects/*.project.yml machine state]
+```
+
 ## Applying This Template
-To apply this template to a new project:
-1.  Copy the entire repository structure.
-2.  Replace placeholder content in `README.md` and `projects/_template.project.yml` with project-specific details.
-3.  Establish initial milestones in `PLAN.md`.
-4.  Log the initialization in `BITACORA.md` and set the initial status in `STATUS.md`.
+1. Copy this repository structure into your new project.
+2. Replace placeholder content with project-specific details.
+3. Instantiate and validate a project YAML file in `projects/`.
+4. Define initial milestones and tasks in `PLAN.md`.
+5. Log initial baseline state in `STATUS.md` and `BITACORA.md`.
 
 ## Validating Canon Compliance
-Ensure your project adheres to the Magnetar Canon:
-- [ ] All required files (listed above) exist.
-- [ ] The project YAML matches the schema.
-- [ ] `BITACORA.md` is updated chronologically.
-- [ ] Active branches follow `BRANCHING_MODEL.md`.
-- [ ] Testing and blocker processes match `TESTING.md` and `BLOCKERS.md`.
+- [ ] All required canonical files exist.
+- [ ] Project YAML exists and matches canonical schema fields.
+- [ ] `BITACORA.md` is updated chronologically and immutably.
+- [ ] Active branches conform to `BRANCHING_MODEL.md`.
+- [ ] Testing commitments align with `TESTING.md`.
+- [ ] Blocker handling follows `BLOCKERS.md` escalation process.
