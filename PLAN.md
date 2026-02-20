@@ -7,36 +7,45 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 
 | Milestone ID | Name | Target Date | Description | Completion Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| ms-01 | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
-| ms-02 | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
-| ms-03 | Tool System & OS Integration | 2026-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
-| ms-04 | Memory & Knowledge Systems | 2026-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
-| ms-05 | Interface & Distribution | 2026-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
+| `ms-01` | Canon Bootstrap | 2026-03-05 | Establish canonical governance and planning artifacts. | All required canonical docs created and reviewed. |
+| `ms-02` | Magnetar Model Baseline | 2026-03-12 | Define MagnetarEidolon architecture and machine-readable project schema. | Architecture and project YAML align with requirements and rules. |
+| `ms-03` | Operational Readiness | 2026-03-20 | Finalize testing, blocker flow, and contribution processes. | Governance processes validated and initial progress reporting active. |
+| `ms-04` | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
+| `ms-05` | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
+| `ms-06` | Tool System & OS Integration | 2026-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
+| `ms-07` | Memory & Knowledge Systems | 2026-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
+| `ms-08` | Interface & Distribution | 2026-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
 | ms-voice-01 | Voice UI Prototype | 2024-05-22 | Create a functional prototype with UI and Voice-to-Text capabilities. | App runs; UI accepts input; Transcription works. |
 
 ## Task Backlog Table
 
-| Task ID | Milestone | Title | Owner | Effort (pts) | Weight (%) | State | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| task-101 | ms-01 | Create Canonical Documentation Files | Jules | 3 | 5% | in_progress | Creating `RULES.md`, `PLAN.md`, etc. |
-| task-102 | ms-01 | Setup Git Repository Structure | Jules | 1 | 2% | ready | Initial commit and branch setup. |
-| task-103 | ms-01 | Define Project YAML Template | Jules | 2 | 3% | planned | `projects/_template.project.yml`. |
-| task-201 | ms-02 | Define MagnetarModel Pydantic Schema | TBD | 5 | 10% | planned | Core state definition. |
-| task-202 | ms-02 | Implement Agent Loop Controller | TBD | 8 | 15% | planned | Main execution logic. |
-| task-301 | ms-03 | Implement Abstract Tool Interface | TBD | 3 | 5% | planned | Base class for tools. |
-| task-302 | ms-03 | create File System Tools | TBD | 5 | 8% | planned | Read/Write/List files. |
-| task-401 | ms-04 | Integrate LiteLLM Provider | TBD | 5 | 10% | planned | Model abstraction. |
-| task-402 | ms-04 | Setup ChromaDB for Memory | TBD | 8 | 12% | planned | Vector store integration. |
-| task-501 | ms-05 | Build CLI with Typer | TBD | 5 | 8% | planned | Command line interface. |
-| task-voice-101 | ms-voice-01 | Setup Project Structure | Jules | 3 | 5% | in_progress | Setup poetry, deps, dirs. |
-| task-voice-102 | ms-voice-01 | Implement Voice UI & Logic | Jules | 5 | 10% | planned | Gradio UI + SR Logic. |
+| Task ID | Milestone | Title | Owner | Effort (pts) | State | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `task-101` | `ms-01` | Create canonical documentation baseline | Core Team | 5 | done | Initial canonical files created. |
+| `task-102` | `ms-02` | Draft Magnetar architecture and stack mapping | Core Team | 4 | in_review | Validate against architecture and stack docs. |
+| `task-103` | `ms-02` | Build project YAML schema template | Core Team | 3 | done | `_template.project.yml` completed. |
+| `task-104` | `ms-03` | Define governance for branching and WIP | Core Team | 4 | ready | Pending team review kickoff. |
+| `task-105` | `ms-03` | Establish testing and blocker controls | Core Team | 6 | in_progress | Drafting acceptance and escalation mechanics. |
+| `task-201` | `ms-04` | Create Canonical Documentation Files | Jules | 3 | done | Creating `RULES.md`, `PLAN.md`, etc. created. |
+| `task-202` | `ms-04` | Setup Git Repository Structure | Jules | 1 | done | Initial commit and branch setup. |
+| `task-203` | `ms-04` | Define Project YAML Template | Jules | 2 | done | `projects/_template.project.yml` created. |
+| `task-301` | `ms-05` | Define MagnetarModel Pydantic Schema | Jules | 5 | done | Core state definition. `src/magnetar/core/model.py` implemented. |
+| `task-302` | `ms-05` | Implement Agent Loop Controller | Jules | 8 | done | Main execution logic. `src/magnetar/core/agent.py` implemented. |
+| `task-401` | `ms-06` | Implement Abstract Tool Interface | Jules | 3 | done | Base class for tools. `src/magnetar/tools/base.py` implemented. |
+| `task-402` | `ms-06` | Create File System Tools | Jules | 5 | done | Read/Write/List files. `src/magnetar/tools/filesystem.py` implemented. |
+| `task-501` | `ms-07` | Integrate LiteLLM Provider | Jules | 5 | done | Model abstraction. `src/magnetar/llm/provider.py` implemented. |
+| `task-502` | `ms-07` | Setup ChromaDB for Memory | Jules | 8 | done | Vector store integration. `src/magnetar/memory/chroma.py` implemented. |
+| `task-601` | `ms-08` | Build CLI with Typer | Jules | 5 | done | Command line interface. `src/magnetar/cli.py` implemented. |
+| task-voice-101 | ms-voice-01 | Setup Project Structure | Jules | 3 | in_progress | Setup poetry, deps, dirs. |
+| task-voice-102 | ms-voice-01 | Implement Voice UI & Logic | Jules | 5 | planned | Gradio UI + SR Logic. |
 
 ## Effort Summary
 
-- **Total effort**: 53 pts
-- **Completed**: 0 pts
-- **In progress**: 6 pts
-- **Remaining**: 47 pts
+- **Total effort**: 75 pts
+- **Completed**: 53 pts
+- **In progress**: 9 pts
+- **Remaining**: 13 pts
+
 
 ## State Definitions
 
