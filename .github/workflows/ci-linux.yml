@@ -6,6 +6,9 @@ on:
       - "ci/**"
       - "master"
   pull_request:
+    branches:
+      - "ci/**"
+      - "master"
 
 permissions:
   contents: read
