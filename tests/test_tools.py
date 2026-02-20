@@ -34,6 +34,29 @@ def test_shell_tool():
     assert result.success is False
     assert result.error is not None
 
+    for denied_command in ["rm -rf /", "shutdown now", "reboot"]:
+        result = shell_tool.run(command=denied_command)
+        assert result.success is False
+        assert not result.output
+        assert result.error is not None
+        assert "denied" in result.error.lower()
+
+    # Test bypass attempts
+    for bypass_command in ["sudo rm -rf /", "env rm -rf /"]:
+        result = shell_tool.run(command=bypass_command)
+        assert result.success is False
+        assert result.error is not None
+        assert "denied" in result.error.lower()
+
+
+def test_shell_tool_rejects_shell_operators_with_clear_error():
+    shell_tool = ShellCommandTool()
+
+    result = shell_tool.run(command="echo foo | grep f")
+    assert result.success is False
+    assert result.error is not None
+    assert "not supported" in result.error.lower()
+
 
 def test_system_interaction_policy_and_audit():
     logger = AuditLogger()
