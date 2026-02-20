@@ -8,11 +8,11 @@
 
 | Milestone ID | Name | Status | Target Date |
 | :--- | :--- | :--- | :--- |
-| ms-01 | Project Initialization & Governance | In Progress | 2024-05-15 |
-| ms-02 | Core Architecture Implementation | Planned | 2024-06-01 |
-| ms-03 | Tool System & OS Integration | Planned | 2024-06-15 |
-| ms-04 | Memory & Knowledge Systems | Planned | 2024-07-01 |
-| ms-05 | Interface & Distribution | Planned | 2024-07-15 |
+| ms-01 | Project Initialization & Governance | In Progress | 2026-05-15 |
+| ms-02 | Core Architecture Implementation | Planned | 2026-06-01 |
+| ms-03 | Tool System & OS Integration | Planned | 2026-06-15 |
+| ms-04 | Memory & Knowledge Systems | Planned | 2026-07-01 |
+| ms-05 | Interface & Distribution | Planned | 2026-07-15 |
 
 ## Risks and Mitigations
 

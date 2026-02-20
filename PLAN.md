@@ -7,11 +7,11 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 
 | Milestone ID | Name | Target Date | Description | Completion Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| ms-01 | Project Initialization & Governance | 2024-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
-| ms-02 | Core Architecture Implementation | 2024-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
-| ms-03 | Tool System & OS Integration | 2024-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
-| ms-04 | Memory & Knowledge Systems | 2024-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
-| ms-05 | Interface & Distribution | 2024-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
+| ms-01 | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
+| ms-02 | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
+| ms-03 | Tool System & OS Integration | 2026-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
+| ms-04 | Memory & Knowledge Systems | 2026-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
+| ms-05 | Interface & Distribution | 2026-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
 
 ## Task Backlog Table
 
