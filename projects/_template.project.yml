@@ -1,0 +1,58 @@
+metadata:
+  project_name: "MagnetarEidolon"
+  description: "Canonical Magnetar project baseline with governance, planning, and operational controls."
+  start_date: "2026-02-20"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "Governance Board"
+    role: "Policy and quality oversight"
+
+milestones:
+  - id: "ms-01"
+    name: "Canon Bootstrap"
+    target_date: "2026-03-05"
+  - id: "ms-02"
+    name: "Magnetar Model Baseline"
+    target_date: "2026-03-12"
+  - id: "ms-03"
+    name: "Operational Readiness"
+    target_date: "2026-03-20"
+
+tasks:
+  - id: "task-101"
+    title: "Create canonical documentation baseline"
+    owner: "Core Team"
+    state: "done"
+  - id: "task-102"
+    title: "Draft Magnetar architecture and stack mapping"
+    owner: "Core Team"
+    state: "in_review"
+  - id: "task-103"
+    title: "Build project YAML schema template"
+    owner: "Core Team"
+    state: "done"
+  - id: "task-104"
+    title: "Define governance for branching and WIP"
+    owner: "Core Team"
+    state: "ready"
+  - id: "task-105"
+    title: "Establish testing and blocker controls"
+    owner: "Core Team"
+    state: "in_progress"
+
+risks:
+  - id: "risk-001"
+    description: "Documentation and machine-state drift"
+    impact: "high"
+    mitigation: "Synchronize updates in PR workflow and log changes in BITACORA"
+  - id: "risk-002"
+    description: "Delayed blocker escalation"
+    impact: "medium"
+    mitigation: "Enforce 1-business-day escalation rule"
+
+reporting:
+  status_update_cadence: "daily-or-post-merge"
+  bitacora_required: true
+  blocker_escalation_sla: "1-business-day"
