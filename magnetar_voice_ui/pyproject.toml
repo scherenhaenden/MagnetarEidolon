@@ -1,0 +1,23 @@
+[project]
+name = "magnetar-voice-ui"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "google-labs-jules[bot]",email = "161369871+google-labs-jules[bot]@users.noreply.github.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gradio (>=6.6.0,<7.0.0)",
+    "speechrecognition (>=3.14.5,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)"
+]

@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+### 2024-05-22 10:30 UTC
+- **Author**: Jules (AI Agent)
+- **Entry**: **Project Creation**: Created sub-project `magnetar-voice-ui` defined in `projects/magnetar-voice-ui.project.yml`. Added `ms-voice-01` milestone and `task-voice-101`, `task-voice-102` to `PLAN.md`. Started `task-voice-101`.
+
 ### 2024-05-22 10:00 UTC
 - **Author**: Jules (AI Agent)
 - **Entry**: **Project Initialization**: Initialized the `MagnetarEidolon` repository following the Magnetar Canonical Project Model. Created `RULES.md`, `PLAN.md`, and `BITACORA.md`. Task `task-101` set to `in_progress`.

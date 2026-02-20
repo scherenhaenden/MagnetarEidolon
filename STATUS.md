@@ -13,6 +13,7 @@
 | ms-03 | Tool System & OS Integration | Planned | 2026-06-15 |
 | ms-04 | Memory & Knowledge Systems | Planned | 2026-07-01 |
 | ms-05 | Interface & Distribution | Planned | 2026-07-15 |
+| ms-voice-01 | Voice UI Prototype | In Progress | 2024-05-22 |
 
 ## Risks and Mitigations
 
@@ -22,3 +23,5 @@
     -   **Mitigation**: Design the `Agent Core` to handle multiple, simpler steps and fallback to cloud models if needed.
 3.  **Risk**: Memory management (context window limits) may impact long conversations.
     -   **Mitigation**: Implement summarization and vector-based retrieval early.
+4.  **Risk**: Audio input capture in sandbox environment.
+    -   **Mitigation**: Focus on verifying logic and UI launch; support file upload as fallback.
