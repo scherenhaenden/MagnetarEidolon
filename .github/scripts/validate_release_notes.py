@@ -19,6 +19,7 @@ REQUIRED_SECTIONS = [
 
 
 def normalize_headings(markdown: str) -> set[str]:
+    """Extract and normalize headings from a markdown string."""
     return {
         match.group(1).strip().lower()
         for match in re.finditer(r"^#{1,6}\s+(.+?)\s*$", markdown, flags=re.MULTILINE)
@@ -47,6 +48,7 @@ def validate_release_notes(markdown: str, min_chars: int) -> list[str]:
 
 
 def main() -> int:
+    """Validate the format of release notes and return the validation status."""
     parser = argparse.ArgumentParser(description="Validate detailed release notes format.")
     parser.add_argument("--file", required=True, type=Path, help="Path to release notes markdown")
     parser.add_argument("--min-chars", type=int, default=1200)
