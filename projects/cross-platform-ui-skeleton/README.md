@@ -25,6 +25,13 @@ Cross-Platform UI Skeleton exists to establish a reusable, governed baseline for
 | `BRANCHING_MODEL.md` | Governance reference for branch strategy. |
 | `WIP_GUIDELINES.md` | Governance reference for WIP limits. |
 
+
+## Current Implementation Snapshot
+- `src/magnetar/ui/platform.py`: platform detection + adapter protocol + Linux/macOS/Windows baseline adapters.
+- `src/magnetar/ui/state.py`: navigation and UI state container skeleton.
+- `src/magnetar/ui/shell.py`: shared shell orchestration with default route map and startup contract.
+- `tests/test_cross_platform_ui.py`: baseline automated tests for platform and shell behavior.
+
 ## Progress Model Overview
 Progress is tracked across milestones and task states using this lifecycle:
 `planned` → `in_progress` → `in_review` → `done`.
