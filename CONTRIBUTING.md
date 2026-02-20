@@ -6,7 +6,7 @@ This document provides guidelines for contributing to the MagnetarEidolon projec
 ## Development Environment Setup
 
 ### Prerequisites
-- Python 3.10+
+- Python 3.11+
 - Poetry (Dependency Management)
 - Git
 
