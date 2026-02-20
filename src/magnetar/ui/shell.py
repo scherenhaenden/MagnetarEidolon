@@ -27,6 +27,7 @@ class UIShell:
     window: WindowConfig
 
     def start(self) -> dict[str, object]:
+        """Initialize and return the application state summary."""
         bootstrap_summary = self.adapter.bootstrap(self.window)
         return {
             "platform": self.adapter.name.value,
@@ -36,6 +37,7 @@ class UIShell:
         }
 
     def navigate(self, route_name: str) -> str:
+        """Navigate to the specified route and return the current route."""
         self.state.navigation.navigate(route_name)
         return self.state.navigation.current_route
 
@@ -44,6 +46,7 @@ def build_default_shell(
     platform_name: PlatformName | None = None,
     window: WindowConfig | None = None,
 ) -> UIShell:
+    """Builds a default UIShell instance."""
     selected_platform = platform_name or detect_platform_name()
     adapter = adapter_for_platform(selected_platform)
     navigation = NavigationState(routes=DEFAULT_ROUTES, current_route="home")
