@@ -6,7 +6,7 @@ authors = [
     {name = "google-labs-jules[bot]",email = "161369871+google-labs-jules[bot]@users.noreply.github.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "gradio (>=6.6.0,<7.0.0)",
     "speechrecognition (>=3.14.5,<4.0.0)"
