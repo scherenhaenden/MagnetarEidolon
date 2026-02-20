@@ -90,6 +90,12 @@ jobs:
       - name: Build source and wheel distributions
         run: python -m build
 
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
       - name: Build OS-specific standalone CLI binary
         run: >-
           python -m PyInstaller
@@ -133,6 +139,12 @@ jobs:
       - name: Build source and wheel distributions
         run: python -m build
 
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
       - name: Build OS-specific standalone CLI binary
         run: >-
           python -m PyInstaller
@@ -175,6 +187,12 @@ jobs:
 
       - name: Build source and wheel distributions
         run: python -m build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Build OS-specific standalone CLI binary
         run: >-
@@ -251,15 +269,15 @@ jobs:
   publish_pypi:
     name: Publish to PyPI
     if: github.event.inputs.publish_to_pypi == 'true'
-    needs: [build_linux, github_release]
+    needs: [github_release]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
     steps:
-      - name: Download Linux artifacts (sdist + wheel)
+      - name: Download dist
         uses: actions/download-artifact@v4
         with:
-          name: release-assets-linux
+          name: dist
           path: dist
 
       - name: Publish to PyPI via trusted publishing
