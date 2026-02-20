@@ -77,6 +77,8 @@ def _map_status_to_error_type(status_code: int) -> ErrorType:
         return ErrorType.AUTHENTICATION
     if status_code == 429:
         return ErrorType.RATE_LIMIT
+    if status_code == 408:
+        return ErrorType.TIMEOUT
     if status_code in {400, 404, 422}:
         return ErrorType.VALIDATION
     if status_code in {500, 502, 503, 504}:

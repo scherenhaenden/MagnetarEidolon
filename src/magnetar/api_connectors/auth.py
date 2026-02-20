@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict
 
 
@@ -13,7 +13,7 @@ class AuthStrategy:
 
 @dataclass
 class BearerTokenAuth(AuthStrategy):
-    token: str
+    token: str = field(repr=False)
 
     def build_headers(self) -> Dict[str, str]:
         return {"Authorization": f"Bearer {self.token}"}
@@ -22,7 +22,7 @@ class BearerTokenAuth(AuthStrategy):
 @dataclass
 class ApiKeyAuth(AuthStrategy):
     key_name: str
-    key_value: str
+    key_value: str = field(repr=False)
 
     def build_headers(self) -> Dict[str, str]:
         return {self.key_name: self.key_value}
