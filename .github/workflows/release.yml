@@ -1,0 +1,187 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version without leading v (example: 0.2.0)"
+        required: true
+        type: string
+      publish_to_pypi:
+        description: "Publish package artifacts to PyPI"
+        required: true
+        default: true
+        type: boolean
+      release_notes:
+        description: "Extremely detailed release notes in markdown format"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    name: Validate release metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Persist release notes
+        run: |
+          cat > RELEASE_NOTES_VALIDATED.md <<'EOF'
+          ${{ github.event.inputs.release_notes }}
+          EOF
+
+      - name: Validate release notes structure
+        run: python .github/scripts/validate_release_notes.py --file RELEASE_NOTES_VALIDATED.md --min-chars 1200
+
+      - name: Upload validated release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: validated-release-notes
+          path: RELEASE_NOTES_VALIDATED.md
+
+  tag:
+    name: Create and push tag
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create version tag
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          TAG="v${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists; skipping creation."
+          else
+            git tag "${TAG}" "${GITHUB_SHA}"
+            git push origin "${TAG}"
+          fi
+
+  build:
+    name: Build release assets (${{ matrix.os }})
+    needs: [validate, tag]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_suffix: linux
+          - os: macos-latest
+            asset_suffix: macos
+          - os: windows-latest
+            asset_suffix: windows
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ github.event.inputs.version }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build pyinstaller rich
+          pip install .
+
+      - name: Build source and wheel distributions
+        run: python -m build
+
+      - name: Build OS-specific standalone CLI binary
+        run: >-
+          python -m PyInstaller
+          --onefile
+          --name magnetar-${{ matrix.asset_suffix }}
+          src/magnetar/cli.py
+
+      - name: Collect release assets (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p release-assets
+          cp dist/* release-assets/
+          cp dist/magnetar-${{ matrix.asset_suffix }} release-assets/
+
+      - name: Collect release assets (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-assets -Force | Out-Null
+          Copy-Item -Path dist\* -Destination release-assets -Force
+          Copy-Item -Path dist\magnetar-${{ matrix.asset_suffix }}.exe -Destination release-assets -Force
+
+      - name: Upload release asset bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ matrix.asset_suffix }}
+          path: release-assets/*
+
+  github_release:
+    name: Publish GitHub release with all assets
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-release-notes
+          path: release-notes
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-linux
+          path: release-assets/linux
+
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-macos
+          path: release-assets/macos
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-windows
+          path: release-assets/windows
+
+      - name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          body_path: release-notes/RELEASE_NOTES_VALIDATED.md
+          files: |
+            release-assets/linux/*
+            release-assets/macos/*
+            release-assets/windows/*
+
+  publish_pypi:
+    name: Publish to PyPI
+    if: github.event.inputs.publish_to_pypi == 'true'
+    needs: [build, github_release]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download Linux artifacts (sdist + wheel)
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-linux
+          path: dist
+
+      - name: Publish to PyPI via trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist

@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-02-20 12:05 UTC
+  **Author:** Codex
+  **Entry:** Decision: Implemented cross-OS CI/CD automation with GitHub Actions, including Linux/macOS/Windows test matrix, release matrix artifacts, enforced detailed release notes validation, and release runbook/template documentation.
+
 - **Timestamp:** 2026-02-20 11:20 UTC
   **Author:** Codex
   **Entry:** State Change: `task-101` moved from `in_progress` to `done` after creating canonical Magnetar project documentation baseline.
