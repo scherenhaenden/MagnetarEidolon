@@ -1,0 +1,44 @@
+metadata:
+  project_name: "Magnetar Voice UI"
+  description: "A Python-based Voice-to-Text UI application using Gradio and SpeechRecognition."
+  version: "0.1.0"
+  start_date: "2024-05-22"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/magnetar_voice_ui"
+
+stakeholders:
+  - name: "Project Lead"
+    role: "Architect & Owner"
+    contact: "lead@example.com"
+  - name: "Jules"
+    role: "Developer"
+    id: "Jules"
+
+milestones:
+  - id: "ms-voice-01"
+    name: "Voice UI Prototype"
+    target_date: "2024-05-22"
+    description: "Create a functional prototype with UI and Voice-to-Text capabilities."
+    status: "in_progress"
+
+tasks:
+  - id: "task-voice-101"
+    milestone_id: "ms-voice-01"
+    title: "Setup Project Structure"
+    owner: "Jules"
+    status: "in_progress"
+  - id: "task-voice-102"
+    milestone_id: "ms-voice-01"
+    title: "Implement Voice UI & Logic"
+    owner: "Jules"
+    status: "planned"
+
+risks:
+  - id: "risk-voice-001"
+    description: "Audio input might not work in sandbox environment."
+    probability: "High"
+    impact: "Medium"
+    mitigation: "Focus on verifying UI launch and logic with file input."
+
+reporting:
+  frequency: "On Completion"
+  format: "Markdown via STATUS.md"

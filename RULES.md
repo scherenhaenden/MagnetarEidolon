@@ -16,7 +16,7 @@ This document establishes the fundamental rules and workflow standards for the M
 - **File Names**: Must mirror those in the canonical repository.
 
 ## Required Files
-Every Magnetar project must include the following files. Any omission requires an explicit exemption logged in `BITACORA.md`.
+Every Magnetar project must include:
 - `README.md`
 - `PLAN.md`
 - `BITACORA.md`
@@ -30,6 +30,8 @@ Every Magnetar project must include the following files. Any omission requires a
 - `WIP_GUIDELINES.md`
 - `CONTRIBUTING.md`
 - `projects/_template.project.yml`
+
+Any omission requires an explicit exemption logged in `BITACORA.md`.
 
 ## Branching Conventions
 - **master**: Immutable release line. Merges require successful CI and documentation updates.
