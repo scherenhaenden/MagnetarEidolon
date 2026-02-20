@@ -46,6 +46,16 @@ This document describes the Git branching strategy used in the MagnetarEidolon p
 - **Naming**: `experiment/<short-description>`
 - **Lifecycle**: For exploratory work that may or may not be merged.
 
+## Conflict Avoidance Strategy
+To prevent merge conflicts in high-traffic documentation files (e.g., `PLAN.md`, `BITACORA.md`, `STATUS.md`), we use a directory-based strategy for branch documentation.
+
+1.  **Branch Directory**: For every active branch (e.g., `feature/new-ui`), create a corresponding directory in `branches/` (e.g., `branches/feature-new-ui/`).
+2.  **Documentation**: All updates to the project state, plan, or logbook relevant to the branch must be written in files within this directory (e.g., `branches/feature-new-ui/CHANGES.md`).
+    - **Do not** edit the root `PLAN.md` or `BITACORA.md` directly in your branch unless necessary.
+3.  **Consolidation**: Before merging to `master` (or `develop`), you must manually transfer the content from your branch's documentation files into the main root files.
+    - This ensures a clean, conflict-free history in the main logs.
+    - Updates to root files are finalized on `master` or during the merge process.
+
 ## Workflow & Merge Rules
 1.  **Start**: Create a branch from `master` (or `develop`).
 2.  **Work**: Commit changes frequently with clear messages.
