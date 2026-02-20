@@ -27,11 +27,13 @@ class SkillsAdministrationModule:
     _skills: Dict[str, SkillDefinition] = field(default_factory=dict)
 
     def register_skill(self, skill: SkillDefinition) -> None:
+        """Register a new skill if it is not already registered."""
         if skill.name in self._skills:
             raise ValueError(f"Skill '{skill.name}' is already registered. Use update_skill to modify existing skills.")
         self._skills[skill.name] = skill
 
     def update_skill(self, skill: SkillDefinition) -> None:
+        """Updates the specified skill in the skills dictionary."""
         if skill.name not in self._skills:
             raise ValueError(f"Skill '{skill.name}' is not registered. Use register_skill to add new skills.")
         self._skills[skill.name] = skill
