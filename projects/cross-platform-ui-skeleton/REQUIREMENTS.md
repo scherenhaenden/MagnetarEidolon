@@ -3,7 +3,10 @@
 ## Functional Requirements
 - **Must-Have:** Provide a clearly defined module boundary and interfaces for core responsibilities.
 - **Must-Have:** Support the tasks described in `PLAN.md` and YAML configuration.
+- **Must-Have:** Include an OS adapter protocol and baseline Linux/macOS/Windows adapter implementations.
+- **Must-Have:** Include a deterministic navigation and UI state container skeleton.
 - **Should-Have:** Include reference examples for common workflows within the module.
+- **Should-Have:** Include baseline automated tests for route and adapter behavior.
 - **Could-Have:** Include optional developer tooling for faster local validation.
 - **Won't-Have:** Production-grade feature completeness in this skeleton phase.
 
