@@ -9,12 +9,14 @@ IDEA_DIR = PROJECT_ROOT / ".idea"
 MODULES_XML = IDEA_DIR / "modules.xml"
 
 def get_project_name_from_file(filepath):
+    """Extracts the project name from a given file path."""
     filename = os.path.basename(filepath)
     name, _ = os.path.splitext(filename) # remove .yml
     name, _ = os.path.splitext(name) # remove .project
     return name
 
 def normalize_name(name):
+    """Replace hyphens with underscores in the given name."""
     return name.replace("-", "_")
 
 def generate_iml_content(module_name):
@@ -30,6 +32,15 @@ def generate_iml_content(module_name):
 </module>"""
 
 def update_modules_xml(new_modules):
+    """Update the modules in the XML configuration.
+    
+    This function parses the MODULES_XML file and updates the list of modules
+    based on the provided new_modules. It checks for the existence of the
+    ProjectModuleManager component and the modules list, creating them if
+    necessary. Existing modules are tracked to prevent duplicates when adding  new
+    entries. Finally, the updated XML tree is written back to the  MODULES_XML file
+    with proper formatting.
+    """
     tree = ET.parse(MODULES_XML)
     root = tree.getroot()
     modules_component = root.find("component[@name='ProjectModuleManager']")
@@ -62,6 +73,14 @@ def update_modules_xml(new_modules):
     tree.write(MODULES_XML, encoding="UTF-8", xml_declaration=True)
 
 def main():
+    """Scan project directories and create .iml files for each project.
+    
+    This function scans for project files in the specified PROJECTS_DIR,  processes
+    each project file that is not a template, and creates a  corresponding
+    directory and .iml file if they do not already exist.  It also updates the
+    modules.xml file with the newly created modules  if any are found during the
+    scanning process.
+    """
     print(f"Scanning projects in {PROJECTS_DIR}...")
     project_files = glob.glob(str(PROJECTS_DIR / "*.project.yml"))
     new_modules = []
