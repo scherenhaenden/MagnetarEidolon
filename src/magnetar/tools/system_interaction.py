@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Callable, Dict, List, Mapping, Optional, Sequence
 import shlex
 import subprocess
 
@@ -89,22 +89,18 @@ class AuditLogger:
         return list(self._events)
 
 
-class CommandExecutor(ABC):
-    @abstractmethod
-    def run(self, command: str, timeout_s: int = 60) -> subprocess.CompletedProcess[str]:
-        raise NotImplementedError
+CommandRunner = Callable[[str, int], subprocess.CompletedProcess[str]]
 
 
-class SubprocessCommandExecutor(CommandExecutor):
-    def run(self, command: str, timeout_s: int = 60) -> subprocess.CompletedProcess[str]:
-        args = shlex.split(command)
-        return subprocess.run(args, capture_output=True, text=True, timeout=timeout_s, check=False)
+def subprocess_command_runner(
+    command: str, timeout_s: int = 60
+) -> subprocess.CompletedProcess[str]:
+    args = shlex.split(command)
+    return subprocess.run(args, capture_output=True, text=True, timeout=timeout_s, check=False)
 
 
 class DesktopAppConnector(ABC):
     """Abstract contract for connectors to desktop apps (Slack/Teams/Telegram/etc)."""
-
-    app_name: str
 
     @abstractmethod
     def send_message(self, channel: str, message: str) -> str:
@@ -114,13 +110,12 @@ class DesktopAppConnector(ABC):
 class StubDesktopConnector(DesktopAppConnector):
     """Test connector used until concrete provider adapters are added."""
 
-    def __init__(self, app_name: str) -> None:
-        self.app_name = app_name
+    def __init__(self) -> None:
         self.sent_messages: List[Dict[str, str]] = []
 
     def send_message(self, channel: str, message: str) -> str:
         self.sent_messages.append({"channel": channel, "message": message})
-        return f"queued:{self.app_name}:{channel}"
+        return f"queued:stub:{channel}"
 
 
 class SystemInteractionModule:
@@ -130,45 +125,52 @@ class SystemInteractionModule:
         self,
         policy: PermissionPolicy,
         audit_logger: AuditLogger,
-        command_executor: Optional[CommandExecutor] = None,
-        desktop_connectors: Optional[Sequence[DesktopAppConnector]] = None,
+        command_runner: Optional[CommandRunner] = None,
+        desktop_connectors: Optional[Mapping[str, DesktopAppConnector]] = None,
     ) -> None:
         self.policy = policy
         self.audit = audit_logger
-        self.command_executor = command_executor or SubprocessCommandExecutor()
-        connectors = desktop_connectors or []
-        self.desktop_connectors = {c.app_name.lower(): c for c in connectors}
+        self.command_runner = command_runner or subprocess_command_runner
+        self.desktop_connectors = {k.lower(): v for k, v in (desktop_connectors or {}).items()}
 
     def run_command(self, command: str, timeout_s: int = 60) -> subprocess.CompletedProcess[str] | None:
         decision = self.policy.evaluate_command(command)
-        self._audit(action="command", target=command, allowed=decision.allowed, reason=decision.reason)
+        self.audit.record(
+            AuditEvent(
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                action="command",
+                target=command,
+                allowed=decision.allowed,
+                reason=decision.reason,
+            )
+        )
         if not decision.allowed:
             return None
-        return self.command_executor.run(command=command, timeout_s=timeout_s)
+        return self.command_runner(command, timeout_s)
 
     def send_desktop_message(self, app_name: str, channel: str, message: str) -> Optional[str]:
         decision = self.policy.evaluate_desktop_action(app_name)
-        self._audit(action="desktop_message", target=app_name, allowed=decision.allowed, reason=decision.reason)
+        self.audit.record(
+            AuditEvent(
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                action="desktop_message",
+                target=app_name,
+                allowed=decision.allowed,
+                reason=decision.reason,
+            )
+        )
         if not decision.allowed:
             return None
         connector = self.desktop_connectors.get(app_name.lower())
         if connector is None:
-            self._audit(
-                action="desktop_message",
-                target=app_name,
-                allowed=False,
-                reason="No connector registered for app",
+            self.audit.record(
+                AuditEvent(
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                    action="desktop_message",
+                    target=app_name,
+                    allowed=False,
+                    reason="No connector registered for app",
+                )
             )
             return None
         return connector.send_message(channel=channel, message=message)
-
-    def _audit(self, action: str, target: str, allowed: bool, reason: str) -> None:
-        self.audit.record(
-            AuditEvent(
-                timestamp=datetime.now(timezone.utc).isoformat(),
-                action=action,
-                target=target,
-                allowed=allowed,
-                reason=reason,
-            )
-        )
