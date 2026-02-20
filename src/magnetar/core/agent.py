@@ -23,15 +23,15 @@ class MagnetarAgent:
         self.llm = llm_provider
 
     def run(self, max_steps: int = 10):
-        """Run the agent loop for a maximum number of steps."""
+        """Run the agent loop for a specified maximum number of steps."""
         step = 0
         while step < max_steps and self.state.goal.status not in ["completed", "failed"]:
             self.step()
             step += 1
 
     def step(self):
-        """Execute one cycle of Observe -> Think -> Act -> Reflect."""
         # 1. Observe: Update environment snapshot
+        """Execute one cycle of Observe, Think, Act, and Reflect."""
         self._observe()
 
         # 2. Think: Decide next action based on state
@@ -45,7 +45,7 @@ class MagnetarAgent:
         self._reflect()
 
     def _observe(self):
-        """Update environment state."""
+        """Update the environment state."""
         self.state.environment = EnvironmentSnapshot(
             os=sys.platform,
             current_directory=os.getcwd(),
@@ -81,7 +81,15 @@ class MagnetarAgent:
         return None
 
     def _act(self, action: Dict[str, Any]):
-        """Execute the decided action."""
+        """Execute the decided action.
+        
+        This function processes an action based on its type, which can either be  a
+        "tool" or "finish". If the action type is "tool", it checks if the  specified
+        tool exists, executes it with the provided arguments, and  records the call
+        along with its result in the tool history. If the tool  is not found, an error
+        message is recorded. For the "finish" action,  it updates the goal status to
+        "completed" and logs a completion message  in the short-term memory.
+        """
         if action["type"] == "tool":
             tool_name = action["name"]
             if tool_name in self.tools:
@@ -116,8 +124,8 @@ class MagnetarAgent:
             ))
 
     def _reflect(self):
-        """Summarize or persist memory."""
         # Simplified: just persist the last memory item to Chroma
+        """Persist the last memory item to Chroma if available."""
         if self.state.short_term_memory:
             last_mem = self.state.short_term_memory[-1]
             self.memory_store.add_memory(last_mem.content, metadata={"timestamp": str(last_mem.timestamp)})
