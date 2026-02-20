@@ -116,3 +116,7 @@ With this setup, imports such as `magnetar.*` resolve correctly in editor inspec
 - [ ] Active branches conform to `BRANCHING_MODEL.md`.
 - [ ] Testing commitments align with `TESTING.md`.
 - [ ] Blocker handling follows `BLOCKERS.md` escalation process.
+
+
+## License
+This project is licensed under the MIT License. See `LICENSE` for full terms.
