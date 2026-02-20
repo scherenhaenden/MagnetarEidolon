@@ -24,6 +24,19 @@ class ApiHttpClient:
         self._client = httpx.Client(base_url=self.base_url, timeout=self.timeout, transport=transport)
 
     def post_json(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Sends a JSON payload to the specified path.
+        
+        This method constructs a POST request with the provided JSON payload  and
+        appropriate headers. If authentication is required, it builds  the necessary
+        headers using the `self.auth` object. The function  handles various exceptions
+        that may arise during the request,  including validation errors, timeouts, HTTP
+        status errors, and  request errors, raising a `ConnectorTransportException`
+        with  relevant error details.
+        
+        Args:
+            path (str): The endpoint to which the JSON payload is sent.
+            payload (Dict[str, Any]): The JSON data to be sent in the request.
+        """
         headers = {"Content-Type": "application/json"}
         if self.auth:
             headers.update(self.auth.build_headers())
@@ -57,6 +70,7 @@ class ApiHttpClient:
             ) from exc
 
     def close(self) -> None:
+        """Close the client connection."""
         self._client.close()
 
     def __enter__(self):
@@ -73,6 +87,14 @@ class ConnectorTransportException(RuntimeError):
 
 
 def _map_status_to_error_type(status_code: int) -> ErrorType:
+    """Maps HTTP status codes to corresponding error types.
+    
+    This function takes an HTTP status code as input and returns the  associated
+    ErrorType. It categorizes the status codes into  authentication errors, rate
+    limits, timeouts, validation errors,  provider errors, and unknown errors based
+    on predefined mappings.  The function utilizes a series of conditional checks
+    to determine  the appropriate error type for the given status code.
+    """
     if status_code in {401, 403}:
         return ErrorType.AUTHENTICATION
     if status_code == 429:

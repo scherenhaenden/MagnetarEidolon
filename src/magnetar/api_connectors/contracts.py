@@ -51,4 +51,5 @@ class GenerationResponse(BaseModel):
 
     @property
     def ok(self) -> bool:
+        """Indicates if there is no error."""
         return self.error is None
