@@ -1,0 +1,47 @@
+metadata:
+  project_name: "API Connectors Module Skeleton"
+  description: "Skeleton definition for connecting to cloud APIs and local model APIs."
+  version: "0.1.0"
+  start_date: "2026-02-20"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/projects"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "Integrations Team"
+    role: "API & Model Integration"
+
+milestones:
+  - id: "ms-api-01"
+    name: "API Connectors Skeleton Baseline"
+    target_date: "2026-03-07"
+    description: "Define a provider-agnostic API connector layer for remote and local models."
+    status: "planned"
+
+tasks:
+  - id: "task-api-101"
+    milestone_id: "ms-api-01"
+    title: "Define HTTP client and auth abstraction"
+    owner: "Integrations Team"
+    status: "planned"
+  - id: "task-api-102"
+    milestone_id: "ms-api-01"
+    title: "Define local model API adapters (e.g., Ollama/OpenAI-compatible local servers)"
+    owner: "Integrations Team"
+    status: "planned"
+  - id: "task-api-103"
+    milestone_id: "ms-api-01"
+    title: "Define unified response and error contract"
+    owner: "Integrations Team"
+    status: "planned"
+
+risks:
+  - id: "risk-api-001"
+    description: "API surface differences across providers can fragment integration logic."
+    probability: "High"
+    impact: "Medium"
+    mitigation: "Standardize a common adapter contract with provider-specific translation layers."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"

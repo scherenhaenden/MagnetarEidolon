@@ -1,0 +1,47 @@
+metadata:
+  project_name: "Cross-Platform UI Skeleton"
+  description: "Skeleton definition for a desktop UI that runs on Linux, macOS, and Windows."
+  version: "0.1.0"
+  start_date: "2026-02-20"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/projects"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "UI Team"
+    role: "Frontend & UX"
+
+milestones:
+  - id: "ms-ui-01"
+    name: "UI Skeleton Baseline"
+    target_date: "2026-03-01"
+    description: "Define the cross-platform UI module structure and interfaces."
+    status: "planned"
+
+tasks:
+  - id: "task-ui-101"
+    milestone_id: "ms-ui-01"
+    title: "Define shared UI shell for Linux/macOS/Windows"
+    owner: "UI Team"
+    status: "planned"
+  - id: "task-ui-102"
+    milestone_id: "ms-ui-01"
+    title: "Define platform-specific adapter interfaces"
+    owner: "UI Team"
+    status: "planned"
+  - id: "task-ui-103"
+    milestone_id: "ms-ui-01"
+    title: "Define navigation and state container skeleton"
+    owner: "UI Team"
+    status: "planned"
+
+risks:
+  - id: "risk-ui-001"
+    description: "Cross-OS windowing differences may affect parity."
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Use a shared core and isolate per-OS adapters behind interfaces."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"
