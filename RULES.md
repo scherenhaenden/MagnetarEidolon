@@ -38,6 +38,7 @@ Any omission requires an explicit exemption logged in `BITACORA.md`.
 - **develop** (optional): Aggregates completed features before stabilization.
 - **feature branches**: Originate from `master` or `develop` and must be rebased before merging.
 - **hotfix branches**: Start from `master` and must trigger a `STATUS.md` update upon completion.
+- **Conflict Avoidance**: Every branch must have a corresponding directory in `branches/` containing its documentation changes. Direct edits to root logs are prohibited until merge.
 - Each Pull Request must reference the tasks it affects and include `BITACORA.md` entries.
 
 ## Allowed Task States

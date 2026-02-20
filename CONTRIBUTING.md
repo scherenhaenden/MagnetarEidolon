@@ -42,8 +42,11 @@ pre-commit install
 1.  **Review Governance**: Before starting, review `RULES.md`, `PLAN.md`, and `WIP_GUIDELINES.md`.
 2.  **Setup**: Follow the "Development Environment Setup" instructions above. Instantiate or update the project YAML in `projects/` for your workstream.
 3.  **Branch**: Create a branch from `master` using the naming conventions defined in `BRANCHING_MODEL.md`.
+    - **Immediately create a directory** in `branches/` corresponding to your branch name (e.g., `branches/feature-my-feature/`).
 4.  **Work**: Implement your feature or fix. Link your work to the corresponding task IDs in `PLAN.md`.
-5.  **Documentation**: Update all relevant documentation. Record state changes, decisions, and discoveries in `BITACORA.md`.
+5.  **Documentation**: Record state changes, decisions, and discoveries in a `CHANGES.md` file within your branch directory (e.g., `branches/feature-my-feature/CHANGES.md`).
+    - **Do not edit root documentation files directly** to avoid merge conflicts.
+    - Consolidate these changes into the main `BITACORA.md` and `PLAN.md` just before merging.
 6.  **Testing**: Run all validation checks and ensure tests pass locally.
 7.  **Pull Request**: Open a Pull Request against `master`.
 
