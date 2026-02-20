@@ -1,5 +1,13 @@
 # Canonical Project Model of MagnetarEidolon
 
+[![CI (Linux)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml)
+[![CI (macOS)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml)
+[![CI (Windows)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml)
+[![Release](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml)
+[![PyPI](https://img.shields.io/pypi/v/magnetar.svg)](https://pypi.org/project/magnetar/)
+[![Python Versions](https://img.shields.io/pypi/pyversions/magnetar.svg)](https://pypi.org/project/magnetar/)
+[![License](https://img.shields.io/github/license/scherenhaenden/MagnetarEidolon)](https://github.com/scherenhaenden/MagnetarEidolon/blob/master/LICENSE)
+
 ## Purpose
 MagnetarEidolon exists to provide a canonical, reusable project governance and execution model for building Magnetar-aligned agent systems with transparent planning, traceable delivery, and cross-platform portability. This repository solves the problem of fragmented project standards by consolidating documentation, planning artifacts, and operational controls into a single, reproducible baseline. It follows the Magnetar standard for documentation, planning, and governance.
 
