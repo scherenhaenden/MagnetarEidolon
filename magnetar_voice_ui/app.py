@@ -9,7 +9,7 @@ sys.path.append(current_dir)
 from core import transcribe_audio
 
 def process_audio(audio_path):
-    """Wrapper for the core transcription logic."""
+    """Processes the audio file for transcription."""
     if audio_path is None:
         return "Please provide audio."
     return transcribe_audio(audio_path)
