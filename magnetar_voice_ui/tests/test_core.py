@@ -39,6 +39,7 @@ class TestTranscribeAudio(unittest.TestCase):
 
     @patch('os.path.exists')
     def test_file_not_found(self, mock_exists):
+        """Test handling of a nonexistent audio file."""
         mock_exists.return_value = False
         result = transcribe_audio("nonexistent.wav")
         self.assertIn("Error: Audio file not found", result)
