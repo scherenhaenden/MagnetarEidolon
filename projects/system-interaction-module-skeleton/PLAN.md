@@ -7,23 +7,24 @@ This plan captures milestones, tasks, estimates, and status for System Interacti
 
 | Milestone ID | Name | Target Date | Description | Completion Criteria |
 | :--- | :--- | :--- | :--- | :--- |
-| `ms-sys-01` | System Interaction Skeleton Baseline | 2026-03-05 | Define adapters and safety boundaries for controlling local software and shell tools. | Milestone tasks transitioned to `done` with passing documentation and baseline tests. |
+| `ms-sys-01` | System Interaction Skeleton Baseline | 2026-03-05 | Define adapters and safety boundaries for controlling local software and shell tools. | Core interfaces, permission policy, audit hooks, and threat model are implemented and covered by tests. |
 
 
 ## Task Backlog Table
 
 | Task ID | Milestone | Title | Owner | Effort (pts) | Weight (%) | State | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `task-sys-101` | `ms-sys-01` | Define desktop application connector interfaces (e.g., messaging apps) | Automation Team | 5 | 38 | in_progress | Initial interface package and safety notes drafted. |
-| `task-sys-102` | `ms-sys-01` | Define console command execution skeleton | Automation Team | 3 | 23 | ready | Execution contract drafted for review. |
-| `task-sys-103` | `ms-sys-01` | Define permission and auditing hooks | Automation Team | 3 | 23 | planned | Depends on reviewed execution contract. |
-| `task-sys-104` | `ms-sys-01` | Author threat model for local automation scope | Automation Team | 2 | 15 | planned | Initial risk workshop scheduled. |
+| `task-sys-101` | `ms-sys-01` | Define desktop application connector interfaces (e.g., messaging apps) | Automation Team | 5 | 38 | in_review | Added `DesktopAppConnector` interface and `StubDesktopConnector` reference implementation. |
+| `task-sys-102` | `ms-sys-01` | Define console command execution skeleton | Automation Team | 3 | 23 | in_review | Added `SystemInteractionModule` command execution path backed by `SubprocessCommandExecutor`. |
+| `task-sys-103` | `ms-sys-01` | Define permission and auditing hooks | Automation Team | 3 | 23 | in_review | Added `PermissionPolicy`, `PermissionDecision`, `AuditLogger`, and `AuditEvent`. |
+| `task-sys-104` | `ms-sys-01` | Author threat model for local automation scope | Automation Team | 2 | 15 | in_review | Threat model and guardrails documented in `ARCHITECTURE.md` and `REQUIREMENTS.md`. |
 
 ## Effort Summary
 - **Total effort:** 13 pts
 - **Completed:** 0 pts
-- **In progress:** 5 pts
-- **Remaining:** 8 pts
+- **In progress:** 0 pts
+- **In review:** 13 pts
+- **Remaining:** 0 pts
 
 ## State Definitions
 - **planned**: Task identified but not yet prioritized.
