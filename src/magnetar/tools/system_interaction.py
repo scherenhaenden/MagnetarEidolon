@@ -43,6 +43,12 @@ class PermissionPolicy:
         if not command:
             return PermissionDecision(False, "Empty command is not allowed")
 
+        if any(token in command for token in ("|", "&&", "||", ";", "$(", "`", ">", "<")):
+            return PermissionDecision(
+                False,
+                "Shell operators are not supported; provide a single executable with plain arguments",
+            )
+
         first_token = shlex.split(command)[0].lower()
         if first_token in self.denied_commands:
             return PermissionDecision(False, f"Command '{first_token}' explicitly denied")
