@@ -27,6 +27,7 @@ def test_detect_platform_name(raw, expected):
     [PlatformName.LINUX, PlatformName.MACOS, PlatformName.WINDOWS],
 )
 def test_adapter_resolution(platform_name):
+    """Test the adapter resolution for different platforms."""
     adapter = adapter_for_platform(platform_name)
     assert adapter.name == platform_name
     assert "notifications" in adapter.capabilities()
@@ -53,5 +54,6 @@ def test_default_shell_bootstrap_and_navigation():
 
 
 def test_unknown_platform_has_no_adapter():
+    """Test that a ValueError is raised for an unknown platform."""
     with pytest.raises(ValueError):
         adapter_for_platform(PlatformName.UNKNOWN)

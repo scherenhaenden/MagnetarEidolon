@@ -5,6 +5,7 @@ import pytest
 
 
 def test_file_tools(tmp_path):
+    """Test file writing, reading, and directory listing tools."""
     file_path = tmp_path / "test.txt"
     content = "Hello Magnetar"
 
@@ -25,6 +26,7 @@ def test_file_tools(tmp_path):
 
 
 def test_shell_tool():
+    """Test the ShellCommandTool for various command executions."""
     shell_tool = ShellCommandTool()
 
     result = shell_tool.run(command="echo 'Hello Shell'")
@@ -75,6 +77,7 @@ def test_shell_tool_rejects_shell_operators_with_clear_error(command: str) -> No
 
 
 def test_system_interaction_policy_and_audit():
+    """Test the system interaction policy and audit logging."""
     logger = AuditLogger()
     module = SystemInteractionModule(
         policy=PermissionPolicy(allowed_commands=["echo"], denied_commands=["rm"]),
@@ -95,6 +98,7 @@ def test_system_interaction_policy_and_audit():
 
 
 def test_system_interaction_desktop_connector():
+    """Test the interaction of the system with the desktop connector."""
     logger = AuditLogger()
     connector = StubDesktopConnector()
     module = SystemInteractionModule(
