@@ -66,20 +66,11 @@ jobs:
             git push origin "${TAG}"
           fi
 
-  build:
-    name: Build release assets (${{ matrix.os }})
+  build_linux:
+    name: Build release assets (linux)
     needs: [validate, tag]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            asset_suffix: linux
-          - os: macos-latest
-            asset_suffix: macos
-          - os: windows-latest
-            asset_suffix: windows
+    runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -104,33 +95,116 @@ jobs:
         run: >-
           python -m PyInstaller
           --onefile
-          --name magnetar-${{ matrix.asset_suffix }}
+          --name magnetar-linux
           src/magnetar/cli.py
 
-      - name: Collect release assets (Unix)
-        if: runner.os != 'Windows'
+      - name: Collect release assets
         run: |
           mkdir -p release-assets
           cp dist/* release-assets/
-          cp dist/magnetar-${{ matrix.asset_suffix }} release-assets/
-
-      - name: Collect release assets (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Path release-assets -Force | Out-Null
-          Copy-Item -Path dist\* -Destination release-assets -Force
-          Copy-Item -Path dist\magnetar-${{ matrix.asset_suffix }}.exe -Destination release-assets -Force
+          cp dist/magnetar-linux release-assets/
 
       - name: Upload release asset bundle
         uses: actions/upload-artifact@v4
         with:
-          name: release-assets-${{ matrix.asset_suffix }}
+          name: release-assets-linux
+          path: release-assets/*
+
+  build_macos:
+    name: Build release assets (macos)
+    needs: [validate, tag]
+    runs-on: macos-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ github.event.inputs.version }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build pyinstaller rich
+          pip install .
+
+      - name: Build source and wheel distributions
+        run: python -m build
+
+      - name: Build OS-specific standalone CLI binary
+        run: >-
+          python -m PyInstaller
+          --onefile
+          --name magnetar-macos
+          src/magnetar/cli.py
+
+      - name: Collect release assets
+        run: |
+          mkdir -p release-assets
+          cp dist/* release-assets/
+          cp dist/magnetar-macos release-assets/
+
+      - name: Upload release asset bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-macos
+          path: release-assets/*
+
+  build_windows:
+    name: Build release assets (windows)
+    needs: [validate, tag]
+    runs-on: windows-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: v${{ github.event.inputs.version }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build pyinstaller rich
+          pip install .
+
+      - name: Build source and wheel distributions
+        run: python -m build
+
+      - name: Build OS-specific standalone CLI binary
+        run: >-
+          python -m PyInstaller
+          --onefile
+          --name magnetar-windows
+          src/magnetar/cli.py
+
+      - name: Collect release assets
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-assets -Force | Out-Null
+          Copy-Item -Path dist\* -Destination release-assets -Force
+          Copy-Item -Path dist\magnetar-windows.exe -Destination release-assets -Force
+
+      - name: Upload release asset bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-windows
           path: release-assets/*
 
   github_release:
-    name: Publish GitHub release with all assets
-    needs: build
+    name: Publish GitHub release with available assets
+    if: >-
+      always() &&
+      (needs.build_linux.result == 'success' || needs.build_macos.result == 'success' || needs.build_windows.result == 'success')
+    needs: [validate, build_linux, build_macos, build_windows]
     runs-on: ubuntu-latest
     steps:
       - name: Download release notes
@@ -140,22 +214,32 @@ jobs:
           path: release-notes
 
       - name: Download Linux artifacts
+        if: needs.build_linux.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: release-assets-linux
           path: release-assets/linux
 
       - name: Download macOS artifacts
+        if: needs.build_macos.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: release-assets-macos
           path: release-assets/macos
 
       - name: Download Windows artifacts
+        if: needs.build_windows.result == 'success'
         uses: actions/download-artifact@v4
         with:
           name: release-assets-windows
           path: release-assets/windows
+
+      - name: Ensure at least one release artifact exists
+        run: |
+          if ! find release-assets -type f | grep -q .; then
+            echo "No release artifacts were produced by any platform build job."
+            exit 1
+          fi
 
       - name: Create GitHub release and upload assets
         uses: softprops/action-gh-release@v2
@@ -170,7 +254,7 @@ jobs:
   publish_pypi:
     name: Publish to PyPI
     if: github.event.inputs.publish_to_pypi == 'true'
-    needs: [build, github_release]
+    needs: [build_linux, github_release]
     runs-on: ubuntu-latest
     permissions:
       id-token: write

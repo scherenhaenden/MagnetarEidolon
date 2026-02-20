@@ -14,16 +14,17 @@ This plan captures milestones, tasks, estimates, and status for API Connectors M
 
 | Task ID | Milestone | Title | Owner | Effort (pts) | Weight (%) | State | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `task-api-101` | `ms-api-01` | Define HTTP client and auth abstraction | Integrations Team | 5 | 38 | in_progress | Started interface draft in this project scaffold. |
-| `task-api-102` | `ms-api-01` | Define local model API adapters (e.g., Ollama/OpenAI-compatible local servers) | Integrations Team | 3 | 23 | ready | Depends on contract from task-api-101. |
-| `task-api-103` | `ms-api-01` | Define unified response and error contract | Integrations Team | 3 | 23 | planned | Will normalize provider-specific response payloads. |
-| `task-api-104` | `ms-api-01` | Set up connector module test harness | Integrations Team | 2 | 15 | planned | Initial smoke tests for provider mocks. |
+| `task-api-101` | `ms-api-01` | Define HTTP client and auth abstraction | Integrations Team | 5 | 38 | in_review | Implemented `ApiHttpClient` with `AuthStrategy` support and normalized transport errors. |
+| `task-api-102` | `ms-api-01` | Define local model API adapters (e.g., Ollama/OpenAI-compatible local servers) | Integrations Team | 3 | 23 | in_review | Added `OpenAICompatibleAdapter` and `OllamaAdapter` with canonical request/response conversion. |
+| `task-api-103` | `ms-api-01` | Define unified response and error contract | Integrations Team | 3 | 23 | in_review | Added `GenerationRequest`, `GenerationResponse`, and `ConnectorError` contracts. |
+| `task-api-104` | `ms-api-01` | Set up connector module test harness | Integrations Team | 2 | 15 | in_review | Added mocked connector tests in `tests/test_api_connectors.py`. |
 
 ## Effort Summary
 - **Total effort:** 13 pts
-- **Completed:** 0 pts
-- **In progress:** 5 pts
-- **Remaining:** 8 pts
+- **Completed (`done`):** 0 pts
+- **In review:** 13 pts
+- **In progress:** 0 pts
+- **Remaining to done:** 13 pts
 
 ## State Definitions
 - **planned**: Task identified but not yet prioritized.
