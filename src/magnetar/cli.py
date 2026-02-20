@@ -17,9 +17,9 @@ app = typer.Typer()
 console = Console()
 
 def load_or_create_agent(goal_desc: str) -> MagnetarAgent:
-    """Initialize the agent with dependencies."""
 
     # State
+    """Initialize and return a MagnetarAgent with the specified goal description."""
     goal = Goal(id=str(uuid.uuid4()), description=goal_desc)
     state = MagnetarEidolon(
         agent_id="local-agent",
@@ -55,7 +55,7 @@ def init():
 
 @app.command()
 def run(goal: str = typer.Option(..., prompt="What is the goal?"), max_steps: int = 10):
-    """Run the agent with a specific goal."""
+    """Run the agent with a specified goal and maximum steps."""
     console.print(f"[bold blue]Starting agent with goal:[/bold blue] {goal}")
 
     agent = load_or_create_agent(goal)
