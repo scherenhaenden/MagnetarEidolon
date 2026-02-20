@@ -1,0 +1,27 @@
+metadata:
+  project_name: "Cross-Platform UI Skeleton"
+  description: "Describe the module mission and target outcomes."
+  start_date: "2026-02-20"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainer"
+
+milestones:
+  - id: "ms-ui-01"
+    name: "UI Skeleton Baseline"
+    target_date: "2026-03-01"
+
+tasks:
+  - id: "task-ui-101"
+    title: "Define shared UI shell for Linux/macOS/Windows"
+    owner: "UI Team"
+    status: "planned"
+
+risks:
+  - id: "risk-001"
+    description: "Describe a key risk for this project."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"
