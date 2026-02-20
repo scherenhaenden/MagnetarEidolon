@@ -1,0 +1,47 @@
+metadata:
+  project_name: "System Interaction Module Skeleton"
+  description: "Skeleton definition for a module that interacts with desktop apps, console, and local system capabilities."
+  version: "0.1.0"
+  start_date: "2026-02-20"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/projects"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "Automation Team"
+    role: "System Integration"
+
+milestones:
+  - id: "ms-sys-01"
+    name: "System Interaction Skeleton Baseline"
+    target_date: "2026-03-05"
+    description: "Define adapters and safety boundaries for controlling local software and shell tools."
+    status: "planned"
+
+tasks:
+  - id: "task-sys-101"
+    milestone_id: "ms-sys-01"
+    title: "Define desktop application connector interfaces (e.g., messaging apps)"
+    owner: "Automation Team"
+    status: "planned"
+  - id: "task-sys-102"
+    milestone_id: "ms-sys-01"
+    title: "Define console command execution skeleton"
+    owner: "Automation Team"
+    status: "planned"
+  - id: "task-sys-103"
+    milestone_id: "ms-sys-01"
+    title: "Define permission and auditing hooks"
+    owner: "Automation Team"
+    status: "planned"
+
+risks:
+  - id: "risk-sys-001"
+    description: "Unrestricted local automation can introduce security risk."
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Enforce explicit permissions and structured audit logging in the module interface."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"
