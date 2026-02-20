@@ -32,6 +32,10 @@ class ApiHttpClient:
             response = self._client.post(path, json=payload, headers=headers)
             response.raise_for_status()
             return response.json()
+        except ValueError as exc:
+            raise ConnectorTransportException(
+                ConnectorError(type=ErrorType.VALIDATION, message=f"Invalid JSON in response: {exc}", retryable=False)
+            ) from exc
         except httpx.TimeoutException as exc:
             raise ConnectorTransportException(
                 ConnectorError(type=ErrorType.TIMEOUT, message=str(exc), retryable=True)
@@ -54,6 +58,12 @@ class ApiHttpClient:
 
     def close(self) -> None:
         self._client.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
 class ConnectorTransportException(RuntimeError):

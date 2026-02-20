@@ -74,7 +74,7 @@ class OllamaAdapter(BaseConnectorAdapter):
         self.client = client
 
     def generate(self, request: GenerationRequest) -> GenerationResponse:
-        prompt = "\n".join([f"{m['role']}: {m['content']}" for m in request.messages])
+        prompt = "\n".join([f"{m.get('role', 'user')}: {m.get('content', '')}" for m in request.messages])
         payload: Dict[str, Any] = {
             "model": request.model,
             "prompt": prompt,

@@ -6,54 +6,54 @@ metadata:
   start_date: '2026-02-20'
   repository: https://github.com/your-org/magnetar-eidolon/tree/master/projects/api-connectors-module-skeleton
 stakeholders:
-- name: Core Team
-  role: Maintainers
-- name: Integrations Team
-  role: Module Delivery
+  - name: Core Team
+    role: Maintainers
+  - name: Integrations Team
+    role: Module Delivery
 milestones:
-- id: ms-api-01
-  name: API Connectors Skeleton Baseline
-  target_date: '2026-03-07'
-  description: Define a provider-agnostic API connector layer for remote and local
-    models.
-  status: in_review
+  - id: ms-api-01
+    name: API Connectors Skeleton Baseline
+    target_date: '2026-03-07'
+    description: Define a provider-agnostic API connector layer for remote and local
+      models.
+    status: in_review
 tasks:
-- id: task-api-101
-  milestone_id: ms-api-01
-  title: Define HTTP client and auth abstraction
-  owner: Integrations Team
-  effort_points: 5
-  status: in_review
-- id: task-api-102
-  milestone_id: ms-api-01
-  title: Define local model API adapters (e.g., Ollama/OpenAI-compatible local servers)
-  owner: Integrations Team
-  effort_points: 3
-  status: in_review
-- id: task-api-103
-  milestone_id: ms-api-01
-  title: Define unified response and error contract
-  owner: Integrations Team
-  effort_points: 3
-  status: in_review
-- id: task-api-104
-  milestone_id: ms-api-01
-  title: Set up connector module test harness
-  owner: Integrations Team
-  effort_points: 2
-  status: in_review
+  - id: task-api-101
+    milestone_id: ms-api-01
+    title: Define HTTP client and auth abstraction
+    owner: Integrations Team
+    effort_points: 5
+    status: in_review
+  - id: task-api-102
+    milestone_id: ms-api-01
+    title: Define local model API adapters (e.g., Ollama/OpenAI-compatible local servers)
+    owner: Integrations Team
+    effort_points: 3
+    status: in_review
+  - id: task-api-103
+    milestone_id: ms-api-01
+    title: Define unified response and error contract
+    owner: Integrations Team
+    effort_points: 3
+    status: in_review
+  - id: task-api-104
+    milestone_id: ms-api-01
+    title: Set up connector module test harness
+    owner: Integrations Team
+    effort_points: 2
+    status: in_review
 risks:
-- id: risk-api-001
-  description: API surface differences across providers can fragment integration logic.
-  probability: High
-  impact: Medium
-  mitigation: Standardize a common adapter contract with provider-specific translation
-    layers.
-- id: risk-api-002
-  description: Credential handling errors could expose secrets.
-  probability: Medium
-  impact: High
-  mitigation: Use centralized secret stores and strict redaction in logs.
+  - id: risk-api-001
+    description: API surface differences across providers can fragment integration logic.
+    probability: High
+    impact: Medium
+    mitigation: Standardize a common adapter contract with provider-specific translation
+      layers.
+  - id: risk-api-002
+    description: Credential handling errors could expose secrets.
+    probability: Medium
+    impact: High
+    mitigation: Use centralized secret stores and strict redaction in logs.
 reporting:
   frequency: Weekly
   format: Markdown via STATUS.md
