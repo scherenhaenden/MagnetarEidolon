@@ -6,6 +6,7 @@
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
+    """Print a greeting to the specified name."""
     print(f'Hi, {name}')  # Press Strg+8 to toggle the breakpoint.
 
 
