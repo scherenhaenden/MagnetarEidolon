@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/MagnetarEidolon.iml" filepath="$PROJECT_DIR$/.idea/MagnetarEidolon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/magnetar_voice_ui/magnetar_voice_ui.iml" filepath="$PROJECT_DIR$/magnetar_voice_ui/magnetar_voice_ui.iml" />
     </modules>
   </component>
 </project>
