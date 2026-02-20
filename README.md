@@ -24,6 +24,9 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 
 Governance references: `BRANCHING_MODEL.md` and `WIP_GUIDELINES.md`.
 
+## Additional Documentation
+- `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
+
 ## Progress Model Overview
 Progress is tracked through milestones and tasks that move through explicit lifecycle states:
 
