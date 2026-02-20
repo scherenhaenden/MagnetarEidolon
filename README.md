@@ -26,6 +26,9 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 | `WIP_GUIDELINES.md` | Policies on concurrent task limits. |
 | `projects/_template.project.yml` | Machine-readable project schema. |
 
+## Additional Documentation
+- `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
+
 ## Progress Model Overview
 Progress is tracked through milestones and tasks that move through explicit lifecycle states:
 
