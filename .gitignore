@@ -34,3 +34,7 @@ htmlcov/
 # ChromaDB
 chroma_db/
 agent_memory/
+# PyCharm / JetBrains
+.idea/
+*.iml
+

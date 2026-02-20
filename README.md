@@ -81,6 +81,19 @@ AI agents working on this project must:
    [projects/*.project.yml machine state]
 ```
 
+
+## PyCharm Compatibility
+This repository is compatible with PyCharm, including the `src/` layout and the nested `magnetar_voice_ui/` package.
+
+Recommended setup:
+1. Open the repository root in PyCharm.
+2. Configure a Python 3.10 interpreter (virtualenv or Poetry environment).
+3. Mark `src/` as a **Sources Root** (right-click folder -> *Mark Directory As* -> *Sources Root*).
+4. Copy `.env.example` to `.env` and enable **"Paths and environment variables from .env file"** in your run/test configuration.
+5. Use `pytest` as the default test runner for the root project.
+
+With this setup, imports such as `magnetar.*` resolve correctly in editor inspections, run configurations, and tests.
+
 ## Applying This Template
 1. Copy this repository structure into your new project.
 2. Replace placeholder content with project-specific details.
