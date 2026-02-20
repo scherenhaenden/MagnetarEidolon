@@ -67,6 +67,7 @@ def test_shell_tool():
     ],
 )
 def test_shell_tool_rejects_shell_operators_with_clear_error(command: str) -> None:
+    """Test that the shell tool rejects shell operators with a clear error."""
     shell_tool = ShellCommandTool()
 
     result = shell_tool.run(command=command)
