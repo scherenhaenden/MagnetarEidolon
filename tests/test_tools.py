@@ -96,15 +96,15 @@ def test_system_interaction_policy_and_audit():
 
 def test_system_interaction_desktop_connector():
     logger = AuditLogger()
-    connector = StubDesktopConnector(app_name="slack")
+    connector = StubDesktopConnector()
     module = SystemInteractionModule(
         policy=PermissionPolicy(allowed_desktop_apps=["slack"]),
         audit_logger=logger,
-        desktop_connectors=[connector],
+        desktop_connectors={"slack": connector},
     )
 
     ack = module.send_desktop_message(app_name="slack", channel="#alerts", message="hello")
-    assert ack == "queued:slack:#alerts"
+    assert ack == "queued:stub:#alerts"
     assert connector.sent_messages[0]["message"] == "hello"
 
     denied_ack = module.send_desktop_message(app_name="teams", channel="#alerts", message="blocked")

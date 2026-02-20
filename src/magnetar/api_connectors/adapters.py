@@ -17,6 +17,7 @@ class BaseConnectorAdapter(ABC):
 
     @abstractmethod
     def generate(self, request: GenerationRequest) -> GenerationResponse:
+        """Generates a response based on the given request."""
         raise NotImplementedError
 
 
@@ -27,6 +28,17 @@ class OpenAICompatibleAdapter(BaseConnectorAdapter):
         self.client = client
 
     def generate(self, request: GenerationRequest) -> GenerationResponse:
+        """def generate(self, request: GenerationRequest) -> GenerationResponse:
+        Generates a response based on the provided generation request.  This function
+        constructs a payload from the given GenerationRequest,  including optional
+        parameters such as temperature and max_tokens.  It then sends a request to the
+        chat completions endpoint and processes  the response. If the response is
+        valid, it extracts the content and  usage information, returning a
+        GenerationResponse. In case of errors,  it handles specific exceptions and
+        returns an appropriate error message  within the GenerationResponse.
+        
+        Args:
+            request (GenerationRequest): The request object containing model"""
         payload: Dict[str, Any] = {
             "model": request.model,
             "messages": request.messages,
@@ -74,14 +86,15 @@ class OllamaAdapter(BaseConnectorAdapter):
         self.client = client
 
     def generate(self, request: GenerationRequest) -> GenerationResponse:
-        prompt = "\n".join([f"{m.get('role', 'user')}: {m.get('content', '')}" for m in request.messages])
-        payload: Dict[str, Any] = {
-            "model": request.model,
-            "prompt": prompt,
-            "stream": False,
-        }
-
+        """Generates a response based on the provided generation request."""
         try:
+            prompt = "\n".join([f"{m['role']}: {m['content']}" for m in request.messages])
+            payload: Dict[str, Any] = {
+                "model": request.model,
+                "prompt": prompt,
+                "stream": False,
+            }
+
             raw = self.client.post_json("/api/generate", payload)
             content = raw.get("response", "")
             usage = {
@@ -103,7 +116,7 @@ class OllamaAdapter(BaseConnectorAdapter):
                 content="",
                 error=exc.error,
             )
-        except (TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             return GenerationResponse(
                 provider=self.provider_name,
                 model=request.model,
