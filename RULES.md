@@ -1,14 +1,19 @@
 # Canonical Ruleset of MagnetarEidolon
 
 ## Introduction
-These rules codify the Magnetar standard. The project must comply with them unless a formal exception is explicitly documented in `BITACORA.md`.
+This document establishes the fundamental rules and workflow standards for the MagnetarEidolon project. These rules codify the Magnetar standard, and the entire project must comply unless a formal exception is documented in `BITACORA.md`.
 
 ## Naming Conventions
-- **Repositories:** `magnetar-<domain>-<descriptor>`
-- **Branches:** `<type>/<short-description>` where `<type>` is one of `feature`, `fix`, `chore`, `experiment`, `hotfix`
-- **Tasks and Blockers:** kebab-case IDs (for example: `task-202`, `blocker-db-outage`)
-- **YAML keys:** `lower_snake_case`
-- **File names:** must mirror canonical repository names and casing
+- **Repositories**: `magnetar-<domain>-<descriptor>` (e.g., `magnetar-core-agent`, `magnetar-memory-chroma`)
+- **Branches**: `<type>/<short-description>`, where type is:
+  - `feature`: New functionality
+  - `fix`: Bug fixes
+  - `chore`: Maintenance tasks
+  - `experiment`: Experimental features
+  - `hotfix`: Urgent production fixes
+- **Tasks and Blockers**: `kebab-case` (e.g., `task-202`, `blocker-db-outage`)
+- **YAML Keys**: `lower_snake_case`
+- **File Names**: Must mirror those in the canonical repository.
 
 ## Required Files
 Every Magnetar project must include:
@@ -24,55 +29,54 @@ Every Magnetar project must include:
 - `BRANCHING_MODEL.md`
 - `WIP_GUIDELINES.md`
 - `CONTRIBUTING.md`
-- `projects/<project>.project.yml`
+- `projects/_template.project.yml`
 
 Any omission requires an explicit exemption logged in `BITACORA.md`.
 
 ## Branching Conventions
-- **master:** immutable release line; merges require successful CI and documentation updates.
-- **develop (optional):** aggregates completed features before stabilization.
-- **feature branches:** originate from `master` or `develop` and must be rebased before merging.
-- **hotfix branches:** start from `master` and require a `STATUS.md` update upon completion.
-- Every Pull Request must reference affected task IDs and include `BITACORA.md` entries.
+- **master**: Immutable release line. Merges require successful CI and documentation updates.
+- **develop** (optional): Aggregates completed features before stabilization.
+- **feature branches**: Originate from `master` or `develop` and must be rebased before merging.
+- **hotfix branches**: Start from `master` and must trigger a `STATUS.md` update upon completion.
+- Each Pull Request must reference the tasks it affects and include `BITACORA.md` entries.
 
 ## Allowed Task States
-Only these task states are valid:
-- `planned`
-- `ready`
-- `in_progress`
-- `in_review`
-- `blocked`
-- `done`
+Tasks must be in one of the following states:
+1. **planned**: Task is defined but not yet scheduled for immediate work.
+2. **ready**: Task is prioritized and ready to be picked up.
+3. **in_progress**: Work has actively begun on the task.
+4. **in_review**: Work is complete and awaiting code review or QA.
+5. **blocked**: Task cannot proceed due to an external impediment.
+6. **done**: Task is fully complete and merged.
 
-### State Transition Rules
-- `planned -> ready` when scope is refined and owner assigned.
-- `ready -> in_progress` when implementation begins.
-- `in_progress -> in_review` when deliverable is complete and under validation.
-- `in_review -> done` when acceptance criteria are met.
-- `in_progress|in_review -> blocked` when impeded by external dependency.
-- `blocked -> in_progress` when blocker is resolved.
+**Allowed Transitions:**
+- `planned` -> `ready`
+- `ready` -> `in_progress`
+- `in_progress` -> `in_review` | `blocked`
+- `in_review` -> `done` | `in_progress` (if feedback requires changes)
+- `blocked` -> `ready` | `in_progress` (when unblocked)
 
 ## Work-In-Progress (WIP) Constraints
-- **WIP Limit:** maximum of 2 tasks in `in_progress` per human or AI contributor.
-- **Exceptions:** exceeding the limit requires documented approval in `WIP_GUIDELINES.md` and an exception entry in `BITACORA.md`.
+- **WIP Limit**: Maximum of **2** tasks in `in_progress` state per individual or AI agent.
+- **Exceptions**: Exceeding the limit requires approval documented in `WIP_GUIDELINES.md` and logged in `BITACORA.md`.
 
 ## Blocker Lifecycle
-1. **Discovery:** log blocker in `BLOCKERS.md` with ID, description, severity, owner, timestamp.
-2. **Assessment:** update related risks in `STATUS.md` and mitigation ideas in `BITACORA.md`.
-3. **Escalation:** escalate if unresolved within 1 business day.
-4. **Resolution:** document fix steps in `BITACORA.md` and mark blocker as resolved.
-5. **Retrospective:** record lessons learned and prevention actions.
+1. **Discovery**: Log in `BLOCKERS.md` with ID, description, severity, owner, and timestamp.
+2. **Assessment**: Update risks in `STATUS.md` and note mitigation ideas in `BITACORA.md`.
+3. **Escalation**: If not resolved within one business day, escalate to project lead.
+4. **Resolution**: Document solution steps in `BITACORA.md` and update blocker status to `resolved`.
+5. **Retrospective**: Capture lessons learned in `BITACORA.md`.
 
 ## Documentation Discipline
-- `BITACORA.md` must chronologically capture every state change, decision, and exception.
-- `STATUS.md` must be updated at least daily or after each PR merge.
-- `PLAN.md` is the source of truth for milestones, dependencies, and assignments.
+- **BITACORA.md**: Must chronologically record every state change, decision, or exception.
+- **STATUS.md**: Must be updated at least once per day or after each PR merge.
+- **PLAN.md**: Is the source of truth for milestones and task assignments.
 
 ## AI Agent Responsibilities
-- Parse project YAML before acting.
-- Do not open PRs unless target tasks are in `in_review`.
-- Document assumptions in `BITACORA.md` when uncertainty exists.
+- Parse the project YAML file before acting.
+- Do not open PRs without confirming the task state is `in_review`.
+- Document assumptions in `BITACORA.md` when uncertain.
 
 ## Compliance and Enforcement
-- CI should validate required file presence and expected structure.
-- Periodic governance audits are required to maintain canonical compliance.
+- Continuous Integration (CI) should validate the presence and structure of required files.
+- Periodic audits will be conducted to ensure adherence to the canonical model.

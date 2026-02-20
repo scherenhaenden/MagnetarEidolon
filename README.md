@@ -11,18 +11,20 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 5. Consult the example project artifacts to resolve process or formatting questions.
 
 ## Project Contents
-| File | Purpose |
-| --- | --- |
-| `PLAN.md` | Project tasks, milestones, ownership, and effort tracking. |
-| `BITACORA.md` | Chronological logbook of state changes, decisions, blockers, and exceptions. |
-| `REQUIREMENTS.md` | Functional and non-functional requirements baseline. |
-| `ARCHITECTURE.md` | System and module architecture, including component interactions. |
-| `RULES.md` | Canonical naming conventions, task states, and workflow standards. |
-| `STATUS.md` | Health summary, milestone status, and risk outlook. |
-| `TESTING.md` | Testing strategy, coverage targets, and reporting process. |
-| `BLOCKERS.md` | Active and resolved blockers, ownership, and escalation tracking. |
 
-Governance references: `BRANCHING_MODEL.md` and `WIP_GUIDELINES.md`.
+| File | Purpose |
+| :--- | :--- |
+| `PLAN.md` | Central project roadmap, milestones, and task backlog. |
+| `BITACORA.md` | Immutable chronological logbook of all events and decisions. |
+| `REQUIREMENTS.md` | Functional and non-functional specifications. |
+| `ARCHITECTURE.md` | High-level system design and component descriptions. |
+| `RULES.md` | Definitive ruleset for naming, workflow, and structure. |
+| `STATUS.md` | Current project health, progress, and risk summary. |
+| `TESTING.md` | Testing strategy, coverage targets, and bug reporting. |
+| `BLOCKERS.md` | Registry of impediments and escalation paths. |
+| `BRANCHING_MODEL.md` | Git branching strategy (based on GitFlow). |
+| `WIP_GUIDELINES.md` | Policies on concurrent task limits. |
+| `projects/_template.project.yml` | Machine-readable project schema. |
 
 ## Additional Documentation
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
@@ -46,11 +48,11 @@ The `projects/_template.project.yml` file is the canonical machine-readable sche
 This schema is the authoritative bridge between human planning artifacts and automation-ready project state.
 
 ## Guidance for AI Collaborators
-AI collaborators must:
-- Parse the project YAML file before beginning work.
-- Use `PLAN.md` and `STATUS.md` to determine execution focus.
-- Respect `RULES.md`, `WIP_GUIDELINES.md`, and `BRANCHING_MODEL.md`.
-- Update `BITACORA.md` after completing any work or changing task state.
+AI agents working on this project must:
+1.  **Parse** the `projects/*.project.yml` file to understand context.
+2.  **Read** `PLAN.md` and `STATUS.md` to determine current focus.
+3.  **Respect** strict constraints in `RULES.md`, `WIP_GUIDELINES.md`, and `BRANCHING_MODEL.md`.
+4.  **Log** all actions and decisions in `BITACORA.md` immediately after completion.
 
 ## Architecture Diagram (Recommended)
 ```text
