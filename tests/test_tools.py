@@ -1,6 +1,7 @@
 from magnetar.tools.filesystem import FileReadTool, FileWriteTool, ListDirectoryTool
 from magnetar.tools.shell import ShellCommandTool
 from magnetar.tools.system_interaction import AuditLogger, PermissionPolicy, StubDesktopConnector, SystemInteractionModule
+import pytest
 
 
 def test_file_tools(tmp_path):
@@ -49,10 +50,25 @@ def test_shell_tool():
         assert "denied" in result.error.lower()
 
 
-def test_shell_tool_rejects_shell_operators_with_clear_error():
+@pytest.mark.parametrize(
+    "command",
+    [
+        "echo foo | grep f",
+        "echo foo && echo bar",
+        "false || echo recovered",
+        "echo one ; echo two",
+        "echo $(echo nested)",
+        "echo `echo nested`",
+        "echo foo > /tmp/foo",
+        "cat < /tmp/foo",
+        "echo foo &",
+    ],
+)
+def test_shell_tool_rejects_shell_operators_with_clear_error(command: str) -> None:
     shell_tool = ShellCommandTool()
 
-    result = shell_tool.run(command="echo foo | grep f")
+    result = shell_tool.run(command=command)
+
     assert result.success is False
     assert result.error is not None
     assert "not supported" in result.error.lower()
