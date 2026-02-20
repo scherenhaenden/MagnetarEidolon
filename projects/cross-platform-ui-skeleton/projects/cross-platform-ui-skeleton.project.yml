@@ -1,0 +1,61 @@
+metadata:
+  project_name: "Cross-Platform UI Skeleton"
+  description: "Define the cross-platform UI module structure and interfaces."
+  version: "0.1.0"
+  start_date: "2026-02-20"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/projects/cross-platform-ui-skeleton"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "UI Team"
+    role: "Module Delivery"
+
+milestones:
+  - id: "ms-ui-01"
+    name: "UI Skeleton Baseline"
+    target_date: "2026-03-01"
+    description: "Define the cross-platform UI module structure and interfaces."
+    status: "in_progress"
+
+tasks:
+  - id: "task-ui-101"
+    milestone_id: "ms-ui-01"
+    title: "Define shared UI shell for Linux/macOS/Windows"
+    owner: "UI Team"
+    effort_points: 5
+    status: "in_progress"
+  - id: "task-ui-102"
+    milestone_id: "ms-ui-01"
+    title: "Define platform-specific adapter interfaces"
+    owner: "UI Team"
+    effort_points: 3
+    status: "ready"
+  - id: "task-ui-103"
+    milestone_id: "ms-ui-01"
+    title: "Define navigation and state container skeleton"
+    owner: "UI Team"
+    effort_points: 3
+    status: "planned"
+  - id: "task-ui-104"
+    milestone_id: "ms-ui-01"
+    title: "Create baseline UI testing scaffolding"
+    owner: "UI Team"
+    effort_points: 2
+    status: "planned"
+
+risks:
+  - id: "risk-ui-001"
+    description: "Cross-OS windowing differences may affect parity."
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Use a shared core and isolate per-OS adapters behind interfaces."
+  - id: "risk-ui-002"
+    description: "Accessibility regressions in new components."
+    probability: "Low"
+    impact: "Medium"
+    mitigation: "Define accessibility checks in CI and design review gates."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"
