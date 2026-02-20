@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+### 2026-02-20 08:43 UTC
+- **Author**: Codex (AI Agent)
+- **Entry**: **Discovery/Decision**: Performed a repository-wide consistency review and corrected schedule/documentation mismatches. Updated `projects/_template.project.yml` so `start_date` now precedes milestone `ms-01`, and synchronized the YAML task list with `PLAN.md` (including `task-103`, `task-202`, `task-301`, `task-302`, `task-401`, `task-402`, and `task-501`). Also normalized `task-302` title casing in `PLAN.md`.
+
 ### 2024-05-22 10:00 UTC
 - **Author**: Jules (AI Agent)
 - **Entry**: **Project Initialization**: Initialized the `MagnetarEidolon` repository following the Magnetar Canonical Project Model. Created `RULES.md`, `PLAN.md`, and `BITACORA.md`. Task `task-101` set to `in_progress`.
