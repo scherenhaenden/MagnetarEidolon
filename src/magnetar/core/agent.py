@@ -23,7 +23,7 @@ class MagnetarAgent:
         self.llm = llm_provider
 
     def run(self, max_steps: int = 10):
-        """Run the agent loop for a specified maximum number of steps."""
+        """Run the agent loop for a maximum number of steps."""
         step = 0
         while step < max_steps and self.state.goal.status not in ["completed", "failed"]:
             self.step()
