@@ -23,7 +23,7 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | task-201 | ms-02 | Define MagnetarModel Pydantic Schema | TBD | 5 | 10% | planned | Core state definition. |
 | task-202 | ms-02 | Implement Agent Loop Controller | TBD | 8 | 15% | planned | Main execution logic. |
 | task-301 | ms-03 | Implement Abstract Tool Interface | TBD | 3 | 5% | planned | Base class for tools. |
-| task-302 | ms-03 | create File System Tools | TBD | 5 | 8% | planned | Read/Write/List files. |
+| task-302 | ms-03 | Create File System Tools | TBD | 5 | 8% | planned | Read/Write/List files. |
 | task-401 | ms-04 | Integrate LiteLLM Provider | TBD | 5 | 10% | planned | Model abstraction. |
 | task-402 | ms-04 | Setup ChromaDB for Memory | TBD | 8 | 12% | planned | Vector store integration. |
 | task-501 | ms-05 | Build CLI with Typer | TBD | 5 | 8% | planned | Command line interface. |
