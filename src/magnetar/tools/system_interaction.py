@@ -49,12 +49,16 @@ class PermissionPolicy:
                 "Shell operators are not supported; provide a single executable with plain arguments",
             )
 
-        tokens = shlex.split(command)
+        try:
+            tokens = shlex.split(command)
+        except ValueError as exc:
+            return PermissionDecision(False, f"Invalid command quoting: {exc}")
+
         if not tokens:
             return PermissionDecision(False, "Invalid command")
         first_token = tokens[0].lower()
         for token in tokens:
-            if token.lower() in self.denied_commands:
+            if token.lower() in self.denied_commands or Path(token).name.lower() in self.denied_commands:
                 return PermissionDecision(False, f"Command '{token}' explicitly denied")
         if first_token in self.denied_commands:
             return PermissionDecision(False, f"Command '{first_token}' explicitly denied")
@@ -181,13 +185,13 @@ class SystemInteractionModule:
         connector = self.desktop_connectors.get(app_name.lower())
         if connector is None:
             self.audit.record(
-                AuditEvent(
-                    timestamp=datetime.now(timezone.utc).isoformat(),
-                    action="desktop_message",
-                    target=app_name,
-                    allowed=False,
-                    reason="No connector registered for app",
-                )
+        connector = self.desktop_connectors.get(app_name.lower())
+        if connector is None:
+            self._audit(
+                action="desktop_message_connector_missing",
+                target=app_name,
+                allowed=False,
+                reason="No connector registered for app",
             )
             return None
         return connector.send_message(channel=channel, message=message)

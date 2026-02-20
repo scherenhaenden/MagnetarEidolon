@@ -59,7 +59,7 @@ class ApiHttpClient:
             raise ConnectorTransportException(
                 ConnectorError(
                     type=mapped,
-                    message=exc.response.text,
+                    message=f"Provider error: {status}",
                     retryable=status in {408, 429, 500, 502, 503, 504},
                     status_code=status,
                 )

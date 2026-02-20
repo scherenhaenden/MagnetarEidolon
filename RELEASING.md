@@ -29,6 +29,7 @@ This repository uses a single automated GitHub Actions release workflow (`.githu
 - Python wheel (`.whl`)
 
 ## Failure handling
-- CI failures stop the release.
 - Release notes validation failures stop the release before tagging.
-- PyPI publish can be disabled during dry runs (`publish_to_pypi: false`).
+- A GitHub release is still published when at least one platform build succeeds; only successful platform artifacts are attached.
+- If all platform builds fail, the release job fails and nothing is published.
+- PyPI publish still requires the Linux build artifacts and can be disabled during dry runs (`publish_to_pypi: false`).
