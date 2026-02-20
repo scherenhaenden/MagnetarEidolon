@@ -54,7 +54,7 @@ class PermissionPolicy:
             return PermissionDecision(False, "Invalid command")
         first_token = tokens[0].lower()
         for token in tokens:
-            if token.lower() in self.denied_commands:
+            if token.lower() in self.denied_commands or Path(token).name.lower() in self.denied_commands:
                 return PermissionDecision(False, f"Command '{token}' explicitly denied")
         if first_token in self.denied_commands:
             return PermissionDecision(False, f"Command '{first_token}' explicitly denied")
