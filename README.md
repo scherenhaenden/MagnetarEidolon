@@ -30,6 +30,15 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 ## Additional Documentation
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
 
+## GitHub Project Board
+
+To provide a higher-level view of the project's tasks and their status, a GitHub Project board has been set up. This board is the primary tool for visualizing and managing the project's workflow.
+
+- **Project Name**: MagnetarEidolon Development
+- **Project URL**: [https://github.com/users/scherenhaenden/projects/8](https://github.com/users/scherenhaenden/projects/8)
+
+While the `PLAN.md` file contains a detailed backlog, the GitHub Project board offers a more interactive way to track progress and priorities.
+
 ## Progress Model Overview
 Progress is tracked through milestones and tasks that move through explicit lifecycle states:
 
