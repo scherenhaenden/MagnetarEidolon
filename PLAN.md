@@ -17,23 +17,23 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 
 | Task ID | Milestone | Title | Owner | Effort (pts) | Weight (%) | State | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| task-101 | ms-01 | Create Canonical Documentation Files | Jules | 3 | 5% | in_progress | Creating `RULES.md`, `PLAN.md`, etc. |
-| task-102 | ms-01 | Setup Git Repository Structure | Jules | 1 | 2% | ready | Initial commit and branch setup. |
-| task-103 | ms-01 | Define Project YAML Template | Jules | 2 | 3% | planned | `projects/_template.project.yml`. |
-| task-201 | ms-02 | Define MagnetarModel Pydantic Schema | TBD | 5 | 10% | planned | Core state definition. |
-| task-202 | ms-02 | Implement Agent Loop Controller | TBD | 8 | 15% | planned | Main execution logic. |
-| task-301 | ms-03 | Implement Abstract Tool Interface | TBD | 3 | 5% | planned | Base class for tools. |
-| task-302 | ms-03 | create File System Tools | TBD | 5 | 8% | planned | Read/Write/List files. |
-| task-401 | ms-04 | Integrate LiteLLM Provider | TBD | 5 | 10% | planned | Model abstraction. |
-| task-402 | ms-04 | Setup ChromaDB for Memory | TBD | 8 | 12% | planned | Vector store integration. |
-| task-501 | ms-05 | Build CLI with Typer | TBD | 5 | 8% | planned | Command line interface. |
+| task-101 | ms-01 | Create Canonical Documentation Files | Jules | 3 | 5% | done | `RULES.md`, `PLAN.md`, etc. created. |
+| task-102 | ms-01 | Setup Git Repository Structure | Jules | 1 | 2% | done | Initial commit and branch setup. |
+| task-103 | ms-01 | Define Project YAML Template | Jules | 2 | 3% | done | `projects/_template.project.yml` created. |
+| task-201 | ms-02 | Define MagnetarModel Pydantic Schema | Jules | 5 | 10% | done | `src/magnetar/core/model.py` implemented. |
+| task-202 | ms-02 | Implement Agent Loop Controller | Jules | 8 | 15% | done | `src/magnetar/core/agent.py` implemented. |
+| task-301 | ms-03 | Implement Abstract Tool Interface | Jules | 3 | 5% | done | `src/magnetar/tools/base.py` implemented. |
+| task-302 | ms-03 | create File System Tools | Jules | 5 | 8% | done | `src/magnetar/tools/filesystem.py` implemented. |
+| task-401 | ms-04 | Integrate LiteLLM Provider | Jules | 5 | 10% | done | `src/magnetar/llm/provider.py` implemented. |
+| task-402 | ms-04 | Setup ChromaDB for Memory | Jules | 8 | 12% | done | `src/magnetar/memory/chroma.py` implemented. |
+| task-501 | ms-05 | Build CLI with Typer | Jules | 5 | 8% | done | `src/magnetar/cli.py` implemented. |
 
 ## Effort Summary
 
 - **Total effort**: 45 pts
-- **Completed**: 0 pts
-- **In progress**: 3 pts
-- **Remaining**: 42 pts
+- **Completed**: 45 pts
+- **In progress**: 0 pts
+- **Remaining**: 0 pts
 
 ## State Definitions
 
