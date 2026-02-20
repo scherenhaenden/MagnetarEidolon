@@ -16,6 +16,11 @@ class NavigationState:
     back_stack: list[str] = field(default_factory=list)
 
     def navigate(self, route_name: str) -> None:
+        """Navigate to the specified route.
+        
+        Args:
+            route_name (str): The name of the route to navigate to.
+        """
         if route_name not in self.routes:
             raise KeyError(f"Unknown route: {route_name}")
         self.back_stack.append(self.current_route)
@@ -34,4 +39,5 @@ class UIStateContainer:
     sidebar_open: bool = True
 
     def toggle_sidebar(self) -> None:
+        """Toggle the state of the sidebar open/closed."""
         self.sidebar_open = not self.sidebar_open
