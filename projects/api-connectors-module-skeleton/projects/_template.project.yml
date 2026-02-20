@@ -1,0 +1,27 @@
+metadata:
+  project_name: "API Connectors Module Skeleton"
+  description: "Describe the module mission and target outcomes."
+  start_date: "2026-02-20"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainer"
+
+milestones:
+  - id: "ms-api-01"
+    name: "API Connectors Skeleton Baseline"
+    target_date: "2026-03-07"
+
+tasks:
+  - id: "task-api-101"
+    title: "Define HTTP client and auth abstraction"
+    owner: "Integrations Team"
+    status: "planned"
+
+risks:
+  - id: "risk-001"
+    description: "Describe a key risk for this project."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"

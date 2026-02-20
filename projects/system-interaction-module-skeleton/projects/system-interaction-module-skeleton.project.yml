@@ -1,0 +1,61 @@
+metadata:
+  project_name: "System Interaction Module Skeleton"
+  description: "Define adapters and safety boundaries for controlling local software and shell tools."
+  version: "0.1.0"
+  start_date: "2026-02-20"
+  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/projects/system-interaction-module-skeleton"
+
+stakeholders:
+  - name: "Core Team"
+    role: "Maintainers"
+  - name: "Automation Team"
+    role: "Module Delivery"
+
+milestones:
+  - id: "ms-sys-01"
+    name: "System Interaction Skeleton Baseline"
+    target_date: "2026-03-05"
+    description: "Define adapters and safety boundaries for controlling local software and shell tools."
+    status: "in_progress"
+
+tasks:
+  - id: "task-sys-101"
+    milestone_id: "ms-sys-01"
+    title: "Define desktop application connector interfaces (e.g., messaging apps)"
+    owner: "Automation Team"
+    effort_points: 5
+    status: "in_progress"
+  - id: "task-sys-102"
+    milestone_id: "ms-sys-01"
+    title: "Define console command execution skeleton"
+    owner: "Automation Team"
+    effort_points: 3
+    status: "ready"
+  - id: "task-sys-103"
+    milestone_id: "ms-sys-01"
+    title: "Define permission and auditing hooks"
+    owner: "Automation Team"
+    effort_points: 3
+    status: "planned"
+  - id: "task-sys-104"
+    milestone_id: "ms-sys-01"
+    title: "Author threat model for local automation scope"
+    owner: "Automation Team"
+    effort_points: 2
+    status: "planned"
+
+risks:
+  - id: "risk-sys-001"
+    description: "Unrestricted local automation can introduce security risk."
+    probability: "Medium"
+    impact: "High"
+    mitigation: "Enforce explicit permissions and structured audit logging in the module interface."
+  - id: "risk-sys-002"
+    description: "OS-level API inconsistencies may break automation behavior."
+    probability: "Medium"
+    impact: "Medium"
+    mitigation: "Use adapter layer and run platform-specific validation tests."
+
+reporting:
+  frequency: "Weekly"
+  format: "Markdown via STATUS.md"
