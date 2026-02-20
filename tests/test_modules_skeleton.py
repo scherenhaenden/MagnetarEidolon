@@ -19,6 +19,7 @@ def test_skills_administration_registration() -> None:
 
 
 def test_skills_administration_duplicate_registration() -> None:
+    """Test duplicate registration of skills in SkillsAdministrationModule."""
     module = SkillsAdministrationModule()
     skill1 = SkillDefinition(
         name="skill-installer",
@@ -40,6 +41,7 @@ def test_skills_administration_duplicate_registration() -> None:
 
 
 def test_skills_administration_update() -> None:
+    """Test the update functionality of the SkillsAdministrationModule."""
     module = SkillsAdministrationModule()
     skill = SkillDefinition(
         name="skill-installer",
@@ -61,6 +63,7 @@ def test_skills_administration_update() -> None:
 
 
 def test_other_module_skeletons_initialize() -> None:
+    """Test the initialization of module names."""
     assert ApiConnectorsModule().module.name == "api-connectors"
     assert SystemInteractionModule().module.name == "system-interaction"
     assert CrossPlatformUIModule().module.name == "cross-platform-ui"
