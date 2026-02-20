@@ -65,6 +65,7 @@ class PermissionPolicy:
         return PermissionDecision(True, "Command approved")
 
     def evaluate_desktop_action(self, app_name: str) -> PermissionDecision:
+        """Evaluate the permission for a desktop action based on the application name."""
         app_name = app_name.strip().lower()
         if not app_name:
             return PermissionDecision(False, "Application name is required")
@@ -81,11 +82,13 @@ class AuditLogger:
         self._events: List[AuditEvent] = []
 
     def record(self, event: AuditEvent) -> None:
+        """Records an audit event and sends it to the sink if available."""
         self._events.append(event)
         if self._sink:
             self._sink(event)
 
     def events(self) -> List[AuditEvent]:
+        """Return a list of audit events."""
         return list(self._events)
 
 
@@ -104,6 +107,7 @@ class DesktopAppConnector(ABC):
 
     @abstractmethod
     def send_message(self, channel: str, message: str) -> str:
+        """Sends a message to a specified channel."""
         raise NotImplementedError
 
 
@@ -114,6 +118,7 @@ class StubDesktopConnector(DesktopAppConnector):
         self.sent_messages: List[Dict[str, str]] = []
 
     def send_message(self, channel: str, message: str) -> str:
+        """Queues a message for a specified channel."""
         self.sent_messages.append({"channel": channel, "message": message})
         return f"queued:stub:{channel}"
 
@@ -134,6 +139,7 @@ class SystemInteractionModule:
         self.desktop_connectors = {k.lower(): v for k, v in (desktop_connectors or {}).items()}
 
     def run_command(self, command: str, timeout_s: int = 60) -> subprocess.CompletedProcess[str] | None:
+        """Executes a command if allowed by the policy."""
         decision = self.policy.evaluate_command(command)
         self.audit.record(
             AuditEvent(
@@ -149,6 +155,17 @@ class SystemInteractionModule:
         return self.command_runner(command, timeout_s)
 
     def send_desktop_message(self, app_name: str, channel: str, message: str) -> Optional[str]:
+        """Sends a desktop message to a specified application.
+        
+        Args:
+            app_name (str): The name of the application to send the message to.
+            channel (str): The channel to send the message on.
+            message (str): The message content to be sent.
+        
+        Returns:
+            Optional[str]: The result of the message sending, or None if not allowed or no connector is
+                found.
+        """
         decision = self.policy.evaluate_desktop_action(app_name)
         self.audit.record(
             AuditEvent(
