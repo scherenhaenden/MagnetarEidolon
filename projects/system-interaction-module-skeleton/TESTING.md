@@ -1,9 +1,16 @@
 # Testing Strategy for System Interaction Module Skeleton
 
 ## Types of Tests
-- Unit tests for each core interface and adapter contract.
-- Integration tests for cross-component interactions.
-- End-to-end smoke tests for the main module flows.
+- Unit tests for each interface and policy decision path.
+- Integration tests for orchestration in `SystemInteractionModule` (policy + execution + auditing).
+- End-to-end smoke tests through the `ShellCommandTool` wrapper.
+
+## Current Automated Coverage Scope
+- Filesystem tool read/write/list behavior.
+- Shell command success and error handling.
+- Permission policy allow/deny command behavior.
+- Desktop connector messaging flow and denied app behavior.
+- Audit event capture for authorization decisions.
 
 ## Code Coverage
 Target at least **80%** automated coverage for module logic and critical contracts.

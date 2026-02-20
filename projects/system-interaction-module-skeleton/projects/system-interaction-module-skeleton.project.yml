@@ -16,7 +16,7 @@ milestones:
     name: "System Interaction Skeleton Baseline"
     target_date: "2026-03-05"
     description: "Define adapters and safety boundaries for controlling local software and shell tools."
-    status: "in_progress"
+    status: "in_review"
 
 tasks:
   - id: "task-sys-101"
@@ -24,25 +24,25 @@ tasks:
     title: "Define desktop application connector interfaces (e.g., messaging apps)"
     owner: "Automation Team"
     effort_points: 5
-    status: "in_progress"
+    status: "in_review"
   - id: "task-sys-102"
     milestone_id: "ms-sys-01"
     title: "Define console command execution skeleton"
     owner: "Automation Team"
     effort_points: 3
-    status: "ready"
+    status: "in_review"
   - id: "task-sys-103"
     milestone_id: "ms-sys-01"
     title: "Define permission and auditing hooks"
     owner: "Automation Team"
     effort_points: 3
-    status: "planned"
+    status: "in_review"
   - id: "task-sys-104"
     milestone_id: "ms-sys-01"
     title: "Author threat model for local automation scope"
     owner: "Automation Team"
     effort_points: 2
-    status: "planned"
+    status: "in_review"
 
 risks:
   - id: "risk-sys-001"
