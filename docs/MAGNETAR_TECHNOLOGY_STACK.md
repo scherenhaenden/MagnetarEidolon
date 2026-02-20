@@ -90,9 +90,7 @@ The CLI serves as the primary interaction surface during early development and c
 
 ## Logging, Tracing, and Evaluation
 
-### Structured Logging with Python Logging or Loguru
-
-Agent transparency and debugging require persistent traces of prompts, decisions, tool calls, and state transitions. Python's `logging` module or the higher-level Loguru library provides structured logging across platforms. Logs may be stored in text or JSON formats for replay and evaluation.
+### Structured Logging with Loguru\n\nAgent transparency and debugging require persistent traces of prompts, decisions, tool calls, and state transitions. The Loguru library provides structured logging across platforms. Logs may be stored in text or JSON formats for replay and evaluation.
 
 Because MagnetarEidolon is serializable, logs can reference exact cognition states, enabling deterministic replay of agent behavior for analysis and refinement.
 
