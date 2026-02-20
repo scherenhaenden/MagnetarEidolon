@@ -41,6 +41,13 @@ def test_shell_tool():
         assert result.error is not None
         assert "denied" in result.error.lower()
 
+    # Test bypass attempts
+    for bypass_command in ["sudo rm -rf /", "env rm -rf /"]:
+        result = shell_tool.run(command=bypass_command)
+        assert result.success is False
+        assert result.error is not None
+        assert "denied" in result.error.lower()
+
 
 def test_shell_tool_rejects_shell_operators_with_clear_error():
     shell_tool = ShellCommandTool()
