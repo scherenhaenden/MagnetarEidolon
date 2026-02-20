@@ -49,7 +49,11 @@ class PermissionPolicy:
                 "Shell operators are not supported; provide a single executable with plain arguments",
             )
 
-        tokens = shlex.split(command)
+        try:
+            tokens = shlex.split(command)
+        except ValueError as exc:
+            return PermissionDecision(False, f"Invalid command quoting: {exc}")
+
         if not tokens:
             return PermissionDecision(False, "Invalid command")
         first_token = tokens[0].lower()
