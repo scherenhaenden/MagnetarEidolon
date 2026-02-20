@@ -14,6 +14,16 @@ State Change, Decision, Blocker, Discovery, PR Merge, Exception.
 ## Log Entries
 
 ---
+**Timestamp:** 2026-02-20 19:33 UTC
+**Author:** Codex
+**Entry:** State Change: `task-api-101`, `task-api-102`, `task-api-103`, and `task-api-104` moved to `in_review` after implementing HTTP/auth abstractions, local adapters, unified contracts, and mocked connector tests.
+
+---
+**Timestamp:** 2026-02-20 19:33 UTC
+**Author:** Codex
+**Entry:** Decision: Implemented module package `magnetar.api_connectors` with provider-neutral contracts, normalized transport errors, and adapter translations for OpenAI-compatible and Ollama endpoints.
+
+---
 **Timestamp:** 2026-02-20 17:21 UTC
 **Author:** Codex
 **Entry:** Project bootstrap: created canonical documentation set and initialized first execution task as `in_progress` to begin the module.
