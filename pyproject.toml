@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "magnetar-eidolon"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cross-OS Autonomous Agent Framework with Separated Cognition State"
 authors = ["Magnetar Team <team@magnetar.ai>"]
 readme = "README.md"
