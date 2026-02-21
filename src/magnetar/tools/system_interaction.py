@@ -159,17 +159,7 @@ class SystemInteractionModule:
         return self.command_runner(command, timeout_s)
 
     def send_desktop_message(self, app_name: str, channel: str, message: str) -> Optional[str]:
-        """Sends a desktop message to a specified application.
-        
-        Args:
-            app_name (str): The name of the application to send the message to.
-            channel (str): The channel to send the message on.
-            message (str): The message content to be sent.
-        
-        Returns:
-            Optional[str]: The result of the message sending, or None if not allowed or no connector is
-                found.
-        """
+        """Sends a desktop message to a specified application."""
         decision = self.policy.evaluate_desktop_action(app_name)
         self.audit.record(
             AuditEvent(
