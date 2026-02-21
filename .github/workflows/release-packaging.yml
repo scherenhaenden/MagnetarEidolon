@@ -200,7 +200,13 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ruby ruby-dev rpm squashfs-tools desktop-file-utils
+          if apt-cache show libfuse2 >/dev/null 2>&1; then
+            FUSE_PACKAGE="libfuse2"
+          else
+            FUSE_PACKAGE="libfuse2t64"
+          fi
+
+          sudo apt-get install -y ruby ruby-dev rpm squashfs-tools desktop-file-utils "$FUSE_PACKAGE"
           sudo gem install --no-document fpm
           python -m pip install --upgrade pip
           pip install pyinstaller rich
@@ -244,7 +250,7 @@ jobs:
 
           wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
-          ./appimagetool AppDir magnetar-${{ needs.prepare.outputs.version }}-x86_64.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool AppDir magnetar-${{ needs.prepare.outputs.version }}-x86_64.AppImage
 
       - name: Prepare snapcraft definition
         run: |
