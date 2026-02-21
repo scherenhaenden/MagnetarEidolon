@@ -1,0 +1,52 @@
+name: Release Packaging macOS
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Git tag to checkout for release packaging"
+        required: true
+        type: string
+
+jobs:
+  build_macos:
+    name: Build macOS standalone binary (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: intel
+            runner: macos-13
+            binary_name: magnetar-macos-intel
+          - target: apple-silicon
+            runner: macos-14
+            binary_name: magnetar-macos-apple-silicon
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller rich
+          pip install .
+
+      - name: Build standalone binary
+        run: >-
+          python -m PyInstaller
+          --onefile
+          --name ${{ matrix.binary_name }}
+          src/magnetar/cli.py
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-macos-${{ matrix.target }}
+          path: dist/${{ matrix.binary_name }}
