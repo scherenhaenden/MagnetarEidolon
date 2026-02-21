@@ -59,3 +59,8 @@ class ChromaMemoryStore(MemoryStore):
             return MemoryResult(success=True)
         except Exception as e:
             return MemoryResult(success=False, error=str(e))
+
+    def close(self):
+        """Release resources."""
+        self.client = None
+        self.collection = None

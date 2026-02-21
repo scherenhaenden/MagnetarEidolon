@@ -4,12 +4,16 @@ import shutil
 from magnetar.memory.chroma import ChromaMemoryStore
 
 @pytest.fixture
-def memory_store():
-    store = ChromaMemoryStore(collection_name="test_memory", persist_directory="./test_chroma_db")
+def memory_store(tmp_path):
+    store = ChromaMemoryStore(collection_name="test_memory", persist_directory=str(tmp_path))
     yield store
     # Cleanup
-    if os.path.exists("./test_chroma_db"):
-        shutil.rmtree("./test_chroma_db")
+    store.close()
+    if os.path.exists(str(tmp_path)):
+        try:
+            shutil.rmtree(str(tmp_path))
+        except OSError:
+            pass  # tmp_path is handled by pytest anyway
 
 def test_add_query_memory(memory_store):
     # Add memory

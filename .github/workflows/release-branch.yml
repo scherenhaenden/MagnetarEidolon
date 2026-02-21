@@ -130,6 +130,7 @@ jobs:
       - name: Collect release assets
         run: |
           mkdir -p release-assets
+          cp dist/* release-assets/
           cp dist/magnetar-macos release-assets/
 
       - name: Upload release asset bundle
@@ -171,6 +172,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path release-assets -Force | Out-Null
+          Copy-Item -Path dist\* -Destination release-assets -Force
           Copy-Item -Path dist\magnetar-windows.exe -Destination release-assets -Force
 
       - name: Upload release asset bundle
