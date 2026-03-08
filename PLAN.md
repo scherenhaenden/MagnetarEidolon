@@ -1,61 +1,47 @@
-# Canonical Plan of MagnetarEidolon
+# Plan operativo de MagnetarEidolon
 
-## Introduction
-This plan captures the project's milestones, tasks, estimates, and status. Its structure must be kept intact to ensure consistency across the Magnetar ecosystem.
+## Base estratégica
+Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, control humano y observabilidad end-to-end.
 
-## Milestones Overview Table
+## Roadmap por fases
 
-| Milestone ID | Name | Target Date | Description | Completion Criteria |
+| Fase | Objetivo | Estado |
+| :--- | :--- | :--- |
+| Fase 1 | Valor individual inmediato (setup simple, ejecuciones visibles, recetas básicas). | in_progress |
+| Fase 2 | Potencia para usuarios avanzados (multiagente, memoria gestionable, políticas finas). | planned |
+| Fase 3 | Colaboración de equipos (workspaces, roles, colas de aprobación). | planned |
+| Fase 4 | Ecosistema y expansión segura (intercambio de recetas + integraciones externas con controles estrictos). | planned |
+
+## Milestones activos
+
+| Milestone ID | Nombre | Fecha objetivo | Estado |
+| :--- | :--- | :--- | :--- |
+| `ms-11` | Experience Foundation | 2026-04-10 | in_progress |
+| `ms-12` | Trust & Policy Center | 2026-04-24 | ready |
+| `ms-13` | Observability & Replay | 2026-05-08 | planned |
+| `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready |
+| `ms-15` | SDK Contract Base | 2026-04-22 | ready |
+
+## Backlog priorizado (acometidos)
+
+| Task ID | Milestone | Título | Estado | Entregable |
 | :--- | :--- | :--- | :--- | :--- |
-| `ms-01` | Canon Bootstrap | 2026-03-05 | Establish canonical governance and planning artifacts. | All required canonical docs created and reviewed. |
-| `ms-02` | Magnetar Model Baseline | 2026-03-12 | Define MagnetarEidolon architecture and machine-readable project schema. | Architecture and project YAML align with requirements and rules. |
-| `ms-03` | Operational Readiness | 2026-03-20 | Finalize testing, blocker flow, and contribution processes. | Governance processes validated and initial progress reporting active. |
-| `ms-04` | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
-| `ms-05` | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
-| `ms-06` | Tool System & OS Integration | 2026-06-15 | Develop the tool system abstraction and implement core OS tools (filesystem, shell) for cross-platform support. | Tool interface defined; `FileTool`, `ShellTool` implemented; Platform abstraction layer working. |
-| `ms-07` | Memory & Knowledge Systems | 2026-07-01 | Integrate LiteLLM for model independence and ChromaDB for long-term memory. | `LiteLLM` provider configured; `ChromaDB` storage implemented; Memory retrieval working. |
-| `ms-08` | Interface & Distribution | 2026-07-15 | Create CLI with Typer, setup logging, and prepare packaging configuration. | CLI commands working; Logging structured; `pyproject.toml` ready for distribution. |
-| ms-voice-01 | Voice UI Prototype | 2024-05-22 | Create a functional prototype with UI and Voice-to-Text capabilities. | App runs; UI accepts input; Transcription works. |
+| `task-1101` | `ms-11` | Definir IA UX flow de onboarding ideal (7 pasos) | in_progress | Flujo validado en `REQUIREMENTS.md` y prototipo navegable. |
+| `task-1102` | `ms-11` | Implementar Tool Catalog con riesgo/alcance visible | ready | Catálogo con etiquetas de riesgo legibles para usuario. |
+| `task-1201` | `ms-12` | Diseñar Policy Center en lenguaje humano | ready | Reglas comprensibles para aprobaciones y acciones destructivas. |
+| `task-1301` | `ms-13` | Habilitar Trace/Replay paso a paso | planned | Vista reproducible de decisiones, llamadas a tools y resultados. |
+| `task-1401` | `ms-14` | Formalizar comandos CLI para run/approve/deny/status/logs | ready | Especificación de comandos y contratos de salida. |
+| `task-1402` | `ms-14` | Verificar CLI de consola en Linux/macOS/Windows | planned | Evidencia de pruebas cruzadas y checklist de paridad. |
+| `task-1501` | `ms-15` | Definir SDK contract (run/status/approve/deny/logs/trace) | ready | Especificación versionada del contrato compartido UI/CLI. |
+| `task-1502` | `ms-15` | Publicar guía de integración para CLI y UI | planned | Ejemplos de consumo y reglas de compatibilidad. |
 
-## Task Backlog Table
+## Criterios de éxito del plan
+- Primera automatización útil en menos de 15 minutos.
+- Riesgos comprensibles antes de aprobar acciones sensibles.
+- Capacidad de explicar qué hizo el agente después de cada run.
+- Reutilización de recetas sin fricción alta.
+- **CLI de consola operativa y verificable como canal de fallback y automatización.**
+- **SDK contract estable que garantice paridad funcional entre UI y CLI.**
 
-| Task ID | Milestone | Title | Owner | Effort (pts) | State | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `task-101` | `ms-01` | Create canonical documentation baseline | Core Team | 5 | done | Initial canonical files created. |
-| `task-102` | `ms-02` | Draft Magnetar architecture and stack mapping | Core Team | 4 | in_review | Validate against architecture and stack docs. |
-| `task-103` | `ms-02` | Build project YAML schema template | Core Team | 3 | done | `_template.project.yml` completed. |
-| `task-104` | `ms-03` | Define governance for branching and WIP | Core Team | 4 | ready | Pending team review kickoff. |
-| `task-105` | `ms-03` | Establish testing and blocker controls | Core Team | 6 | in_progress | Drafting acceptance and escalation mechanics. |
-| `task-201` | `ms-04` | Create Canonical Documentation Files | Jules | 3 | done | Creating `RULES.md`, `PLAN.md`, etc. created. |
-| `task-202` | `ms-04` | Setup Git Repository Structure | Jules | 1 | done | Initial commit and branch setup. |
-| `task-203` | `ms-04` | Define Project YAML Template | Jules | 2 | done | `projects/_template.project.yml` created. |
-| `task-301` | `ms-05` | Define MagnetarModel Pydantic Schema | Jules | 5 | done | Core state definition. `src/magnetar/core/model.py` implemented. |
-| `task-302` | `ms-05` | Implement Agent Loop Controller | Jules | 8 | done | Main execution logic. `src/magnetar/core/agent.py` implemented. |
-| `task-401` | `ms-06` | Implement Abstract Tool Interface | Jules | 3 | done | Base class for tools. `src/magnetar/tools/base.py` implemented. |
-| `task-402` | `ms-06` | Create File System Tools | Jules | 5 | done | Read/Write/List files. `src/magnetar/tools/filesystem.py` implemented. |
-| `task-501` | `ms-07` | Integrate LiteLLM Provider | Jules | 5 | done | Model abstraction. `src/magnetar/llm/provider.py` implemented. |
-| `task-502` | `ms-07` | Setup ChromaDB for Memory | Jules | 8 | done | Vector store integration. `src/magnetar/memory/chroma.py` implemented. |
-| `task-601` | `ms-08` | Build CLI with Typer | Jules | 5 | done | Command line interface. `src/magnetar/cli.py` implemented. |
-| task-voice-101 | ms-voice-01 | Setup Project Structure | Jules | 3 | in_progress | Setup poetry, deps, dirs. |
-| task-voice-102 | ms-voice-01 | Implement Voice UI & Logic | Jules | 5 | planned | Gradio UI + SR Logic. |
-
-## Effort Summary
-
-- **Total effort**: 75 pts
-- **Completed**: 53 pts
-- **In progress**: 9 pts
-- **Remaining**: 13 pts
-
-
-## State Definitions
-
-- **planned**: Task identified but work has not started.
-- **ready**: Task is prioritized and ready for assignment.
-- **in_progress**: Work is actively being performed.
-- **in_review**: Work is complete, awaiting review/merge.
-- **blocked**: Task cannot proceed due to external factors.
-- **done**: Task is completed and verified.
-
-## Change Management
-
-This document must be updated whenever tasks change state or scope. Changes must be reflected in the project's YAML file and recorded in `BITACORA.md`.
+## Control de cambios
+Toda variación de tareas o estado se refleja en `STATUS.md` y se registra en `BITACORA.md`.
