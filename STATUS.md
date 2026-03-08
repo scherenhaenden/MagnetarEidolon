@@ -1,39 +1,37 @@
-# Status of MagnetarEidolon
+# Estado actual — MagnetarEidolon
 
-## Progress Summary
-**Overall completion:** 71%
-`[███████████████░░░░░] 71%`
+## Resumen
+**Progreso global estimado:** 64%
+`[█████████████░░░░░░░] 64%`
 
-## Current Milestones
+El proyecto ya tiene dirección estratégica clara (`NEW_PLAN.md`) y está en fase de aterrizaje operativo en documentación, acometidos y validaciones.
 
-| Milestone ID | Name | Status | Target Date |
-| :--- | :--- | :--- | :--- |
-| `ms-01` | Canon Bootstrap | Completed | 2026-03-05 |
-| `ms-02` | Magnetar Model Baseline | In Progress | 2026-03-12 |
-| `ms-03` | Operational Readiness | Not Started | 2026-03-20 |
-| `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
-| `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
-| `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
-| `ms-07` | Memory & Knowledge Systems | Completed | 2026-07-01 |
-| `ms-08` | Interface & Distribution | Completed | 2026-07-15 |
-| ms-voice-01 | Voice UI Prototype | In Progress | 2024-05-22 |
+## Estado por frente
 
-## Risks and Mitigations
+| Frente | Estado | Nota |
+| :--- | :--- | :--- |
+| Visión de producto | aligned | Principios y roadmap definidos. |
+| UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
+| Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
+| Observability/Replay | planned | Se prioriza después de cerrar policy center base. |
+| **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |
+| **SDK contract** | **ready** | Definición requerida para evitar divergencia entre UI y CLI. |
 
-1.  **Risk**: Governance drift between Markdown docs and YAML project state.
-    -   **Mitigation**: Enforce synchronized updates through PR checklist and BITACORA entries.
-2.  **Risk**: Ambiguous task transitions during rapid delivery.
-    -   **Mitigation**: Restrict to canonical states and document every change in `BITACORA.md`.
-3.  **Risk**: Blockers not escalated in time.
-    -   **Mitigation**: Apply 1-business-day escalation policy from `BLOCKERS.md`.
-4.  **Risk**: Cross-OS differences (e.g., path separators, shell commands) may complicate the `Tool System`.
-    -   **Mitigation**: Used Python's standard library (`pathlib`, `shutil`) and platform checks in `ShellCommandTool`.
-5.  **Risk**: Local LLM performance (e.g., Ollama) may be insufficient for complex reasoning.
-    -   **Mitigation**: `LLMProvider` is model-agnostic and can switch to stronger models if needed.
-6.  **Risk**: Memory management (context window limits) may impact long conversations.
-    -   **Mitigation**: Implemented `ChromaMemoryStore` for long-term storage and retrieval.
-7.  **Risk**: Audio input capture in sandbox environment.
-    -   **Mitigation**: Focus on verifying logic and UI launch; support file upload as fallback.
+## Acometidos inmediatos (siguiente ciclo)
+1. Cerrar especificación funcional de onboarding y live execution.
+2. Aterrizar contratos de aprobaciones (approve/deny/pause) en policy center.
+3. Definir matriz de eventos para trazabilidad y replay.
+4. **Verificar que el CLI de consola cubre run/status/approve/deny/logs en Linux, macOS y Windows.**
+5. Publicar especificación inicial del SDK contract y pruebas de consumo en CLI/UI.
 
-## Reporting Cadence
-Update at least once per day and immediately after each merged PR.
+## Riesgos principales
+1. Desalineación entre visión y backlog ejecutable.
+2. Sobrecarga de UX por mezclar Build/Execution/Debug sin separación clara.
+3. Brechas de paridad entre UI y CLI en estados o comandos.
+4. Ausencia de contrato SDK versionado que rompa integraciones internas.
+
+## Mitigaciones
+- Revisión semanal obligatoria de coherencia `NEW_PLAN` -> `PLAN` -> `REQUIREMENTS`.
+- Contratos únicos de estado/eventos compartidos entre interfaces.
+- Checklist de verificación CLI cross-platform en cada release funcional.
+- Versionado semántico y changelog específico para el SDK contract.

@@ -1,82 +1,43 @@
-# Requirements for MagnetarEidolon
+# Requisitos de MagnetarEidolon
 
-## Introduction
-This document defines the requirements for both the MagnetarEidolon project and the Canonical Project Model it follows. This ensures alignment with the Magnetar Canonical Architecture and Technology Stack, as well as the governance and documentation standards.
+## Objetivo de producto
+Construir una plataforma de agentes que combine potencia operativa con control humano explícito, basada en simplicidad de uso, confianza y observabilidad total.
 
-## Canonical Project Model Requirements
+## Requisitos funcionales (FR)
 
-### Functional Requirements
+### Experiencia y flujo
+- **FR-01 (Must)**: El onboarding ideal debe cubrir trust mode, habilitación de herramientas, carga de contexto, objetivo, plan y aprobaciones.
+- **FR-02 (Must)**: La UI debe exponer Dashboard, Live Execution, Tool Catalog, Memory Inspector, Trace/Replay y Policy Center.
+- **FR-03 (Should)**: Debe existir Recipe Builder para flujos reutilizables.
 
-#### Must-Have
-- Define a canonical project governance and execution documentation set.
-- Provide explicit milestone/task planning with allowed lifecycle states.
-- Provide immutable operational logbook semantics via `BITACORA.md`.
-- Provide blocker tracking and escalation workflow.
-- Provide machine-readable project schema template under `projects/`.
+### Confianza y políticas
+- **FR-04 (Must)**: Toda acción de impacto debe clasificarse por nivel de riesgo.
+- **FR-05 (Must)**: Operaciones de escritura/modificación requieren aprobación por defecto.
+- **FR-06 (Must)**: Acciones destructivas requieren doble confirmación o simulación previa.
+- **FR-07 (Must)**: Toda acción sensible debe dejar evidencia auditable.
+- **FR-08 (Must)**: Toda receta importada inicia deshabilitada y pasa revisión de permisos.
 
-#### Should-Have
-- Include architecture guidance tied to Magnetar cognition/runtime separation.
-- Include AI collaborator workflow guidance and compliance checks.
-- Include test strategy with acceptance criteria and reporting cadence.
+### Motor agente y memoria
+- **FR-09 (Must)**: Separación estricta entre estado cognitivo serializable y loop de ejecución.
+- **FR-10 (Must)**: Memoria de corto y largo plazo debe ser visible y administrable (ver, fijar, borrar).
+- **FR-11 (Should)**: Reglas y políticas deben ser editables desde Markdown/versionado.
 
-#### Could-Have
-- Add CI validation for required file presence and YAML schema checks.
-- Add optional dashboards to visualize status and blocker trends.
+### Interfaces
+- **FR-12 (Must)**: Debe existir una **CLI de consola** para ejecutar objetivos, observar progreso, aprobar/denegar acciones y consultar trazas.
+- **FR-13 (Must)**: La CLI y la UI deben compartir semántica de estados y eventos.
+- **FR-14 (Must)**: Debe existir un **SDK/Runtime Contract** consumible por CLI y UI para evitar duplicación de lógica.
+- **FR-15 (Should)**: El SDK debe exponer comandos/operaciones de alto nivel: `run`, `status`, `approve`, `deny`, `logs`, `trace`.
 
-#### Won't-Have (for initial baseline)
-- Full runtime implementation of Magnetar agent core in this phase.
-- Provider-specific production deployment automation.
+## Requisitos no funcionales (NFR)
+- **NFR-01 (Must)**: Portabilidad Linux/macOS/Windows.
+- **NFR-02 (Must)**: Observabilidad estructurada (logs/eventos/replay) para auditoría y debugging.
+- **NFR-03 (Must)**: Seguridad por defecto orientada a "trust by design".
+- **NFR-04 (Must)**: Latencia y complejidad percibida deben permitir primer valor < 15 min.
+- **NFR-05 (Should)**: Arquitectura modular para cambiar proveedor de modelos y tool adapters sin rehacer el sistema.
+- **NFR-06 (Must)**: Compatibilidad hacia atrás razonable del SDK contract entre versiones menores.
 
-### Non-Functional Requirements
-
-#### Must-Have
-- Documentation must be version-controlled and human-readable.
-- Task states and governance semantics must be deterministic and consistent.
-- All required canonical files must exist at repository root (plus `projects/`).
-
-#### Should-Have
-- Content should be parseable by AI tools and automation scripts.
-- Governance rules should be auditable through chronological logs.
-
-#### Could-Have
-- Add linting rules for Markdown table consistency.
-- Add machine validation for task state transitions.
-
-#### Won't-Have (for initial baseline)
-- Complex enterprise workflow engines or external PM integrations.
-
-
-## MagnetarEidolon Application Requirements
-
-### Functional Requirements
-
-#### Core Reasoning & State
-- **FR-01: Cognition Separation (Must-Have)**: The system must strictly separate the agent's cognition state (`MagnetarModel`) from its execution logic (`Agent Core`).
-- **FR-02: Serialization (Must-Have)**: The entire cognition state must be serializable to JSON to support persistence, pause/resume, and analysis.
-- **FR-03: Rule Loading (Must-Have)**: The agent must load behavioral rules, constraints, and knowledge from Markdown files at runtime.
-
-#### Tool System
-- **FR-04: Tool Abstraction (Must-Have)**: The system must provide an abstract interface for tools that hides OS-specific implementation details.
-- **FR-05: Cross-OS Support (Must-Have)**: The agent must operate uniformly on Linux, macOS, and Windows using platform-specific adapters for filesystem and shell operations.
-- **FR-06: Knowledge Acquisition (Should-Have)**: The system must support tools for HTTP requests and web content extraction.
-
-#### Memory & Learning
-- **FR-07: Long-Term Memory (Must-Have)**: The agent must store and retrieve semantic information using vector embeddings.
-- **FR-08: Short-Term Context (Must-Have)**: The agent must maintain a sliding window or summary of the immediate conversation history within the `MagnetarModel`.
-
-#### Interface
-- **FR-09: CLI (Must-Have)**: The system must provide a command-line interface for initiating tasks and observing progress.
-- **FR-10: Logging (Must-Have)**: The system must log all prompts, tool calls, and state transitions in a structured format.
-
-### Non-Functional Requirements
-
-#### Technology Stack
-- **NFR-01: Language (Must-Have)**: The implementation must use Python as the core language.
-- **NFR-02: Data Validation (Must-Have)**: The `MagnetarModel` must be implemented using Pydantic for strict typing and validation.
-- **NFR-03: Model Agnosticism (Must-Have)**: The system must use `LiteLLM` to support both local (Ollama) and cloud (OpenAI, Anthropic) models.
-- **NFR-04: Vector Store (Must-Have)**: The system must use `ChromaDB` for local, offline-capable vector storage.
-
-#### Quality & Performance
-- **NFR-05: Portability (Must-Have)**: The codebase must not depend on OS-specific binaries or paths without fallback or abstraction.
-- **NFR-06: Modularity (Should-Have)**: Components (memory, tools, models) should be loosely coupled to allow for easy replacement or extension.
-- **NFR-07: Safety (Must-Have)**: The agent must respect safety constraints defined in Markdown rules (e.g., path restrictions, command validation).
+## Criterios de aceptación
+1. El usuario entiende qué hará el agente antes de ejecutar acciones de riesgo.
+2. Puede reconstruir el "qué" y el "por qué" de una ejecución completa.
+3. Puede operar el sistema desde UI o **CLI** sin perder gobernanza.
+4. El mismo flujo es ejecutable vía SDK sin cambiar semántica de políticas/eventos.
