@@ -45,7 +45,7 @@ La arquitectura prioriza tres propiedades: **control humano**, **trazabilidad to
 - **Policy Gate**: decide cuándo pedir aprobación y aplica reglas de riesgo.
 - **Observability Hub**: captura eventos, decisiones, costos y evidencia auditable.
 - **Tool Runtime**: adaptadores multiplataforma para filesystem, shell, web y conectores.
-- **SDK / Runtime Contract**: capa reusable con operaciones de ejecución (`run`, `status`, `approve`, `deny`, `logs`, `trace`).
+- **SDK / Runtime Contract**: capa reutilizable con operaciones de ejecución (`run`, `status`, `approve`, `deny`, `logs`, `trace`).
 - **Memory System**: contexto inmediato + memoria persistente para aprendizaje reutilizable.
 - **CLI Interface**: canal operativo oficial para consola/automatización y fallback sin UI.
 
