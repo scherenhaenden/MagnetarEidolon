@@ -1,161 +1,161 @@
-# NEW PLAN — Magnetar Aegis
+# NEW PLAN — MagnetarEidolon
 
-## 1) Propósito del producto
-Crear una plataforma de agentes **fácil de usar, confiable y visualmente clara**, enfocada en que cualquier persona pueda automatizar tareas complejas sin convertirse en experta en seguridad o infraestructura.
+## 1) Product Purpose
+Create an agent platform that is **easy to use, trustworthy, and visually clear**, focused on helping anyone automate complex tasks without becoming an expert in security or infrastructure.
 
-La promesa central:
+Core promise:
 
-> **“Construir, ejecutar, observar y confiar en agentes AI sin caos técnico.”**
-
----
-
-## 2) Principios rectores (no negociables)
-
-1. **Simplicidad radical de uso**  
-   El usuario debe poder empezar en minutos.
-2. **Confianza por diseño**  
-   Acciones de riesgo siempre visibles y aprobables.
-3. **Observabilidad total**  
-   Todo lo que el agente hace debe entenderse y revisarse.
-4. **Control humano siempre disponible**  
-   El usuario puede aprobar, negar o pausar decisiones críticas.
-5. **Memoria explícita y gestionable**  
-   El usuario ve, edita y elimina lo que el agente “recuerda”.
-6. **Experiencia premium**  
-   Interfaz elegante tipo “centro de mando”, no chat genérico.
+> **"Build, run, observe, and trust AI agents without technical chaos."**
 
 ---
 
-## 3) Qué queremos conservar y qué evitar
+## 2) Guiding Principles (Non-Negotiable)
 
-### Mantener
-- Flexibilidad para trabajar con distintos modelos.
-- Uso de herramientas conectadas al mundo real.
-- Flujos reutilizables (recetas/skills).
-- Historial y trazas para depuración.
-- Sistema de aprobación humana para acciones sensibles.
-
-### Evitar
-- Complejidad inicial innecesaria.
-- Integraciones que oculten riesgos.
-- Automatizaciones “mágicas” difíciles de auditar.
-- Importar recetas externas sin validación y transparencia.
-- Experiencias donde el usuario no entiende qué acaba de pasar.
-
----
-
-## 4) Experiencia del usuario deseada
-
-## Onboarding ideal
-1. Abrir la app.
-2. Elegir modo de confianza.
-3. Activar herramientas desde un catálogo visual.
-4. Cargar contexto (documentos/proyecto).
-5. Escribir objetivo.
-6. Ver plan y aprobar acciones riesgosas.
-7. Obtener resultado con resumen claro de lo ocurrido.
-
-## Sensación del producto
-- “Tengo poder, pero también control.”
-- “Sé qué está haciendo el agente en todo momento.”
-- “No tengo que adivinar riesgos.”
-- “Puedo reutilizar lo que funciona.”
+1. **Radical simplicity**
+   Users should be able to start in minutes.
+2. **Trust by design**
+   Risky actions must always be visible and approvable.
+3. **Full observability**
+   Everything an agent does must be understandable and reviewable.
+4. **Human control always available**
+   Users can approve, deny, or pause critical decisions.
+5. **Explicit, manageable memory**
+   Users can view, edit, and delete what the agent "remembers."
+6. **Premium experience**
+   An elegant command-center interface, not a generic chat UI.
 
 ---
 
-## 5) Modos de uso del producto
+## 3) What We Want to Preserve and What to Avoid
 
-1. **Modo Uso**  
-   Para ejecutar objetivos rápidamente con mínima fricción.
-2. **Modo Construcción**  
-   Para diseñar flujos y recetas reutilizables.
-3. **Modo Depuración**  
-   Para inspeccionar decisiones, errores, costos y rendimiento.
+### Preserve
+- Flexibility to work with different models.
+- Use of tools connected to real-world systems.
+- Reusable flows (recipes/skills).
+- History and traces for debugging.
+- Human approval for sensitive actions.
 
-Estos modos deben convivir sin mezclar todo en una sola experiencia confusa.
-
----
-
-## 6) Modelo de confianza y seguridad (producto)
-
-- Toda acción con impacto se clasifica por nivel de riesgo.
-- Lectura simple: puede correr con menos fricción.
-- Escritura/modificación: requiere aprobación por defecto.
-- Acciones destructivas: doble confirmación o simulación previa.
-- Toda acción sensible deja rastro auditable.
-- Todo flujo importado inicia desactivado y con revisión de permisos.
-- Los permisos deben explicarse en lenguaje humano, no técnico.
+### Avoid
+- Unnecessary initial complexity.
+- Integrations that hide risk.
+- "Magic" automations that are hard to audit.
+- Importing external recipes without validation and transparency.
+- Experiences where users do not understand what just happened.
 
 ---
 
-## 7) Pantallas clave para el MVP de producto
+## 4) Desired User Experience
 
-1. **Dashboard principal**  
-   Estado de agentes, ejecuciones recientes, aprobaciones pendientes.
-2. **Vista de ejecución en vivo**  
-   Plan, progreso, resultados intermedios, decisiones críticas.
-3. **Constructor de recetas**  
-   Crear automatizaciones reutilizables de forma visual.
-4. **Catálogo de herramientas**  
-   Activar capacidades con claridad de riesgo y alcance.
-5. **Inspector de memoria**  
-   Ver, fijar, borrar y comprender conocimiento del agente.
-6. **Trace/Replay**  
-   Revisar paso a paso qué ocurrió en una ejecución.
-7. **Centro de políticas**  
-   Definir reglas de aprobación y seguridad en lenguaje claro.
+### Ideal Onboarding
+1. Open the app.
+2. Choose trust mode.
+3. Enable tools from a visual catalog.
+4. Load context (documents/project).
+5. Enter an objective.
+6. Review the plan and approve risky actions.
+7. Receive the result with a clear summary of what happened.
 
----
-
-## 8) Roadmap de producto (por fases)
-
-## Fase 1 — Valor inmediato individual
-- Experiencia local simple.
-- Un asistente principal.
-- Ejecuciones visibles con aprobaciones.
-- Recetas básicas reutilizables.
-
-## Fase 2 — Potencia para usuarios avanzados
-- Varios especialistas por tarea.
-- Memoria de largo plazo gestionable.
-- Políticas más finas.
-- Replays y comparativas de ejecuciones.
-
-## Fase 3 — Colaboración en equipo
-- Espacios compartidos.
-- Roles y permisos.
-- Colas de aprobación.
-- Mayor gobernanza y trazabilidad.
-
-## Fase 4 — Ecosistema y expansión
-- Intercambio seguro de recetas.
-- Integraciones de terceros con controles estrictos.
-- Escalado opcional sin perder filosofía “control primero”.
+### Product Feeling
+- "I have power, but also control."
+- "I know what the agent is doing at all times."
+- "I do not have to guess risks."
+- "I can reuse what works."
 
 ---
 
-## 9) Diferenciadores estratégicos
+## 5) Product Usage Modes
 
-1. **Claridad operativa**: siempre se entiende el “qué y por qué”.
-2. **Confianza por defecto**: seguridad integrada, no opcional.
-3. **Observabilidad hermosa**: depurar se vuelve una ventaja competitiva.
-4. **Híbrido visual + editable**: accesible para todos, poderoso para expertos.
-5. **Portabilidad de recetas**: automatizaciones reutilizables y compartibles.
+1. **Execution Mode**
+   Run objectives quickly with minimal friction.
+2. **Build Mode**
+   Design reusable flows and recipes.
+3. **Debug Mode**
+   Inspect decisions, errors, costs, and performance.
 
----
-
-## 10) Criterios de éxito
-
-- Usuario crea su primera automatización útil en menos de 15 minutos.
-- Usuario comprende riesgos antes de aprobar acciones sensibles.
-- Usuario puede explicar qué hizo el agente después de cada ejecución.
-- Usuario reutiliza recetas en tareas futuras con mínima adaptación.
-- Equipo percibe la plataforma como “poderosa pero segura”.
+These modes should coexist without being merged into one confusing experience.
 
 ---
 
-## 11) Resumen ejecutivo
+## 6) Trust and Security Model (Product)
 
-**Magnetar Aegis debe ser un sistema de agentes centrado en simplicidad, confianza y visibilidad total.**
+- Every impactful action is classified by risk level.
+- Read-only operations can run with less friction.
+- Write/modify operations require approval by default.
+- Destructive actions require double confirmation or a simulation first.
+- Every sensitive action leaves an auditable record.
+- Every imported flow starts disabled and undergoes permission review.
+- Permissions must be explained in human language, not technical jargon.
 
-No se trata de añadir complejidad técnica, sino de entregar una experiencia donde automatizar sea rápido, gobernable y comprensible desde el primer uso.
+---
+
+## 7) Key Screens for the Product MVP
+
+1. **Main Dashboard**
+   Agent status, recent runs, pending approvals.
+2. **Live Execution View**
+   Plan, progress, intermediate results, critical decisions.
+3. **Recipe Builder**
+   Create reusable automations visually.
+4. **Tool Catalog**
+   Enable capabilities with clear risk and scope definitions.
+5. **Memory Inspector**
+   View, pin, delete, and understand agent knowledge.
+6. **Trace/Replay**
+   Review step-by-step what happened during execution.
+7. **Policy Center**
+   Define approval and security rules in clear language.
+
+---
+
+## 8) Product Roadmap (By Phase)
+
+### Phase 1 — Immediate Individual Value
+- Simple local experience.
+- One main assistant.
+- Visible runs with approvals.
+- Basic reusable recipes.
+
+### Phase 2 — Power for Advanced Users
+- Multiple specialists per task.
+- Manageable long-term memory.
+- Finer-grained policies.
+- Replays and run comparisons.
+
+### Phase 3 — Team Collaboration
+- Shared workspaces.
+- Roles and permissions.
+- Approval queues.
+- Stronger governance and traceability.
+
+### Phase 4 — Ecosystem and Expansion
+- Safe recipe exchange.
+- Third-party integrations with strict controls.
+- Optional scaling without losing the "control first" philosophy.
+
+---
+
+## 9) Strategic Differentiators
+
+1. **Operational clarity**: users always understand the "what" and the "why."
+2. **Default trust**: security is integrated, not optional.
+3. **Beautiful observability**: debugging becomes a competitive advantage.
+4. **Visual + editable hybrid**: accessible for everyone, powerful for experts.
+5. **Recipe portability**: reusable, shareable automations.
+
+---
+
+## 10) Success Criteria
+
+- Users create their first useful automation in under 15 minutes.
+- Users understand risks before approving sensitive actions.
+- Users can explain what the agent did after each run.
+- Users reuse recipes in future tasks with minimal adaptation.
+- Teams perceive the platform as "powerful but safe."
+
+---
+
+## 11) Executive Summary
+
+**MagnetarEidolon should be an agent system centered on simplicity, trust, and full visibility.**
+
+The goal is not to add technical complexity, but to deliver an experience where automation is fast, governable, and understandable from first use.
