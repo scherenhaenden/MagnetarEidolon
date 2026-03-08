@@ -18,7 +18,14 @@ class MagnetarCli {
       return;
     }
 
+    if (command === '-h' || command === '--help') {
+      this.printHelp();
+      return;
+    }
+
+    console.error(`Unknown command: ${command}`);
     this.printHelp();
+    process.exit(1);
   }
 
   private printHelp(): void {
