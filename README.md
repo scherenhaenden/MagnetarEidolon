@@ -35,6 +35,10 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 | `CONTRIBUTING.md` | Contribution guidelines, code of conduct, and PR workflow |
 | `projects/_template.project.yml` | Machine-readable project schema. |
 
+
+## TypeScript + Angular Skeleton
+A starter migration skeleton is available at `typescript-angular-skeleton/`. It introduces a TypeScript OOP domain layer, Angular UI shell, and CLI entrypoint that explicitly uses the MagnetarEidolon canonical model as a core context while keeping application goals broader than model description alone.
+
 ## Additional Documentation
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
 
