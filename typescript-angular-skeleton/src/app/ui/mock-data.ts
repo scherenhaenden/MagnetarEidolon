@@ -1,4 +1,30 @@
-export const MOCK_AGENTS = [
+export interface Agent {
+  id: string;
+  name: string;
+  status: string;
+  type: string;
+  runs: number;
+  latency: string;
+}
+
+export interface Run {
+  id: string;
+  agent: string;
+  status: string;
+  time: string;
+  tokens: string;
+  cost: string;
+}
+
+export interface Tool {
+  name: string;
+  category: string;
+  trust: string;
+  status: string;
+  icon: string;
+}
+
+export const MOCK_AGENTS: Agent[] = [
   {
     id: 'ag-01',
     name: 'Data Pipeline Sentinel',
@@ -25,7 +51,7 @@ export const MOCK_AGENTS = [
   },
 ];
 
-export const MOCK_RUNS = [
+export const MOCK_RUNS: Run[] = [
   {
     id: 'run-992a',
     agent: 'Data Pipeline Sentinel',
@@ -36,7 +62,7 @@ export const MOCK_RUNS = [
   },
   {
     id: 'run-992b',
-    agent: 'Infra Auto-Scaler',
+    agent: 'Infrastructure Auto-Scaler',
     status: 'pending_approval',
     time: '5m ago',
     tokens: '1.1k',
@@ -52,7 +78,7 @@ export const MOCK_RUNS = [
   },
 ];
 
-export const MOCK_TOOLS = [
+export const MOCK_TOOLS: Tool[] = [
   {
     name: 'Postgres Prod (RO)',
     category: 'Databases',
