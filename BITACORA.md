@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 22:05 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Introduced Docker containerization for the project. Added a multi-stage `Dockerfile` and `docker-compose.yml` supporting both development (hot-reload) and production (Nginx) environments. Configured `.dockerignore` to maintain a clean build context. Work tracked in `branches/feature-docker-integration/`.
+
 - **Timestamp:** 2026-03-09 21:45 UTC
   **Author:** Gemini CLI
   **Entry:** Decision: Fixed CI build failure ("tsc: command not found"). Hardened `packages/magnetar-sdk/package.json` by using `npx tsc` in build scripts and updated all Node CI workflows to use `npm ci --include=dev` to ensure `typescript` is available during the `prepare` lifecycle hook.
@@ -28,7 +32,4 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 - **Timestamp:** 2026-03-09 21:15 UTC
   **Author:** Gemini CLI
-  **Entry:** State Change: Merged `origin/master` into `codex/create-new-branch-and-typescript-pipelines`. Resolved conflicts in `package.json` and `tsconfig.cli.json` resulting from the workspace rehoming to `apps/magnetar-ui`. Verified that CLI build and runtime scripts are preserved in the new structure.
-
-- **Timestamp:** 2026-03-09 20:40 UTC
 ...
