@@ -5,7 +5,8 @@
 - Added cross-platform build validation (`npm ci`, `npm run build`) and CLI smoke testing (`node dist/cli/magnetar-cli.js about`) for Linux, macOS, and Windows.
 - Kept workflow names and triggers stable to preserve existing badges and branch protections while changing runtime focus to TypeScript.
 - Merged `master` to synchronize with the workspace rehome into `apps/magnetar-ui` and resolved related configuration conflicts.
-- **CI Hardening**: Switched all TypeScript/Node CI workflows to use `npm ci` instead of `npm install` to ensure deterministic and reliable builds across all platforms.
+- **CI Hardening**: Switched all TypeScript/Node CI workflows to use `npm ci --include=dev` instead of `npm install` to ensure deterministic builds and availability of development tools like `tsc`.
+- **SDK Build Fix**: Updated `packages/magnetar-sdk/package.json` to use `npx tsc`, ensuring the `prepare` script can find the TypeScript compiler even if not in the global path.
 
 ## Notes
 - All workflows now correctly utilize the committed `package-lock.json` files in `apps/magnetar-ui` and `packages/magnetar-sdk`.
