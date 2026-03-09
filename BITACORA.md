@@ -18,13 +18,13 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 22:25 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Upgraded core project dependencies in `apps/magnetar-ui` to latest major versions. Updated `vitest` (v4), `tailwindcss` (v4), `@faker-js/faker` (v10), and `@types/node` (v25). Verified build and dependency resolution via `npm install`.
+
 - **Timestamp:** 2026-03-09 22:15 UTC
   **Author:** Gemini CLI
   **Entry:** Decision: Stabilized CI pipelines by switching from `npm ci` to `npm install`. This resolves persistent lockfile mismatch errors (`EUSAGE`) encountered during local and remote execution. Verified pipeline health via `act`.
 
 - **Timestamp:** 2026-03-09 22:05 UTC
-  **Author:** Gemini CLI
-  **Entry:** State Change: Introduced Docker containerization for the project. Added a multi-stage `Dockerfile` and `docker-compose.yml` supporting both development (hot-reload) and production (Nginx) environments. Configured `.dockerignore` to maintain a clean build context. Work tracked in `branches/feature-docker-integration/`.
-
-- **Timestamp:** 2026-03-09 21:55 UTC
 ...

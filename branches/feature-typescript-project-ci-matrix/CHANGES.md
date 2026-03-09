@@ -8,6 +8,7 @@
 - **CI Stabilization**: Switched TypeScript/Node CI workflows to use `npm install` instead of `npm ci` to resolve lockfile synchronization issues and ensure pipeline reliability across local (`act`) and remote environments.
 - **SDK Build Fix**: Updated `packages/magnetar-sdk/package.json` to use `npx tsc`, ensuring the `prepare` script can find the TypeScript compiler even if not in the global path.
 - **Test Quality Gate**: Updated `apps/magnetar-ui/vitest.config.ts` to enforce a 100% coverage threshold across all metrics (lines, branches, functions, statements).
+- **Dependency Upgrades**: Upgraded core devDependencies in `apps/magnetar-ui` to latest major versions: `vitest` (v4), `tailwindcss` (v4), `@faker-js/faker` (v10), and `@types/node` (v25).
 
 ## Notes
 - Re-scoped CI compile step to `npm run build:cli` with a dedicated `tsconfig.cli.json` so workflows validate the operational CLI path while the Angular shell dependencies are still incomplete.
