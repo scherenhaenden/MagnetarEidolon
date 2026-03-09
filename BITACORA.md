@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 21:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Hardened CI pipelines for deterministic builds. Switched all TypeScript/Node CI workflows (`ci-linux`, `ci-macos`, `ci-windows`, `ci-typescript-ui`) from `npm install` to `npm ci`. Verified that `package-lock.json` is present in `apps/magnetar-ui` and `packages/magnetar-sdk`.
+
 - **Timestamp:** 2026-03-09 21:15 UTC
   **Author:** Gemini CLI
   **Entry:** State Change: Merged `origin/master` into `codex/create-new-branch-and-typescript-pipelines`. Resolved conflicts in `package.json` and `tsconfig.cli.json` resulting from the workspace rehoming to `apps/magnetar-ui`. Verified that CLI build and runtime scripts are preserved in the new structure.

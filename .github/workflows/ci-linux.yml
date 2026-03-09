@@ -23,7 +23,7 @@ jobs:
         node-version: ["20", "22"]
     defaults:
       run:
-        working-directory: typescript-angular-skeleton
+        working-directory: apps/magnetar-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build TypeScript project
         run: npm run build:cli
       - name: Smoke test CLI
@@ -43,6 +43,6 @@ jobs:
         with:
           name: test-artifacts-linux-node${{ matrix.node-version }}
           path: |
-            typescript-angular-skeleton/dist
-            typescript-angular-skeleton/npm-debug.log
+            apps/magnetar-ui/dist
+            apps/magnetar-ui/npm-debug.log
           if-no-files-found: warn

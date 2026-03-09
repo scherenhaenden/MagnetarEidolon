@@ -40,11 +40,11 @@ jobs:
           cache-dependency-path: apps/magnetar-ui/package-lock.json
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Install Magnetar SDK dependencies
         working-directory: packages/magnetar-sdk
-        run: npm install
+        run: npm ci
 
       - name: Run TypeScript tests
         run: npm run test:ci
