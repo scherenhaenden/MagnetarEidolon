@@ -62,7 +62,7 @@ class ChromaMemoryStore(MemoryStore):
             return MemoryResult(success=False, error=str(e))
 
     def close(self) -> None:
-        """Release resources held by the Chroma client/system cache."""
+        """Release resources held by the Chroma client."""
         try:
             SharedSystemClient.clear_system_cache()
         except Exception:
