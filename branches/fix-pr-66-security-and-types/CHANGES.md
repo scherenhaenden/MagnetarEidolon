@@ -34,6 +34,9 @@ This branch addresses critical security vulnerabilities, technical bugs, and UI 
 - Closed issue #68 ([task-ts-107]) with implementation details.
 - Added comment to blocker #79 regarding partial resolution via path traversal fix.
 
+## Branch Integration
+- Merged `origin/codex/create-angular-app-skeleton-with-typescript-oop` into this branch to establish the unified baseline for the TypeScript OOP architecture.
+
 ## Required Updates to Root Files (To be done upon merge)
 - **PLAN.md**: Fix typo in `task-ts-qa-101` from "Setup" to "Set up". (Already synchronized in local file).
 - **BITACORA.md**: Record the security hardening, type corrections, and task completions for the TypeScript SDK.
