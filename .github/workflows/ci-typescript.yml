@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: typescript-angular-skeleton
+        working-directory: apps/magnetar-ui
 
     steps:
       - name: Checkout
@@ -18,10 +18,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
+
+      - name: Install Magnetar SDK dependencies
+        working-directory: packages/magnetar-sdk
+        run: npm ci --include=dev
+
+      - name: Build Magnetar SDK
+        working-directory: packages/magnetar-sdk
+        run: npm run build
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci --include=dev
 
-      - name: Build TypeScript SDK
-        run: npm run build
+      - name: Build TypeScript UI
+        run: npm run build:web

@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { MemoryItem } from './models';
+import { MemoryItem } from './models.js';
 
 export interface ToolResult {
   success: boolean;

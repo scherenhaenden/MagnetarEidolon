@@ -1,0 +1,81 @@
+name: CI (TypeScript UI)
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "fix/**"
+      - "master"
+    paths:
+      - "apps/magnetar-ui/**"
+      - "packages/magnetar-sdk/**"
+      - ".github/workflows/ci-typescript-ui.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "apps/magnetar-ui/**"
+      - "packages/magnetar-sdk/**"
+      - ".github/workflows/ci-typescript-ui.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript-ui:
+    name: Validate Magnetar UI workspace
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/magnetar-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/magnetar-ui/package-lock.json
+
+      - name: Install Magnetar SDK dependencies
+        working-directory: packages/magnetar-sdk
+        run: npm ci --include=dev
+
+      - name: Build Magnetar SDK
+        working-directory: packages/magnetar-sdk
+        run: npm run build
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Run TypeScript tests
+        run: npm run test:ci
+
+      - name: Run web build
+        run: npm run build:web
+
+      - name: Run CLI build
+        run: npm run build:cli
+
+      - name: Run CLI smoke command
+        run: npm run cli -- about
+
+      - name: Run development CLI smoke command
+        run: npm run cli:dev -- about
+
+      - name: Run Magnetar SDK typecheck
+        run: npm --prefix ../../packages/magnetar-sdk run typecheck
+
+      - name: Run TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Upload TypeScript test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-typescript-ui
+          path: |
+            apps/magnetar-ui/coverage
+          if-no-files-found: warn
