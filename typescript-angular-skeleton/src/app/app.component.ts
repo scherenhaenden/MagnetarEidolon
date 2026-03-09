@@ -1,194 +1,17 @@
-import {
-  Component,
-  Input,
-  ViewEncapsulation,
-  computed,
-  signal,
-} from '@angular/core';
+import { Component, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-const MOCK_AGENTS = [
-  {
-    id: 'ag-01',
-    name: 'Data Pipeline Sentinel',
-    status: 'active',
-    type: 'Orchestrator',
-    runs: 1240,
-    latency: '45ms',
-  },
-  {
-    id: 'ag-02',
-    name: 'Code Review Enforcer',
-    status: 'idle',
-    type: 'Reviewer',
-    runs: 85,
-    latency: '120ms',
-  },
-  {
-    id: 'ag-03',
-    name: 'Infrastructure Auto-Scaler',
-    status: 'active',
-    type: 'Operations',
-    runs: 8900,
-    latency: '12ms',
-  },
-];
-
-const MOCK_RUNS = [
-  {
-    id: 'run-992a',
-    agent: 'Data Pipeline Sentinel',
-    status: 'success',
-    time: '2m ago',
-    tokens: '4.2k',
-    cost: '$0.04',
-  },
-  {
-    id: 'run-992b',
-    agent: 'Infra Auto-Scaler',
-    status: 'pending_approval',
-    time: '5m ago',
-    tokens: '1.1k',
-    cost: '$0.01',
-  },
-  {
-    id: 'run-992c',
-    agent: 'Code Review Enforcer',
-    status: 'failed',
-    time: '1h ago',
-    tokens: '8.9k',
-    cost: '$0.09',
-  },
-];
-
-const MOCK_TOOLS = [
-  {
-    name: 'Postgres Prod (RO)',
-    category: 'Databases',
-    trust: 'High',
-    status: 'connected',
-    icon: 'database',
-  },
-  {
-    name: 'AWS EC2 Control',
-    category: 'Infrastructure',
-    trust: 'Critical',
-    status: 'requires_auth',
-    icon: 'server',
-  },
-  {
-    name: 'GitHub Pr Manager',
-    category: 'VCS',
-    trust: 'Medium',
-    status: 'connected',
-    icon: 'git-merge',
-  },
-  {
-    name: 'Stripe Billing API',
-    category: 'APIs',
-    trust: 'High',
-    status: 'connected',
-    icon: 'credit-card',
-  },
-  {
-    name: 'Internal Slack Notifier',
-    category: 'Automation',
-    trust: 'Low',
-    status: 'connected',
-    icon: 'message-square',
-  },
-];
-
-const ICONS: Record<string, string> = {
-  home: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
-  activity: 'M22 12h-4l-3 9L9 3l-3 9H2',
-  'git-branch':
-    'M6 3v12 M18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M9 18h6 M12 12l3-3',
-  wrench:
-    'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
-  database:
-    'M3 9c0 1.66 4.03 3 9 3s9-1.34 9-3 M3 15c0 1.66 4.03 3 9 3s9-1.34 9-3 M3 5c0 1.66 4.03 3 9 3s9-1.34 9-3v14c0 1.66-4.03 3-9 3s-9-1.34-9-3V5z',
-  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
-  server:
-    'M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6z M2 14a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4z M6 6h.01 M6 14h.01 M10 6h.01 M10 14h.01',
-  'git-merge':
-    'M18 6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 9V6 M6 15v-3 M18 9l-6 6',
-  'credit-card':
-    'M2 8h20 M2 16h20 M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
-  'message-square':
-    'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
-  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35',
-  command:
-    'M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z',
-  cpu: 'M4 4h16v16H4z M9 9h6v6H9z M9 1v3 M15 1v3 M9 20v3 M15 20v3 M20 9h3 M20 14h3 M1 9h3 M1 14h3',
-  play: 'M5 3l14 9-14 9V3z',
-  check: 'M20 6L9 17l-5-5',
-  x: 'M18 6L6 18 M6 6l12 12',
-  alert:
-    'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01',
-};
-
-@Component({
-  selector: 'ui-icon',
-  standalone: true,
-  template: `
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      [attr.width]="size"
-      [attr.height]="size"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      [class]="cssClass">
-      <path [attr.d]="path"></path>
-    </svg>
-  `,
-})
-class IconComponent {
-  @Input() public name = '';
-  @Input() public size = 20;
-  @Input() public cssClass = '';
-
-  public get path(): string {
-    return ICONS[this.name] || ICONS.activity;
-  }
-}
-
-@Component({
-  selector: 'ui-badge',
-  standalone: true,
-  template: `
-    <span [class]="baseClasses + ' ' + (colorClasses[status] || colorClasses.default)">
-      <ng-content></ng-content>
-    </span>
-  `,
-})
-class BadgeComponent {
-  @Input() public status = 'default';
-
-  public readonly baseClasses =
-    'px-2 py-0.5 text-xs font-medium rounded-full border flex items-center gap-1.5 w-fit';
-
-  public readonly colorClasses: Record<string, string> = {
-    active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    idle: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
-    failed: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-    pending_approval:
-      'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]',
-    default: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  };
-}
+import { UiBadgeComponent, BadgeStatus } from './ui/badge.component';
+import { UiIconComponent } from './ui/icon.component';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data';
 
 @Component({
   selector: 'screen-dashboard',
   standalone: true,
-  imports: [CommonModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
     <div class="space-y-8 animate-fade-in pb-12">
+      <!-- ... (keeping existing template as is) ... -->
       <div class="relative group">
         <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
         <div class="relative bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
@@ -261,7 +84,7 @@ class BadgeComponent {
                 <tr *ngFor="let run of runs" class="hover:bg-white/[0.02] transition-colors cursor-pointer">
                   <td class="px-4 py-3 font-mono text-xs text-zinc-500">{{ run.id }}</td>
                   <td class="px-4 py-3 font-medium">{{ run.agent }}</td>
-                  <td class="px-4 py-3"><ui-badge [status]="run.status">{{ run.status }}</ui-badge></td>
+                  <td class="px-4 py-3"><ui-badge [status]="getRunStatus(run)">{{ run.status }}</ui-badge></td>
                   <td class="px-4 py-3 font-mono text-xs text-zinc-400">{{ run.tokens }} tok / {{ run.cost }}</td>
                   <td class="px-4 py-3 text-right text-zinc-500">{{ run.time }}</td>
                 </tr>
@@ -295,14 +118,28 @@ class BadgeComponent {
   `,
 })
 class DashboardScreen {
-  public readonly agents = MOCK_AGENTS;
-  public readonly runs = MOCK_RUNS;
+  public readonly agents: Agent[] = MOCK_AGENTS;
+  public readonly runs: Run[] = MOCK_RUNS;
+
+  public getRunStatus(run: Run): BadgeStatus {
+    switch (run.status) {
+      case 'success':
+        return 'success';
+      case 'failed':
+        return 'failed';
+      case 'pending_approval':
+        return 'pending_approval';
+      default:
+        console.warn(`Unexpected run status encountered: ${run.status}`);
+        return 'default';
+    }
+  }
 }
 
 @Component({
   selector: 'screen-live-run',
   standalone: true,
-  imports: [CommonModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
     <div class="h-[calc(100vh-6rem)] grid grid-cols-12 gap-6 animate-fade-in pb-6">
       <div class="col-span-3 bg-[#0a0a0d] border border-white/5 rounded-xl flex flex-col overflow-hidden relative">
@@ -312,6 +149,7 @@ class DashboardScreen {
           </h3>
           <ui-badge status="active">Running</ui-badge>
         </div>
+        <!-- ... (keeping existing template as is) ... -->
         <div class="flex-1 overflow-y-auto p-4 space-y-6 relative">
           <div class="absolute left-[27px] top-6 bottom-6 w-px bg-white/10 z-0"></div>
           <div class="relative z-10 flex gap-4">
@@ -350,7 +188,7 @@ class DashboardScreen {
           </div>
         </div>
       </div>
-
+      <!-- ... (keeping rest of template as is) ... -->
       <div class="col-span-6 bg-[#0a0a0d] border border-white/5 rounded-xl flex flex-col relative overflow-hidden shadow-2xl">
         <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
         <div class="p-4 border-b border-white/5 flex justify-between items-center bg-black/40">
@@ -446,9 +284,10 @@ class LiveRunScreen {}
 @Component({
   selector: 'screen-builder',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, UiIconComponent],
   template: `
     <div class="h-[calc(100vh-6rem)] grid grid-cols-4 gap-0 border border-white/5 rounded-xl overflow-hidden animate-fade-in shadow-2xl bg-[#08080a]">
+      <!-- ... (keeping existing template as is) ... -->
       <div class="col-span-3 relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent">
         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
         <div class="absolute top-4 left-4 bg-[#121216] border border-white/10 rounded-lg p-1.5 flex gap-1 z-20 shadow-lg backdrop-blur-md">
@@ -476,7 +315,7 @@ class BuilderScreen {}
 @Component({
   selector: 'screen-tools',
   standalone: true,
-  imports: [CommonModule, IconComponent, BadgeComponent],
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <div class="flex justify-between items-end">
@@ -492,7 +331,7 @@ class BuilderScreen {}
             <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
               <ui-icon [name]="tool.icon" [size]="20"></ui-icon>
             </div>
-            <ui-badge [status]="tool.status === 'connected' ? 'active' : 'idle'">{{ tool.status }}</ui-badge>
+            <ui-badge [status]="getToolStatusBadge(tool)">{{ tool.status }}</ui-badge>
           </div>
           <div class="relative z-10 flex-1">
             <h3 class="font-medium text-zinc-200 text-base group-hover:text-white transition-colors">{{ tool.name }}</h3>
@@ -504,13 +343,26 @@ class BuilderScreen {}
   `,
 })
 class ToolsScreen {
-  public readonly tools = MOCK_TOOLS;
+  public readonly tools: Tool[] = MOCK_TOOLS;
+
+  public getToolStatusBadge(tool: Tool): BadgeStatus {
+    if (tool.status === 'connected') {
+      return 'active';
+    } else if (tool.status === 'requires_auth') {
+      return 'pending_approval';
+    } else if (tool.status === 'disconnected') {
+      return 'idle';
+    } else {
+      console.warn(`Unexpected tool status encountered: ${tool.status}`);
+      return 'default';
+    }
+  }
 }
 
 @Component({
   selector: 'screen-policy',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, UiIconComponent],
   template: `
     <div class="space-y-6 animate-fade-in max-w-5xl mx-auto pb-12">
       <div class="flex justify-between items-center bg-gradient-to-r from-violet-500/10 to-transparent p-6 rounded-2xl border border-violet-500/20">
@@ -530,7 +382,7 @@ class PolicyScreen {}
   standalone: true,
   imports: [
     CommonModule,
-    IconComponent,
+    UiIconComponent,
     DashboardScreen,
     LiveRunScreen,
     BuilderScreen,
