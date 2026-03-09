@@ -62,6 +62,28 @@ El repositorio se encuentra en una fase de transición estratégica:
 - CLI de desarrollo: `cd apps/magnetar-ui && npm install && npm run cli:dev -- about`
 - CLI compilada: `cd apps/magnetar-ui && npm run build:cli && npm run cli -- about`
 
+## Comandos operativos actuales
+```bash
+cd apps/magnetar-ui
+npm install
+
+# Web local
+npm run start
+
+# CLI en desarrollo
+npm run cli:dev -- about
+npm run cli:dev -- canonical-model
+
+# CLI compilada
+npm run build:cli
+npm run cli -- about
+
+# Validación
+npm run typecheck
+npm run test:ci
+npm run build
+```
+
 ## Acometidos inmediatos
 1. Consolidar experiencia MVP con Dashboard + Live Execution + Policy Center.
 2. Garantizar trazabilidad de acciones sensibles con aprobación humana.

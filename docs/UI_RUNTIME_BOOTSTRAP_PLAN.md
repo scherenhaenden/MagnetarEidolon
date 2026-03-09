@@ -193,3 +193,27 @@ This plan is complete only when all of the following are true:
 - Root docs explain the difference between local startup and no-install distribution.
 - CI validates the startup commands contributors are told to use.
 - Test strategy documents how startup tests and test-the-tests validation are enforced.
+
+## Current Command Baseline
+These are the commands the repository currently expects contributors to use for the TypeScript UI workspace.
+
+```bash
+cd apps/magnetar-ui
+npm install
+
+# Web local
+npm run start
+
+# CLI in development
+npm run cli:dev -- about
+npm run cli:dev -- canonical-model
+
+# Built CLI
+npm run build:cli
+npm run cli -- about
+
+# Validation
+npm run typecheck
+npm run test:ci
+npm run build
+```

@@ -17,7 +17,7 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-
         <div class="relative bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
           <div class="flex items-center gap-3 text-cyan-400 font-medium tracking-wide text-sm">
             <ui-icon name="command" [size]="16"></ui-icon>
-            AEGIS COMMAND
+            EIDOLON COMMAND
           </div>
           <input
             type="text"
@@ -397,7 +397,7 @@ class PolicyScreen {}
             <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-400 to-violet-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.3)]">
               <div class="w-3 h-3 bg-[#050505] rounded-full"></div>
             </div>
-            <span class="font-bold text-lg tracking-tight text-white shadow-sm">MAGNETAR<span class="font-light text-zinc-400 ml-1">AEGIS</span></span>
+            <span class="font-bold text-lg tracking-tight text-white shadow-sm">MAGNETAR<span class="font-light text-zinc-400 ml-1">EIDOLON</span></span>
           </div>
           <nav class="hidden md:flex gap-1 bg-white/[0.03] p-1 rounded-lg border border-white/5">
             <ng-container *ngFor="let tab of tabs">

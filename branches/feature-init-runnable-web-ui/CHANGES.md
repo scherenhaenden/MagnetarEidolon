@@ -10,6 +10,10 @@ Initializes the existing `apps/magnetar-ui` codebase as a real runnable web work
     - Added browser entrypoint and styling pipeline so the existing UI can render with its intended utility-class visual system.
 - **apps/magnetar-ui/README.md**:
     - Replaced placeholder startup guidance with real web, CLI, and validation commands.
+- **README.md / docs/UI_RUNTIME_BOOTSTRAP_PLAN.md**:
+    - Added the exact root-level command baseline for web startup, CLI usage, and validation.
+- **apps/magnetar-ui/src/app/app.component.ts**:
+    - Removed remaining `Magnetar Aegis` naming leaks so the UI consistently refers to `Magnetar Eidolon`.
 - **.github/workflows/ci-typescript-ui.yml / TESTING.md**:
     - Extended validation expectations to cover real web build and CLI smoke paths.
 - **PLAN.md / STATUS.md / README.md / BITACORA.md**:
