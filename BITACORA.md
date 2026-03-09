@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 20:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Iniciada la extracción del runtime TypeScript compartido hacia `packages/magnetar-sdk` en una rama dedicada. El objetivo es separar la UI de producto (`apps/magnetar-ui`) del contrato reusable para UI y CLI, manteniendo trazabilidad documental y validación por tests/typecheck.
+
 - **Timestamp:** 2026-03-09 19:45 UTC
   **Author:** Codex
   **Entry:** State Change: Reubicado el workspace TypeScript desde `typescript-angular-skeleton` a `apps/magnetar-ui`. Se añadió pipeline dedicado `CI (TypeScript UI)`, se activaron scripts de test/typecheck con `Vitest`, y se validó localmente el primer smoke suite del workspace.

@@ -1,11 +1,11 @@
 # MagnetarEidolon UI Workspace
 
-This workspace contains the active TypeScript UI proof of concept for **MagnetarEidolon**, together with the local CLI/runtime pieces that are being validated for the shared UI + CLI architecture.
+This workspace contains the active TypeScript UI proof of concept for **MagnetarEidolon**.
 
 ## Design Intent
 - The product is **MagnetarEidolon**.
 - The canonical project model is used as governance/context, not as the product identity.
-- This workspace is a transition step toward `apps/magnetar-ui` + future `packages/magnetar-sdk`.
+- The shared runtime now begins to live in `packages/magnetar-sdk`.
 
 ## Included Pieces
 - `src/app/core/models/canonical-model.ts`: OOP domain model classes.
@@ -25,4 +25,4 @@ npm run cli -- about
 npm run cli -- canonical-model
 ```
 
-> Note: This workspace is still transitional. The UI is being re-homed into a product-aligned layout first; the shared runtime/package split comes next.
+> Note: This workspace is still transitional. The UI layout is now product-aligned, and the shared runtime extraction to `packages/magnetar-sdk` has started.

@@ -29,7 +29,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
     - **Focus**: Pure functions, state models, and individual agent logic steps.
     - **Tooling**: `Vitest`.
     - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
-    - **Requirement**: No code in `src/app/core/` can be merged without 100% branch and line coverage.
+    - **Requirement**: No code en `packages/magnetar-sdk/src/` puede mergearse sin cobertura completa del módulo afectado; mientras exista código compartido aún dentro de la UI, aplica la misma exigencia a ese path temporal.
 
 2.  **Integration Tests**
     - **Focus**: Interaction between `MagnetarAgent`, `Tool` adapters, and `MemoryStore`.

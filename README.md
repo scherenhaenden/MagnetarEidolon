@@ -51,7 +51,7 @@ La CLI no debe duplicar lógica de negocio; debe consumir ese SDK/Runtime Contra
 El repositorio se encuentra en una fase de transición estratégica:
 - La implementación en Python sigue activa mientras se evalúa el prototipo en TypeScript.
 - La UI TypeScript ya vive en `apps/magnetar-ui` y deja de tratarse como un "skeleton" permanente.
-- El camino objetivo para la arquitectura unificada CLI/Web es `apps/magnetar-ui` + un runtime compartido que más adelante vivirá en `packages/magnetar-sdk`.
+- El camino objetivo para la arquitectura unificada CLI/Web es `apps/magnetar-ui` + `packages/magnetar-sdk`; la extracción del runtime compartido está en ejecución.
 - Los planes y pruebas de calidad ahora priorizan la migración a TypeScript.
 - Una vez validado el prototipo TypeScript, se procederá a retirar el código Python legado.
 

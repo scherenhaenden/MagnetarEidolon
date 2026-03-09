@@ -65,4 +65,4 @@ La arquitectura prioriza tres propiedades: **control humano**, **trazabilidad to
 ## Decisión de transición activa
 - El directorio temporal `typescript-angular-skeleton` deja de representar el destino arquitectónico deseado.
 - La UI debe vivir bajo una estructura de producto explícita (`apps/magnetar-ui`) para evitar que un nombre de prototipo condicione la arquitectura.
-- El runtime compartido seguirá inicialmente dentro del workspace de UI mientras se estabiliza, pero la dirección aprobada es extraerlo después a `packages/magnetar-sdk`.
+- La extracción del runtime compartido hacia `packages/magnetar-sdk` está en ejecución para separar claramente producto UI y contrato reusable.

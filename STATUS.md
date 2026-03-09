@@ -10,7 +10,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 ## Enfoque inmediato
 - Consolidar la UI TypeScript ya reubicada en `apps/magnetar-ui`.
 - Activar y estabilizar pipeline propio para validación TypeScript sin depender solo del CI Python legado.
-- Dejar documentado el siguiente paso arquitectónico: extraer el runtime compartido a `packages/magnetar-sdk`.
+- Ejecutar la extracción del runtime compartido a `packages/magnetar-sdk` y fijar su contrato inicial.
 
 ## Hitos (Milestones)
 
@@ -40,7 +40,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 | TS test pipeline | in_review | Workflow dedicado creado y validado localmente con tests + typecheck. |
 | Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
 | **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |
-| **SDK contract** | **ready** | Definición requerida para evitar divergencia entre UI y CLI. |
+| **SDK contract** | **in_progress** | Extracción física del runtime compartido en curso hacia `packages/magnetar-sdk`. |
 
 ## Riesgos y Mitigaciones
 

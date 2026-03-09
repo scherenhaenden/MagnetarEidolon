@@ -8,12 +8,14 @@ on:
       - "master"
     paths:
       - "apps/magnetar-ui/**"
+      - "packages/magnetar-sdk/**"
       - ".github/workflows/ci-typescript-ui.yml"
   pull_request:
     branches:
       - "master"
     paths:
       - "apps/magnetar-ui/**"
+      - "packages/magnetar-sdk/**"
       - ".github/workflows/ci-typescript-ui.yml"
 
 permissions:
@@ -40,8 +42,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install Magnetar SDK dependencies
+        working-directory: packages/magnetar-sdk
+        run: npm install
+
       - name: Run TypeScript tests
         run: npm run test:ci
+
+      - name: Run Magnetar SDK typecheck
+        run: npx tsc -p ../../packages/magnetar-sdk/tsconfig.json --noEmit
 
       - name: Run TypeScript typecheck
         run: npm run typecheck

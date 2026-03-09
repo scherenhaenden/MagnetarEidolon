@@ -57,13 +57,13 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-1101` | `ms-11` | Definir IA UX flow de onboarding | Core Team | in_progress | 7 pasos de flujo ideal. |
 | `task-1102` | `ms-11` | Implementar Tool Catalog | Core Team | ready | Con visibilidad de riesgo/alcance. |
 | `task-1103` | `ms-16` | Reubicar la UI TS a `apps/magnetar-ui` | Core Team | in_review | Workspace movido y referencias activas actualizadas desde el nombre temporal anterior. |
-| `task-1104` | `ms-16` | Definir separación futura UI/SDK | Core Team | planned | Preparar extracción de runtime compartido hacia `packages/magnetar-sdk`. |
+| `task-1104` | `ms-16` | Definir separación futura UI/SDK | Core Team | in_progress | Extracción activa del runtime compartido hacia `packages/magnetar-sdk`. |
 | `task-1201` | `ms-12` | Diseñar Policy Center | Core Team | ready | Reglas en lenguaje humano. |
 | `task-1301` | `ms-13` | Habilitar Trace/Replay | Core Team | planned | Vista reproducible paso a paso. |
 | `task-1401` | `ms-14` | Formalizar comandos CLI | Core Team | ready | Contratos de run/approve/logs. |
 | `task-1402` | `ms-14` | Verificar CLI multiplataforma | Core Team | planned | Linux/macOS/Windows. |
-| `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | ready | Paridad funcional UI/CLI. |
-| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | planned | Ejemplos CLI y UI. |
+| `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | in_progress | El paquete `packages/magnetar-sdk` pasa a representar el contrato compartido. |
+| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | in_progress | Documentar consumo desde UI y próximos clientes CLI. |
 | `task-104` | `ms-03` | Definir gobernanza de branching/WIP | Core Team | ready | Pendiente revisión. |
 | `task-105` | `ms-03` | Establecer controles de test/blocker | Core Team | in_progress | Borrador de mecanismos de escalado. |
 | `task-201` | `ms-04` | Crear archivos de doc canónica | Jules | done | RULES, PLAN, etc. |

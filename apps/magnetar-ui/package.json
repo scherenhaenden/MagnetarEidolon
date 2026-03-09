@@ -16,6 +16,7 @@
     "magnetar-cli": "dist/cli/magnetar-cli.js"
   },
   "dependencies": {
+    "@magnetar/magnetar-sdk": "file:../../packages/magnetar-sdk",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
