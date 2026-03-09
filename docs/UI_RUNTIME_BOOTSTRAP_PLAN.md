@@ -41,7 +41,7 @@ Current gaps:
 The repository must provide a command that launches the TypeScript UI in a browser-oriented local dev server.
 
 Success conditions:
-- `apps/magnetar-ui` has a real `start` or `dev` command.
+- `apps/magnetar-ui` has a real `start` or `dev` command that launches the UI without missing dependencies or placeholder behavior.
 - The command launches a web application locally.
 - The startup path is documented in workspace and root docs.
 - The UI consumes `packages/magnetar-sdk` through a stable local package boundary.
@@ -105,7 +105,7 @@ Deliverables:
   - this plan document if implementation deviates
 
 Acceptance checks:
-- A contributor can run the documented command and open the UI locally.
+- A contributor can run the documented command and open the UI locally without startup-script or dependency-resolution errors.
 - The startup command fails loudly and clearly on broken dependency wiring.
 
 ## Workstream C: Make the CLI usable in development and distribution

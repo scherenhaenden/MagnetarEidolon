@@ -3,6 +3,7 @@ import { Tool, ToolResult } from '../interfaces.js';
 
 /**
  * A virtual/mock filesystem for the web browser environment.
+ * Existing keys are readable even when their content is the empty string.
  */
 export class WebFileSystemTool implements Tool {
   public readonly name = 'filesystem';
@@ -21,6 +22,7 @@ export class WebFileSystemTool implements Tool {
           return of({ success: false, error: `File not found: ${args.path}` });
         }
 
+        // Empty-string content is a valid file payload, not a missing-file signal.
         return of({ success: true, output: this.virtualFS.get(args.path) ?? '' });
       case 'write':
         if (args.content === undefined) {

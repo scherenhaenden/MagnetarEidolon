@@ -17,7 +17,7 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-
         <div class="relative bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
           <div class="flex items-center gap-3 text-cyan-400 font-medium tracking-wide text-sm">
             <ui-icon name="command" [size]="16"></ui-icon>
-            EIDOLON COMMAND
+            MAGNETAR EIDOLON COMMAND
           </div>
           <input
             type="text"

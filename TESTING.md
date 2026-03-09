@@ -29,7 +29,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
     - **Focus**: Pure functions, state models, and individual agent logic steps.
     - **Tooling**: `Vitest`.
     - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
-    - **Requirement**: No code en `packages/magnetar-sdk/src/` puede mergearse sin cobertura completa del módulo afectado; mientras exista código compartido aún dentro de la UI, aplica la misma exigencia a ese path temporal.
+    - **Requirement**: Ningun codigo en `packages/magnetar-sdk/src/` puede mergearse sin cobertura completa del modulo afectado; mientras exista codigo compartido aun dentro de la UI, aplica la misma exigencia a ese path temporal.
 
 2.  **Integration Tests**
     - **Focus**: Interaction between `MagnetarAgent`, `Tool` adapters, and `MemoryStore`.
@@ -47,7 +47,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 
 ### TypeScript CI Pipeline Baseline
 - A dedicated GitHub Actions workflow must validate the TypeScript UI workspace independently of the Python legacy pipeline.
-- Minimum baseline stages:
+- Minimum baseline stages (Node.js 22):
   - install Node dependencies in `apps/magnetar-ui`
   - build the real web UI entrypoint
   - build the CLI artifact path
