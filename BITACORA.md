@@ -18,6 +18,22 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 17:45 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Synchronized local PLAN.md with GitHub Issue tracker. Closed issues #67 (TS SDK Integration) and #68 (LLM Provider Service) following verification of implementation in the Angular shell. Updated project effort summary to reflect 87 completed points.
+
+- **Timestamp:** 2026-03-09 17:35 UTC
+  **Author:** Gemini CLI
+  **Entry:** Security: Hardened TypeScript SDK against Absolute Path Traversal. Implemented `resolveSafePath` in `NodeFileSystemTool` to restrict all file operations to the current working directory. Added path validation to `WebFileSystemTool`.
+
+- **Timestamp:** 2026-03-09 17:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Refined TypeScript SDK type safety. Fixed critical invalid type 'str' (leftover from Python) to 'string' in `agent.ts`. Implemented robust null handling for LLM responses and enhanced UI status mapping with explicit warning logs for unexpected states.
+
+- **Timestamp:** 2026-03-09 17:15 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Merged 'origin/codex/create-angular-app-skeleton-with-typescript-oop' into 'fix/pr-66-security-and-types'. Integrated the baseline Angular OOP skeleton with current security hardening and type safety refinements.
+
 - **Timestamp:** 2026-03-09 16:45 UTC
   **Author:** Codex
   **Entry:** Decision: Reconciled branch changelogs with canonical root documentation. Added missing records for the TypeScript migration documentation and testing-strategy updates, and clarified in root docs that Python remains active while the TypeScript proof of concept is evaluated as the likely successor architecture.
