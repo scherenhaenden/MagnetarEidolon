@@ -1,5 +1,11 @@
 # MagnetarEidolon
 
+[![CI (Linux)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml)
+[![CI (macOS)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml)
+[![CI (Windows)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml)
+[![Release](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml)
+[![License](https://img.shields.io/github/license/scherenhaenden/MagnetarEidolon)](https://github.com/scherenhaenden/MagnetarEidolon/blob/master/LICENSE)
+
 ## Propósito
 MagnetarEidolon evoluciona hacia una plataforma de agentes enfocada en **simplicidad, confianza y observabilidad total**.
 
@@ -41,11 +47,21 @@ La CLI no debe duplicar lógica de negocio; debe consumir ese SDK/Runtime Contra
 | `STATUS.md` | Estado actual, riesgos y próximos compromisos. |
 | `TESTING.md` | Estrategia de validación técnica y de producto. |
 
+## Estado de Transición
+El repositorio se encuentra en una fase de transición estratégica:
+- La implementación en Python sigue activa mientras se evalúa el prototipo en TypeScript.
+- El **TypeScript Angular Skeleton** es el camino actual para la arquitectura unificada CLI/Web.
+- Los planes y pruebas de calidad ahora priorizan la migración a TypeScript.
+- Una vez validado el prototipo TypeScript, se procederá a retirar el código Python legado.
+
 ## Acometidos inmediatos
 1. Consolidar experiencia MVP con Dashboard + Live Execution + Policy Center.
 2. Garantizar trazabilidad de acciones sensibles con aprobación humana.
 3. Mantener **CLI de consola** como interfaz oficial de operación/diagnóstico.
 4. Formalizar el **SDK contract** que consumen tanto UI como CLI.
+
+## Información adicional
+- `docs/MAGNETAR_TECHNOLOGY_STACK.md`: decisiones tecnológicas y justificación para Linux, macOS y Windows.
 
 ## Nota de gobernanza
 Cualquier cambio de alcance debe sincronizarse en `NEW_PLAN.md`, `PLAN.md`, `REQUIREMENTS.md` y `STATUS.md` en el mismo PR para evitar deriva documental.

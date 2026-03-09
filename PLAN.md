@@ -12,28 +12,67 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | Fase 3 | Colaboración de equipos (workspaces, roles, colas de aprobación). | planned |
 | Fase 4 | Ecosistema y expansión segura (intercambio de recetas + integraciones externas con controles estrictos). | planned |
 
-## Milestones activos
+## Resumen de Milestones
 
-| Milestone ID | Nombre | Fecha objetivo | Estado |
-| :--- | :--- | :--- | :--- |
-| `ms-11` | Experience Foundation | 2026-04-10 | in_progress |
-| `ms-12` | Trust & Policy Center | 2026-04-24 | ready |
-| `ms-13` | Observability & Replay | 2026-05-08 | planned |
-| `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready |
-| `ms-15` | SDK Contract Base | 2026-04-22 | ready |
-
-## Backlog priorizado (acometidos)
-
-| Task ID | Milestone | Título | Estado | Entregable |
+| Milestone ID | Nombre | Fecha objetivo | Estado | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
-| `task-1101` | `ms-11` | Definir IA UX flow de onboarding ideal (7 pasos) | in_progress | Flujo validado en `REQUIREMENTS.md` y prototipo navegable. |
-| `task-1102` | `ms-11` | Implementar Tool Catalog con riesgo/alcance visible | ready | Catálogo con etiquetas de riesgo legibles para usuario. |
-| `task-1201` | `ms-12` | Diseñar Policy Center en lenguaje humano | ready | Reglas comprensibles para aprobaciones y acciones destructivas. |
-| `task-1301` | `ms-13` | Habilitar Trace/Replay paso a paso | planned | Vista reproducible de decisiones, llamadas a tools y resultados. |
-| `task-1401` | `ms-14` | Formalizar comandos CLI para run/approve/deny/status/logs | ready | Especificación de comandos y contratos de salida. |
-| `task-1402` | `ms-14` | Verificar CLI de consola en Linux/macOS/Windows | planned | Evidencia de pruebas cruzadas y checklist de paridad. |
-| `task-1501` | `ms-15` | Definir SDK contract (run/status/approve/deny/logs/trace) | ready | Especificación versionada del contrato compartido UI/CLI. |
-| `task-1502` | `ms-15` | Publicar guía de integración para CLI y UI | planned | Ejemplos de consumo y reglas de compatibilidad. |
+| `ms-01` | Canon Bootstrap | 2026-03-05 | done | Establecer artefactos de gobernanza y planificación. |
+| `ms-02` | Magnetar Model Baseline | 2026-03-12 | done | Definir arquitectura y esquema de proyecto. |
+| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | in_progress | Migración del motor de razonamiento a TypeScript. |
+| `ms-ts-qa-01` | TypeScript Testing & QA | 2026-03-30 | planned | Pirámide de pruebas y 100% cobertura en core. |
+| `ms-11` | Experience Foundation | 2026-04-10 | in_progress | UI/UX base y catálogo de herramientas. |
+| `ms-12` | Trust & Policy Center | 2026-04-24 | ready | Centro de control de políticas y aprobaciones. |
+| `ms-13` | Observability & Replay | 2026-05-08 | planned | Trazabilidad y reproducción de ejecuciones. |
+| `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready | Interfaz de línea de comandos unificada. |
+| `ms-15` | SDK Contract Base | 2026-04-22 | ready | Contrato compartido entre UI y CLI. |
+| `ms-04` | Project Initialization | 2026-05-15 | done | Estructura inicial y archivos de gobernanza. |
+| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base del motor en Python. |
+| `ms-06` | Tool System | 2026-06-15 | done | Abstracción de herramientas y herramientas OS. |
+| `ms-07` | Memory & Knowledge | 2026-07-01 | done | Integración de LiteLLM y ChromaDB. |
+| `ms-08` | Distribution | 2026-07-15 | done | Empaquetado y CLI inicial. |
+
+## Backlog priorizado
+
+| Task ID | Milestone | Título | Propietario | Estado | Notas |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `task-101` | `ms-01` | Crear base de documentación canónica | Core Team | done | Archivos canónicos iniciales creados. |
+| `task-102` | `ms-02` | Borrador de arquitectura Magnetar | Core Team | in_review | Validar contra docs de arquitectura. |
+| `task-103` | `ms-02` | Plantilla de esquema YAML | Core Team | done | `_template.project.yml` completado. |
+| `task-ts-101` | `ms-ts-01` | Portar estado MagnetarModel a TS | Gemini | done | Definido en `core/models.ts`. |
+| `task-ts-102` | `ms-ts-01` | Portar Reasoning Loop a TS | Gemini | done | Definido en `core/agent.ts`. |
+| `task-ts-103` | `ms-ts-01` | Implementar interfaces SDK | Gemini | done | Definido en `core/interfaces.ts`. |
+| `task-ts-104` | `ms-ts-01` | Crear adaptadores de Node.js (CLI) | Gemini | done | `core/tools/node-filesystem.ts` creado. |
+| `task-ts-105` | `ms-ts-01` | Crear adaptadores de Browser (Web) | Gemini | done | `core/tools/web-filesystem.ts` creado. |
+| `task-ts-106` | `ms-ts-01` | Integrar SDK en Angular Shell | Gemini | done | Integración en app.component.ts. |
+| `task-ts-107` | `ms-ts-01` | Implementar servicio LLM Provider | Gemini | done | Interfaz y uso en agente implementados. |
+| `task-ts-qa-101` | `ms-ts-qa-01` | Configurar Vitest (100% cobertura) | Gemini | planned | Umbral obligatorio. |
+| `task-ts-qa-102` | `ms-ts-qa-01` | Implementar generador Bogus/Faker | Gemini | planned | Para datos realistas en tests. |
+| `task-ts-qa-103` | `ms-ts-qa-01` | Tests unitarios de modelos de estado | Gemini | planned | |
+| `task-ts-qa-104` | `ms-ts-qa-01` | Tests unitarios de MagnetarAgent loop | Gemini | planned | |
+| `task-ts-qa-105` | `ms-ts-qa-01` | Tests de integración tool-agent-memory | Gemini | planned | |
+| `task-ts-qa-106` | `ms-ts-qa-01` | Tests E2E de aceptación (CLI/Web) | Gemini | planned | |
+| `task-1101` | `ms-11` | Definir IA UX flow de onboarding | Core Team | in_progress | 7 pasos de flujo ideal. |
+| `task-1102` | `ms-11` | Implementar Tool Catalog | Core Team | ready | Con visibilidad de riesgo/alcance. |
+| `task-1201` | `ms-12` | Diseñar Policy Center | Core Team | ready | Reglas en lenguaje humano. |
+| `task-1301` | `ms-13` | Habilitar Trace/Replay | Core Team | planned | Vista reproducible paso a paso. |
+| `task-1401` | `ms-14` | Formalizar comandos CLI | Core Team | ready | Contratos de run/approve/logs. |
+| `task-1402` | `ms-14` | Verificar CLI multiplataforma | Core Team | planned | Linux/macOS/Windows. |
+| `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | ready | Paridad funcional UI/CLI. |
+| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | planned | Ejemplos CLI y UI. |
+| `task-104` | `ms-03` | Definir gobernanza de branching/WIP | Core Team | ready | Pendiente revisión. |
+| `task-105` | `ms-03` | Establecer controles de test/blocker | Core Team | in_progress | Borrador de mecanismos de escalado. |
+| `task-201` | `ms-04` | Crear archivos de doc canónica | Jules | done | RULES, PLAN, etc. |
+| `task-202` | `ms-04` | Setup de estructura de repositorio Git | Jules | done | |
+| `task-203` | `ms-04` | Definir plantilla YAML de proyecto | Jules | done | |
+| `task-301` | `ms-05` | Esquema Pydantic de MagnetarModel | Jules | done | |
+| `task-302` | `ms-05` | Controlador de Agent Loop | Jules | done | |
+| `task-401` | `ms-06` | Interfaz abstracta de herramientas | Jules | done | |
+| `task-402` | `ms-06` | Herramientas de sistema de archivos | Jules | done | |
+| `task-501` | `ms-07` | Proveedor LiteLLM | Jules | done | |
+| `task-502` | `ms-07` | Setup de ChromaDB para memoria | Jules | done | |
+| `task-601` | `ms-08` | Construir CLI con Typer | Jules | done | |
+| `task-voice-101` | `ms-voice-01` | Setup estructura (Voice UI) | Jules | in_progress | |
+| `task-voice-102` | `ms-voice-01` | Lógica e interfaz Voice UI | Jules | planned | |
 
 ## Criterios de éxito del plan
 - Primera automatización útil en menos de 15 minutos.
@@ -42,6 +81,12 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 - Reutilización de recetas sin fricción alta.
 - **CLI de consola operativa y verificable como canal de fallback y automatización.**
 - **SDK contract estable que garantice paridad funcional entre UI y CLI.**
+
+## Esfuerzo acumulado
+- **Total esfuerzo estimado**: 165 pts
+- **Puntos completados**: 105 pts
+- **Puntos en progreso**: 15 pts
+- **Puntos restantes**: 45 pts
 
 ## Control de cambios
 Toda variación de tareas o estado se refleja en `STATUS.md` y se registra en `BITACORA.md`.

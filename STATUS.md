@@ -1,10 +1,27 @@
 # Estado actual — MagnetarEidolon
 
 ## Resumen
-**Progreso global estimado:** 64%
-`[█████████████░░░░░░░] 64%`
+**Progreso global estimado:** 72%
+`[██████████████░░░░░░] 72%`
 
-El proyecto ya tiene dirección estratégica clara (`NEW_PLAN.md`) y está en fase de aterrizaje operativo en documentación, acometidos y validaciones.
+## Dirección actual
+El repositorio opera en un estado de transición controlada. La implementación en Python sigue activa mientras se valida el prototipo en TypeScript como sucesor para la arquitectura unificada CLI/Web. Una vez validado el prototipo TypeScript, se retirará el código Python legado. Hasta entonces, Python es el baseline activo y TypeScript es el track estratégico de migración.
+
+## Hitos (Milestones)
+
+| Milestone ID | Nombre | Estado | Fecha objetivo |
+| :--- | :--- | :--- | :--- |
+| `ms-01` | Canon Bootstrap | Finalizado | 2026-03-05 |
+| `ms-02` | Magnetar Model Baseline | Finalizado | 2026-03-12 |
+| `ms-ts-01` | TypeScript Core & SDK Migration | En curso | 2026-03-20 |
+| `ms-11` | Experience Foundation | En curso | 2026-04-10 |
+| `ms-14` | CLI Operativa de Consola | Listo | 2026-04-17 |
+| `ms-15` | SDK Contract Base | Listo | 2026-04-22 |
+| `ms-04` | Project Initialization & Governance | Finalizado | 2026-05-15 |
+| `ms-05` | Core Architecture Implementation | Finalizado | 2026-06-01 |
+| `ms-06` | Tool System & OS Integration | Finalizado | 2026-06-15 |
+| `ms-07` | Memory & Knowledge Systems | Finalizado | 2026-07-01 |
+| `ms-08` | Interface & Distribution | Finalizado | 2026-07-15 |
 
 ## Estado por frente
 
@@ -12,26 +29,23 @@ El proyecto ya tiene dirección estratégica clara (`NEW_PLAN.md`) y está en fa
 | :--- | :--- | :--- |
 | Visión de producto | aligned | Principios y roadmap definidos. |
 | UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
+| Migración TS | in_progress | Core portado, adaptadores de entorno en validación. |
 | Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
-| Observability/Replay | planned | Se prioriza después de cerrar policy center base. |
 | **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |
 | **SDK contract** | **ready** | Definición requerida para evitar divergencia entre UI y CLI. |
 
-## Acometidos inmediatos (siguiente ciclo)
-1. Cerrar especificación funcional de onboarding y live execution.
-2. Aterrizar contratos de aprobaciones (approve/deny/pause) en policy center.
-3. Definir matriz de eventos para trazabilidad y replay.
-4. **Verificar que el CLI de consola cubre run/status/approve/deny/logs en Linux, macOS y Windows.**
-5. Publicar especificación inicial del SDK contract y pruebas de consumo en CLI/UI.
+## Riesgos y Mitigaciones
 
-## Riesgos principales
-1. Desalineación entre visión y backlog ejecutable.
-2. Sobrecarga de UX por mezclar Build/Execution/Debug sin separación clara.
-3. Brechas de paridad entre UI y CLI en estados o comandos.
-4. Ausencia de contrato SDK versionado que rompa integraciones internas.
+1.  **Riesgo**: Desincronización entre docs Markdown y estado YAML del proyecto.
+    -   **Mitigación**: Sincronización obligatoria en cada PR y registros en BITACORA.
+2.  **Riesgo**: Brechas de paridad entre UI y CLI.
+    -   **Mitigación**: Uso de un SDK contract compartido y validación multiplataforma.
+3.  **Riesgo**: Diferencias de OS (rutas, shell) en el Tool System.
+    -   **Mitigación**: Uso de librerías estándar de abstracción de rutas y validación cruzada.
+4.  **Riesgo**: Rendimiento de LLM local (Ollama).
+    -   **Mitigación**: Proveedor agnóstico que permite saltar a modelos más potentes si es necesario.
+5.  **Riesgo**: Consistencia de API entre Node.js y Browser para el SDK compartido.
+    -   **Mitigación**: Interfaces estrictas en `core/interfaces.ts` y adaptadores específicos por entorno.
 
-## Mitigaciones
-- Revisión semanal obligatoria de coherencia `NEW_PLAN` -> `PLAN` -> `REQUIREMENTS`.
-- Contratos únicos de estado/eventos compartidos entre interfaces.
-- Checklist de verificación CLI cross-platform en cada release funcional.
-- Versionado semántico y changelog específico para el SDK contract.
+## Cadencia de reporte
+Actualización al menos una vez al día e inmediatamente después de cada PR mergeado.

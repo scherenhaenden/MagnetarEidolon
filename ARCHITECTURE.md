@@ -52,6 +52,6 @@ La arquitectura prioriza tres propiedades: **control humano**, **trazabilidad to
 ## Decisiones de diseño
 1. UI y CLI comparten el mismo contrato de ejecución y estados vía SDK.
 2. La CLI es un cliente del SDK (no una implementación paralela del core).
-3. Las acciones destructivas nunca bypass-ean el `Policy Gate`.
+3. Las acciones destructivas nunca hacen bypass del `Policy Gate`.
 4. Cada decisión del agente es reproducible desde `Trace/Replay`.
 5. La memoria del agente siempre es inspeccionable por el usuario.
