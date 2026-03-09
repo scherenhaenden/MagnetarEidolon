@@ -10,6 +10,7 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `ms-01` | Canon Bootstrap | 2026-03-05 | Establish canonical governance and planning artifacts. | All required canonical docs created and reviewed. |
 | `ms-02` | Magnetar Model Baseline | 2026-03-12 | Define MagnetarEidolon architecture and machine-readable project schema. | Architecture and project YAML align with requirements and rules. |
 | `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | Port the core reasoning engine and state models to TypeScript to support a unified CLI/Web SDK. | Core logic ported, environment-specific adapters (Node/Web) implemented. |
+| `ms-ts-qa-01` | TypeScript Testing & Quality Assurance | 2026-03-30 | Implement a comprehensive test pyramid with 100% coverage, modular unit tests, and E2E acceptance criteria. | 100% coverage reached, bogus data generation implemented, all tests passing. |
 | `ms-03` | Operational Readiness | 2026-03-20 | Finalize testing, blocker flow, and contribution processes. | Governance processes validated and initial progress reporting active. |
 | `ms-04` | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
 | `ms-05` | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
@@ -32,6 +33,12 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `task-ts-105` | `ms-ts-01` | Create Browser (Web) tool adapters | Gemini | 5 | done | `core/tools/web-filesystem.ts` created. |
 | `task-ts-106` | `ms-ts-01` | Integrate TS SDK into Angular UI shell | Gemini | 5 | planned | |
 | `task-ts-107` | `ms-ts-01` | Implement TS-based LLM provider service | Gemini | 5 | planned | |
+| `task-ts-qa-101` | `ms-ts-qa-01` | Setup Vitest for unit testing with 100% coverage | Gemini | 3 | planned | Mandatory threshold enforcement. |
+| `task-ts-qa-102` | `ms-ts-qa-01` | Implement Bogus/Faker data generator | Gemini | 3 | planned | For realistic test values. |
+| `task-ts-qa-103` | `ms-ts-qa-01` | Write unit tests for MagnetarEidolon state models | Gemini | 5 | planned | |
+| `task-ts-qa-104` | `ms-ts-qa-01` | Write modular unit tests for MagnetarAgent loop | Gemini | 8 | planned | |
+| `task-ts-qa-105` | `ms-ts-qa-01` | Write integration tests for tool-agent-memory | Gemini | 5 | planned | |
+| `task-ts-qa-106` | `ms-ts-qa-01` | Implement E2E Acceptance Tests for Shared SDK | Gemini | 5 | planned | Verify CLI and Web consistency. |
 | `task-104` | `ms-03` | Define governance for branching and WIP | Core Team | 4 | ready | Pending team review kickoff. |
 | `task-105` | `ms-03` | Establish testing and blocker controls | Core Team | 6 | in_progress | Drafting acceptance and escalation mechanics. |
 | `task-201` | `ms-04` | Create Canonical Documentation Files | Jules | 3 | done | Creating `RULES.md`, `PLAN.md`, etc. created. |
@@ -49,10 +56,10 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 
 ## Effort Summary
 
-- **Total effort**: 107 pts
+- **Total effort**: 136 pts
 - **Completed**: 77 pts
 - **In progress**: 9 pts
-- **Remaining**: 21 pts
+- **Remaining**: 50 pts
 
 
 ## State Definitions
