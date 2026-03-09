@@ -18,14 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
-- **Timestamp:** 2026-03-09 21:55 UTC
+- **Timestamp:** 2026-03-09 22:35 UTC
   **Author:** Gemini CLI
-  **Entry:** Decision: Enforced 100% test coverage in Vitest configuration for `apps/magnetar-ui`. Updated `vitest.config.ts` with mandatory thresholds for lines, branches, functions, and statements. Marked `task-ts-qa-101` as done.
+  **Entry:** State Change: Marked milestone `ms-ts-01` (TypeScript Core & SDK Migration) as completed in `PLAN.md` and `STATUS.md`. Unified project status documentation by aligning the "Dirección actual" section with the completed core migration status. Verified all subtasks (task-ts-101 to task-ts-107) are done.
 
-- **Timestamp:** 2026-03-09 21:45 UTC
+- **Timestamp:** 2026-03-09 22:25 UTC
   **Author:** Gemini CLI
-  **Entry:** Decision: Fixed CI build failure ("tsc: command not found"). Hardened `packages/magnetar-sdk/package.json` by using `npx tsc` in build scripts and updated all Node CI workflows to use `npm ci --include=dev` to ensure `typescript` is available during the `prepare` lifecycle hook.
+  **Entry:** Decision: Upgraded core project dependencies in `apps/magnetar-ui` to latest major versions. Updated `vitest` (v4), `tailwindcss` (v4), `@faker-js/faker` (v10), and `@types/node` (v25). Verified build and dependency resolution via `npm install`.
 
-- **Timestamp:** 2026-03-09 21:30 UTC
+- **Timestamp:** 2026-03-09 22:15 UTC
   **Author:** Gemini CLI
 ...

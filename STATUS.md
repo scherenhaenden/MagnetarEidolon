@@ -5,7 +5,7 @@
 `[██████████████░░░░░░] 72%`
 
 ## Dirección actual
-El repositorio opera en un estado de transición controlada. La implementación en Python sigue activa mientras se valida el prototipo en TypeScript como sucesor para la arquitectura unificada CLI/Web. Una vez validado el prototipo TypeScript, se retirará el código Python legado. Hasta entonces, Python es el baseline activo y TypeScript es el track estratégico de migración.
+El repositorio opera en un estado de transición controlada. La migración del núcleo (core) a TypeScript ha sido completada y el SDK compartido está operativo. La implementación en Python sigue activa únicamente como referencia histórica y baseline de validación cruzada hasta que el prototipo TypeScript sea declarado estable en producción. El foco estratégico es ahora la consolidación de la UI en `apps/magnetar-ui` y la extracción definitiva del runtime compartido.
 
 ## Enfoque inmediato
 - Consolidar la UI TypeScript ya reubicada en `apps/magnetar-ui`.
@@ -19,7 +19,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 | :--- | :--- | :--- | :--- |
 | `ms-01` | Canon Bootstrap | Finalizado | 2026-03-05 |
 | `ms-02` | Magnetar Model Baseline | Finalizado | 2026-03-12 |
-| `ms-ts-01` | TypeScript Core & SDK Migration | En curso | 2026-03-20 |
+| `ms-ts-01` | TypeScript Core & SDK Migration | Finalizado | 2026-03-20 |
 | `ms-11` | Experience Foundation | En curso | 2026-04-10 |
 | `ms-16` | UI Workspace Rehome & TS Delivery Pipeline | En curso | 2026-04-15 |
 | `ms-14` | CLI Operativa de Consola | Listo | 2026-04-17 |
@@ -36,7 +36,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 | :--- | :--- | :--- |
 | Visión de producto | aligned | Principios y roadmap definidos. |
 | UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
-| Migración TS | in_progress | Core portado, adaptadores de entorno en validación. |
+| Migración TS | done | Core portado, SDK inicial implementado y adaptadores en validación. |
 | UI workspace rehome | in_review | Workspace movido a `apps/magnetar-ui`; pendiente consolidación post-move. |
 | Runtime startup UX | in_progress | La inicialización real del workspace web está activa en `feature/init-runnable-web-ui`; el build web ya forma parte de la validación local. |
 | TS test pipeline | in_review | Workflow dedicado creado y validado localmente con tests + typecheck. |
@@ -54,7 +54,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
     -   **Mitigación**: Uso de librerías estándar de abstracción de rutas y validación cruzada.
 4.  **Riesgo**: Rendimiento de LLM local (Ollama).
     -   **Mitigación**: Proveedor agnóstico que permite saltar a modelos más potentes si es necesario.
-5.  **Riesgo**: Consistencia de API entre Node.js y Browser para el SDK compartido.
+5.  **Riesgo**: Consistencia de API entre Node.js and Browser para el SDK compartido.
     -   **Mitigación**: Interfaces estrictas en `core/interfaces.ts` y adaptadores específicos por entorno.
 
 ## Cadencia de reporte

@@ -18,7 +18,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | :--- | :--- | :--- | :--- | :--- |
 | `ms-01` | Canon Bootstrap | 2026-03-05 | done | Establecer artefactos de gobernanza y planificación. |
 | `ms-02` | Magnetar Model Baseline | 2026-03-12 | done | Definir arquitectura y esquema de proyecto. |
-| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | in_progress | Migración del motor de razonamiento a TypeScript. |
+| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | done | Migración del motor de razonamiento a TypeScript. |
 | `ms-ts-qa-01` | TypeScript Testing & QA | 2026-03-30 | planned | Pirámide de pruebas y 100% cobertura en core. |
 | `ms-11` | Experience Foundation | 2026-04-10 | in_progress | UI/UX base y catálogo de herramientas. |
 | `ms-16` | UI Workspace Rehome & TS Delivery Pipeline | 2026-04-15 | in_progress | Reubicar la UI TypeScript a una estructura de producto y activar pipeline propio de validación. |
@@ -27,7 +27,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready | Interfaz de línea de comandos unificada. |
 | `ms-15` | SDK Contract Base | 2026-04-22 | ready | Contrato compartido entre UI y CLI. |
 | `ms-04` | Project Initialization | 2026-05-15 | done | Estructura inicial y archivos de gobernanza. |
-| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base del motor en Python. |
+| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base histórica; código Python legado retirado. |
 | `ms-06` | Tool System | 2026-06-15 | done | Abstracción de herramientas y herramientas OS. |
 | `ms-07` | Memory & Knowledge | 2026-07-01 | done | Integración de LiteLLM y ChromaDB. |
 | `ms-08` | Distribution | 2026-07-15 | done | Empaquetado y CLI inicial. |
