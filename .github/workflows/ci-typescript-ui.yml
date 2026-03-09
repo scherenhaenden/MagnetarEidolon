@@ -1,0 +1,56 @@
+name: CI (TypeScript UI)
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "fix/**"
+      - "master"
+    paths:
+      - "apps/magnetar-ui/**"
+      - ".github/workflows/ci-typescript-ui.yml"
+  pull_request:
+    branches:
+      - "master"
+    paths:
+      - "apps/magnetar-ui/**"
+      - ".github/workflows/ci-typescript-ui.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test-typescript-ui:
+    name: Validate Magnetar UI workspace
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/magnetar-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: apps/magnetar-ui/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run TypeScript tests
+        run: npm run test:ci
+
+      - name: Run TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Upload TypeScript test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-typescript-ui
+          path: |
+            apps/magnetar-ui/coverage
+          if-no-files-found: warn

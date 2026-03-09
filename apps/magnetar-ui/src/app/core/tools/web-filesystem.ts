@@ -1,5 +1,5 @@
 import { Observable, of } from 'rxjs';
-import { Tool, ToolResult } from '../interfaces';
+import { Tool, ToolResult } from '../interfaces.js';
 
 /**
  * A virtual/mock filesystem for the web browser environment.
@@ -17,10 +17,11 @@ export class WebFileSystemTool implements Tool {
 
     switch (args.action) {
       case 'read':
-        const content = this.virtualFS.get(args.path) || '';
-        return content !== ''
-          ? of({ success: true, output: content })
-          : of({ success: false, error: `File not found or empty: ${args.path}` });
+        if (!this.virtualFS.has(args.path)) {
+          return of({ success: false, error: `File not found: ${args.path}` });
+        }
+
+        return of({ success: true, output: this.virtualFS.get(args.path) ?? '' });
       case 'write':
         if (args.content === undefined) {
            return of({ success: false, error: 'Content is required for write action.' });

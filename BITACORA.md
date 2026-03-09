@@ -18,6 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 19:45 UTC
+  **Author:** Codex
+  **Entry:** State Change: Reubicado el workspace TypeScript desde `typescript-angular-skeleton` a `apps/magnetar-ui`. Se añadió pipeline dedicado `CI (TypeScript UI)`, se activaron scripts de test/typecheck con `Vitest`, y se validó localmente el primer smoke suite del workspace.
+
+- **Timestamp:** 2026-03-09 19:15 UTC
+  **Author:** Codex
+  **Entry:** Decision: La UI TypeScript deja de considerarse un directorio temporal aceptable bajo `typescript-angular-skeleton`. Se aprueba reubicarla a `apps/magnetar-ui`, activar un pipeline propio de validación TypeScript y documentar la futura extracción del runtime compartido hacia `packages/magnetar-sdk`.
+
 - **Timestamp:** 2026-03-09 18:30 UTC
   **Author:** Gemini CLI
   **Entry:** State Change: Merged 'origin/master' into 'fix/pr-66-security-and-types'. Resolved conflicts in PLAN.md, README.md, and STATUS.md by unifying TypeScript migration milestones with the new Spanish-localized project roadmap.

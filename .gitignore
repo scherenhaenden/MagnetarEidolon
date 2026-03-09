@@ -34,7 +34,13 @@ htmlcov/
 # ChromaDB
 chroma_db/
 agent_memory/
+
+# TypeScript UI workspace
+apps/magnetar-ui/node_modules/
+apps/magnetar-ui/coverage/
+apps/magnetar-ui/dist/
+apps/magnetar-ui/dist-test/
+
 # PyCharm / JetBrains
 .idea/
 *.iml
-

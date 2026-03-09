@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Observable, from, map, catchError, of } from 'rxjs';
-import { Tool, ToolResult } from '../interfaces';
+import { Tool, ToolResult } from '../interfaces.js';
 
 export class NodeFileSystemTool implements Tool {
   public readonly name = 'filesystem';

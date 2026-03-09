@@ -27,8 +27,8 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 
 1.  **Modular Unit Tests (100% Coverage Target)**
     - **Focus**: Pure functions, state models, and individual agent logic steps.
-    - **Tooling**: `Vitest` or `Jest`.
-    - **Data Strategy**: Use `Bogus` (or `Faker.js`) to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
+    - **Tooling**: `Vitest`.
+    - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
     - **Requirement**: No code in `src/app/core/` can be merged without 100% branch and line coverage.
 
 2.  **Integration Tests**
@@ -43,7 +43,23 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 - [ ] 100% Unit Test coverage for the affected core module.
 - [ ] All integration scenarios passing in both Node and Browser environments (where applicable).
 - [ ] No regressions in E2E acceptance flows.
-- [ ] Bogus data generation used to verify edge cases in state transitions.
+- [ ] `@faker-js/faker` data generation used to verify edge cases in state transitions.
+
+### TypeScript CI Pipeline Baseline
+- A dedicated GitHub Actions workflow must validate the TypeScript UI workspace independently of the Python legacy pipeline.
+- Minimum baseline stages:
+  - install Node dependencies in `apps/magnetar-ui`
+  - run unit tests in CI mode
+  - run TypeScript typecheck/build validation
+  - upload test/coverage artifacts on failure
+
+### Testing the Tests
+- The TypeScript test system itself must be validated, not only the application code.
+- Minimum meta-validation plan:
+  - maintain at least one deterministic smoke suite that must always pass on CI
+  - verify failure reporting through artifacts/logs when a test job fails
+  - add negative-path cases for filesystem/tool safety rules so the suite proves it catches regressions, not only happy paths
+  - periodically validate coverage thresholds and test command wiring after workspace moves or package-script changes
 
 ## Application Code Testing (Python Legacy)
 

@@ -1,6 +1,6 @@
-import { Observable, of, from, map, switchMap, tap, catchError } from 'rxjs';
-import { MagnetarEidolon, MemoryItem, ToolCall } from './models';
-import { LLMProvider, Tool, MemoryStore, ToolResult } from './interfaces';
+import { Observable, of, map, switchMap, tap } from 'rxjs';
+import { MagnetarEidolon, ToolCall } from './models.js';
+import { LLMProvider, Tool, MemoryStore, ToolResult } from './interfaces.js';
 
 export class MagnetarAgent {
   private tools: Map<string, Tool> = new Map();
@@ -41,10 +41,10 @@ export class MagnetarAgent {
     };
   }
 
-  private think(): Observable<any> {
+  private think(): Observable<{ type: string; name?: string; args?: Record<string, unknown>; message?: string } | null> {
     const prompt = this.constructPrompt();
     return this.llm.generate([{ role: 'user', content: prompt }]).pipe(
-      map(response => response && response.content ? this.parseAction(response.content) : null)
+          map(response => response.content ? this.parseAction(response.content) : null)
     );
   }
 
@@ -106,7 +106,7 @@ export class MagnetarAgent {
   private constructPrompt(): string {
     const history = this.state.shortTermMemory
       .slice(-5)
-      .map(m => `- ${m.content}`)
+      .map((m) => `- ${m.content}`)
       .join('\n');
 
     return `

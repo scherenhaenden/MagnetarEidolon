@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { ICONS } from './icons';
+import { ICONS } from './icons.js';
 
 @Component({
   selector: 'ui-icon',

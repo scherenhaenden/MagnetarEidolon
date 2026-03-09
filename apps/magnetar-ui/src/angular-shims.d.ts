@@ -1,4 +1,8 @@
 declare module '@angular/core' {
+  export interface ApplicationConfig {
+    providers?: unknown[];
+  }
+
   export function Component(metadata: {
     selector: string;
     standalone?: boolean;
@@ -27,8 +31,9 @@ declare module '@angular/core' {
 
 declare module '@angular/common' {
   export const CommonModule: unknown;
+  export const NgClass: unknown;
 }
 
 declare module '@angular/platform-browser' {
-  export function bootstrapApplication(component: unknown): Promise<unknown>;
+  export function bootstrapApplication(component: unknown, options?: import('@angular/core').ApplicationConfig): Promise<unknown>;
 }

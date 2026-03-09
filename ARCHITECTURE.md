@@ -55,3 +55,14 @@ La arquitectura prioriza tres propiedades: **control humano**, **trazabilidad to
 3. Las acciones destructivas nunca hacen bypass del `Policy Gate`.
 4. Cada decisión del agente es reproducible desde `Trace/Replay`.
 5. La memoria del agente siempre es inspeccionable por el usuario.
+
+## Estructura de repositorio objetivo
+- `apps/magnetar-ui`: shell de producto para Dashboard, Live Execution, Builder, Memory y Policy Center.
+- `packages/magnetar-sdk`: contrato/runtime compartido para estado, agente, herramientas y operaciones consumidas por UI y CLI.
+- `src/magnetar`: baseline Python legado mientras se valida la transición TypeScript.
+- `.github/workflows`: pipelines separados para Python legacy, UI TypeScript y empaquetado/release.
+
+## Decisión de transición activa
+- El directorio temporal `typescript-angular-skeleton` deja de representar el destino arquitectónico deseado.
+- La UI debe vivir bajo una estructura de producto explícita (`apps/magnetar-ui`) para evitar que un nombre de prototipo condicione la arquitectura.
+- El runtime compartido seguirá inicialmente dentro del workspace de UI mientras se estabiliza, pero la dirección aprobada es extraerlo después a `packages/magnetar-sdk`.

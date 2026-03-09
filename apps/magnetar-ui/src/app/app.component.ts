@@ -1,9 +1,9 @@
 import { Component, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UiBadgeComponent, BadgeStatus } from './ui/badge.component';
-import { UiIconComponent } from './ui/icon.component';
-import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data';
+import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
+import { UiIconComponent } from './ui/icon.component.js';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
 
 @Component({
   selector: 'screen-dashboard',

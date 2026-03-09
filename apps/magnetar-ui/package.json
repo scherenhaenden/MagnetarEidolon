@@ -1,0 +1,28 @@
+{
+  "name": "@magnetar/magnetar-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MagnetarEidolon TypeScript UI workspace with a shared CLI/runtime proof of concept.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "test": "vitest",
+    "test:ci": "vitest run --coverage",
+    "cli": "node dist/cli/magnetar-cli.js",
+    "start": "echo 'Use Angular CLI (ng serve) after adding framework dependencies.'"
+  },
+  "bin": {
+    "magnetar-cli": "dist/cli/magnetar-cli.js"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.7.0",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^3.2.4",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4"
+  }
+}
