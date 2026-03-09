@@ -1,0 +1,23 @@
+services:
+  # Development Service (with hot-reload)
+  dev:
+    build:
+      context: .
+      target: development
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./apps/magnetar-ui:/app/apps/magnetar-ui
+      - ./packages/magnetar-sdk:/app/packages/magnetar-sdk
+      - /app/apps/magnetar-ui/node_modules
+      - /app/packages/magnetar-sdk/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Useful for Windows/WSL/Mac file system events
+
+  # Production Service (built and served via Nginx)
+  app:
+    build:
+      context: .
+      target: production
+    ports:
+      - "8080:80"
