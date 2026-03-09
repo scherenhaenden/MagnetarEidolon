@@ -18,6 +18,26 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 20:40 UTC
+  **Author:** Codex
+  **Entry:** State Change: Iniciada la rama `feature/init-runnable-web-ui` para convertir la UI existente en `apps/magnetar-ui` en un workspace Angular realmente ejecutable. Se añadieron scripts y configuración de arranque web/CLI alrededor de la UI ya existente, sin crear una segunda UI, y se vinculó el trabajo al issue `#129`.
+
+- **Timestamp:** 2026-03-09 20:20 UTC
+  **Author:** Codex
+  **Entry:** Decision: Documentado un plan detallado para convertir `apps/magnetar-ui` en una superficie realmente arrancable para web y CLI. Se añadió `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` y se registraron en la documentación raíz las ubicaciones canónicas del GitHub Issue Tracker y del project board `MagnetarEidolon`.
+
+- **Timestamp:** 2026-03-09 20:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Iniciada la extracción del runtime TypeScript compartido hacia `packages/magnetar-sdk` en una rama dedicada. El objetivo es separar la UI de producto (`apps/magnetar-ui`) del contrato reusable para UI y CLI, manteniendo trazabilidad documental y validación por tests/typecheck.
+
+- **Timestamp:** 2026-03-09 19:45 UTC
+  **Author:** Codex
+  **Entry:** State Change: Reubicado el workspace TypeScript desde `typescript-angular-skeleton` a `apps/magnetar-ui`. Se añadió pipeline dedicado `CI (TypeScript UI)`, se activaron scripts de test/typecheck con `Vitest`, y se validó localmente el primer smoke suite del workspace.
+
+- **Timestamp:** 2026-03-09 19:15 UTC
+  **Author:** Codex
+  **Entry:** Decision: La UI TypeScript deja de considerarse un directorio temporal aceptable bajo `typescript-angular-skeleton`. Se aprueba reubicarla a `apps/magnetar-ui`, activar un pipeline propio de validación TypeScript y documentar la futura extracción del runtime compartido hacia `packages/magnetar-sdk`.
+
 - **Timestamp:** 2026-03-09 18:30 UTC
   **Author:** Gemini CLI
   **Entry:** State Change: Merged 'origin/master' into 'fix/pr-66-security-and-types'. Resolved conflicts in PLAN.md, README.md, and STATUS.md by unifying TypeScript migration milestones with the new Spanish-localized project roadmap.
