@@ -18,7 +18,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | :--- | :--- | :--- | :--- | :--- |
 | `ms-01` | Canon Bootstrap | 2026-03-05 | done | Establecer artefactos de gobernanza y planificación. |
 | `ms-02` | Magnetar Model Baseline | 2026-03-12 | done | Definir arquitectura y esquema de proyecto. |
-| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | in_progress | Migración del motor de razonamiento a TypeScript. |
+| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | done | Migración del motor de razonamiento a TypeScript. |
 | `ms-ts-qa-01` | TypeScript Testing & QA | 2026-03-30 | planned | Pirámide de pruebas y 100% cobertura en core. |
 | `ms-11` | Experience Foundation | 2026-04-10 | in_progress | UI/UX base y catálogo de herramientas. |
 | `ms-16` | UI Workspace Rehome & TS Delivery Pipeline | 2026-04-15 | in_progress | Reubicar la UI TypeScript a una estructura de producto y activar pipeline propio de validación. |

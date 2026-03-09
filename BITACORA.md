@@ -18,13 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 22:35 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Marked milestone `ms-ts-01` (TypeScript Core & SDK Migration) as completed in `PLAN.md` and `STATUS.md`. Unified project status documentation by aligning the "Dirección actual" section with the completed core migration status. Verified all subtasks (task-ts-101 to task-ts-107) are done.
+
 - **Timestamp:** 2026-03-09 22:25 UTC
   **Author:** Gemini CLI
   **Entry:** Decision: Upgraded core project dependencies in `apps/magnetar-ui` to latest major versions. Updated `vitest` (v4), `tailwindcss` (v4), `@faker-js/faker` (v10), and `@types/node` (v25). Verified build and dependency resolution via `npm install`.
 
 - **Timestamp:** 2026-03-09 22:15 UTC
   **Author:** Gemini CLI
-  **Entry:** Decision: Stabilized CI pipelines by switching from `npm ci` to `npm install`. This resolves persistent lockfile mismatch errors (`EUSAGE`) encountered during local and remote execution. Verified pipeline health via `act`.
-
-- **Timestamp:** 2026-03-09 22:05 UTC
 ...
