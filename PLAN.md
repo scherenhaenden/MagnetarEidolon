@@ -33,7 +33,7 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `task-ts-105` | `ms-ts-01` | Create Browser (Web) tool adapters | Gemini | 5 | done | `core/tools/web-filesystem.ts` created. |
 | `task-ts-106` | `ms-ts-01` | Integrate TS SDK into Angular UI shell | Gemini | 5 | planned | |
 | `task-ts-107` | `ms-ts-01` | Implement TS-based LLM provider service | Gemini | 5 | planned | |
-| `task-ts-qa-101` | `ms-ts-qa-01` | Setup Vitest for unit testing with 100% coverage | Gemini | 3 | planned | Mandatory threshold enforcement. |
+| `task-ts-qa-101` | `ms-ts-qa-01` | Set up Vitest for unit testing with 100% coverage | Gemini | 3 | planned | Mandatory threshold enforcement. |
 | `task-ts-qa-102` | `ms-ts-qa-01` | Implement Bogus/Faker data generator | Gemini | 3 | planned | For realistic test values. |
 | `task-ts-qa-103` | `ms-ts-qa-01` | Write unit tests for MagnetarEidolon state models | Gemini | 5 | planned | |
 | `task-ts-qa-104` | `ms-ts-qa-01` | Write modular unit tests for MagnetarAgent loop | Gemini | 8 | planned | |
