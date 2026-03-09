@@ -1,134 +1,67 @@
-# Canonical Project Model of MagnetarEidolon
+# MagnetarEidolon
 
 [![CI (Linux)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml)
 [![CI (macOS)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml)
 [![CI (Windows)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml)
 [![Release](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml)
-[![PyPI](https://img.shields.io/pypi/v/magnetar.svg)](https://pypi.org/project/magnetar/)
-[![Python Versions](https://img.shields.io/pypi/pyversions/magnetar.svg)](https://pypi.org/project/magnetar/)
 [![License](https://img.shields.io/github/license/scherenhaenden/MagnetarEidolon)](https://github.com/scherenhaenden/MagnetarEidolon/blob/master/LICENSE)
 
-## Purpose
-MagnetarEidolon exists to provide a canonical, reusable project governance and execution model for building Magnetar-aligned agent systems with transparent planning, traceable delivery, and cross-platform portability. This repository solves the problem of fragmented project standards by consolidating documentation, planning artifacts, and operational controls into a single, reproducible baseline. It follows the Magnetar standard for documentation, planning, and governance.
+## Propósito
+MagnetarEidolon evoluciona hacia una plataforma de agentes enfocada en **simplicidad, confianza y observabilidad total**.
 
-## How to Use This Repository
-1. Clone this canonical model repository.
-2. Copy and complete `projects/_template.project.yml` for your concrete project instance.
-3. Replicate and maintain the required documentation set in the repository root.
-4. Follow WIP, branching, and blocker handling rules from governance documents.
-5. Consult the example project artifacts to resolve process or formatting questions.
+Promesa del producto:
 
-## Project Contents
+> **"Build, run, observe, and trust AI agents without technical chaos."**
 
-| File | Purpose |
+Este repositorio mantiene el marco documental y técnico para aterrizar esa visión en entregables verificables.
+
+## Principios rectores
+1. Simplicidad radical para empezar en minutos.
+2. Confianza por diseño (acciones de riesgo siempre visibles/aprobables).
+3. Observabilidad completa de planes, pasos y resultados.
+4. Control humano permanente.
+5. Memoria explícita, editable y gobernable.
+6. Experiencia premium tipo command-center.
+
+## Modos de uso del producto
+- **Execution Mode**: ejecutar objetivos rápido.
+- **Build Mode**: crear recetas/flows reutilizables.
+- **Debug Mode**: inspeccionar decisiones, costos y errores.
+
+## ¿Esto implica un SDK?
+Sí. Si existe una CLI operativa y una UI con semántica compartida, debe existir un **núcleo reutilizable tipo SDK** (librería interna/externa) que exponga contratos estables para:
+- ejecutar runs,
+- consultar estado,
+- aprobar/denegar acciones,
+- recuperar trazas y logs.
+
+La CLI no debe duplicar lógica de negocio; debe consumir ese SDK/Runtime Contract.
+
+## Documentación canónica
+| Archivo | Rol |
 | :--- | :--- |
-| `PLAN.md` | Central project roadmap, milestones, and task backlog. |
-| `BITACORA.md` | Immutable chronological logbook of all events and decisions. |
-| `REQUIREMENTS.md` | Functional and non-functional specifications. |
-| `ARCHITECTURE.md` | High-level system design and component descriptions. |
-| `RULES.md` | Definitive ruleset for naming, workflow, and structure. |
-| `STATUS.md` | Current project health, progress, and risk summary. |
-| `TESTING.md` | Testing strategy, coverage targets, and bug reporting. |
-| `BLOCKERS.md` | Registry of impediments and escalation paths. |
-| `BRANCHING_MODEL.md` | Git branching strategy (based on GitFlow). |
-| `WIP_GUIDELINES.md` | Policies on concurrent task limits. |
-| `CONTRIBUTING.md` | Contribution guidelines, code of conduct, and PR workflow |
-| `projects/_template.project.yml` | Machine-readable project schema. |
+| `NEW_PLAN.md` | Visión de producto y dirección estratégica base. |
+| `PLAN.md` | Roadmap operativo por fases, milestones y acometidos. |
+| `REQUIREMENTS.md` | Requisitos funcionales/no funcionales alineados a la nueva visión. |
+| `ARCHITECTURE.md` | Arquitectura objetivo para UI, motor agente, políticas y memoria. |
+| `STATUS.md` | Estado actual, riesgos y próximos compromisos. |
+| `TESTING.md` | Estrategia de validación técnica y de producto. |
 
+## Estado de Transición
+El repositorio se encuentra en una fase de transición estratégica:
+- La implementación en Python sigue activa mientras se evalúa el prototipo en TypeScript.
+- El **TypeScript Angular Skeleton** es el camino actual para la arquitectura unificada CLI/Web.
+- Los planes y pruebas de calidad ahora priorizan la migración a TypeScript.
+- Una vez validado el prototipo TypeScript, se procederá a retirar el código Python legado.
 
-## TypeScript + Angular Skeleton
-A starter migration skeleton is available at `typescript-angular-skeleton/`. It introduces a TypeScript OOP domain layer, Angular UI shell, and CLI entrypoint that explicitly uses the MagnetarEidolon canonical model as a core context while keeping application goals broader than model description alone.
+## Acometidos inmediatos
+1. Consolidar experiencia MVP con Dashboard + Live Execution + Policy Center.
+2. Garantizar trazabilidad de acciones sensibles con aprobación humana.
+3. Mantener **CLI de consola** como interfaz oficial de operación/diagnóstico.
+4. Formalizar el **SDK contract** que consumen tanto UI como CLI.
 
-## Transition Status
-The repository is currently in a transition phase:
+## Información adicional
+- `docs/MAGNETAR_TECHNOLOGY_STACK.md`: decisiones tecnológicas y justificación para Linux, macOS y Windows.
 
-- The Python implementation is not yet retired because the TypeScript proof of concept is still being evaluated.
-- The TypeScript skeleton is the current proof-of-concept path for a unified CLI/Web architecture.
-- Root planning and testing documents now track the TypeScript migration and quality gates explicitly.
-- Once the TypeScript proof of concept shows good results, the Python project is expected to be removed.
-
-## Additional Documentation
-- `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
-
-## GitHub Project Board
-
-To provide a higher-level view of the project's tasks and their status, a GitHub Project board has been set up. This board is the primary tool for visualizing and managing the project's workflow.
-
-- **Project Name**: MagnetarEidolon Development
-- **Project URL**: [https://github.com/users/scherenhaenden/projects/8](https://github.com/users/scherenhaenden/projects/8)
-
-While the `PLAN.md` file contains a detailed backlog, the GitHub Project board offers a more interactive way to track progress and priorities.
-
-## Progress Model Overview
-Progress is tracked through milestones and tasks that move through explicit lifecycle states:
-
-`planned -> ready -> in_progress -> in_review -> done`
-
-When blocked, a task transitions to `blocked` and is linked to an entry in `BLOCKERS.md`. Every state transition and significant decision must be recorded in `BITACORA.md`.
-
-## YAML Project Schema
-The `projects/_template.project.yml` file is the canonical machine-readable schema. It captures:
-- metadata
-- stakeholders
-- milestones
-- tasks
-- risks
-- reporting hooks
-
-This schema is the authoritative bridge between human planning artifacts and automation-ready project state.
-
-## Guidance for AI Collaborators
-AI agents working on this project must:
-1.  **Parse** the `projects/*.project.yml` file to understand context.
-2.  **Read** `PLAN.md` and `STATUS.md` to determine current focus.
-3.  **Respect** strict constraints in `RULES.md`, `WIP_GUIDELINES.md`, and `BRANCHING_MODEL.md`.
-4.  **Log** all actions and decisions in `BITACORA.md` immediately after completion.
-
-## Architecture Diagram (Recommended)
-```text
-[RULES + BRANCHING + WIP + BLOCKERS]
-                 |
-                 v
-              [PLAN]
-                 |
-                 v
-[REQUIREMENTS] [ARCHITECTURE] [TESTING] [STATUS]
-                 |
-                 v
-             [BITACORA]
-                 |
-                 v
-   [projects/*.project.yml machine state]
-```
-
-
-## PyCharm Compatibility
-This repository is compatible with PyCharm, including the `src/` layout and the nested `magnetar_voice_ui/` package.
-
-Recommended setup:
-1. Open the repository root in PyCharm.
-2. Configure a Python 3.10 interpreter (virtualenv or Poetry environment).
-3. Mark `src/` as a **Sources Root** (right-click folder -> *Mark Directory As* -> *Sources Root*).
-4. Copy `.env.example` to `.env` and enable **"Paths and environment variables from .env file"** in your run/test configuration.
-5. Use `pytest` as the default test runner for the root project.
-
-With this setup, imports such as `magnetar.*` resolve correctly in editor inspections, run configurations, and tests.
-
-## Applying This Template
-1. Copy this repository structure into your new project.
-2. Replace placeholder content with project-specific details.
-3. Instantiate and validate a project YAML file in `projects/`.
-4. Define initial milestones and tasks in `PLAN.md`.
-5. Log initial baseline state in `STATUS.md` and `BITACORA.md`.
-
-## Validating Canon Compliance
-- [ ] All required canonical files exist.
-- [ ] Project YAML exists and matches canonical schema fields.
-- [ ] `BITACORA.md` is updated chronologically and immutably.
-- [ ] Active branches conform to `BRANCHING_MODEL.md`.
-- [ ] Testing commitments align with `TESTING.md`.
-- [ ] Blocker handling follows `BLOCKERS.md` escalation process.
-
-
-## License
-This project is licensed under the MIT License. See `LICENSE` for full terms.
+## Nota de gobernanza
+Cualquier cambio de alcance debe sincronizarse en `NEW_PLAN.md`, `PLAN.md`, `REQUIREMENTS.md` y `STATUS.md` en el mismo PR para evitar deriva documental.
