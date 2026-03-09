@@ -130,6 +130,7 @@ class DashboardScreen {
       case 'pending_approval':
         return 'pending_approval';
       default:
+        console.warn(`Unexpected run status encountered: ${run.status}`);
         return 'default';
     }
   }
@@ -345,7 +346,16 @@ class ToolsScreen {
   public readonly tools: Tool[] = MOCK_TOOLS;
 
   public getToolStatusBadge(tool: Tool): BadgeStatus {
-    return tool.status === 'connected' ? 'active' : 'idle';
+    if (tool.status === 'connected') {
+      return 'active';
+    } else if (tool.status === 'requires_auth') {
+      return 'pending_approval';
+    } else if (tool.status === 'disconnected') {
+      return 'idle';
+    } else {
+      console.warn(`Unexpected tool status encountered: ${tool.status}`);
+      return 'default';
+    }
   }
 }
 

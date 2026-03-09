@@ -11,12 +11,16 @@ export class WebFileSystemTool implements Tool {
   private virtualFS: Map<string, string> = new Map();
 
   public execute(args: { action: 'read' | 'write' | 'list'; path: string; content?: string }): Observable<ToolResult> {
+    if (!args.path || typeof args.path !== 'string') {
+      return of({ success: false, error: 'Invalid path provided.' });
+    }
+
     switch (args.action) {
       case 'read':
-        const content = this.virtualFS.get(args.path);
-        return content !== undefined
+        const content = this.virtualFS.get(args.path) || '';
+        return content !== ''
           ? of({ success: true, output: content })
-          : of({ success: false, error: `File not found: ${args.path}` });
+          : of({ success: false, error: `File not found or empty: ${args.path}` });
       case 'write':
         if (args.content === undefined) {
            return of({ success: false, error: 'Content is required for write action.' });

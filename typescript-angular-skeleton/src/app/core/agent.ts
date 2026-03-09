@@ -44,7 +44,7 @@ export class MagnetarAgent {
   private think(): Observable<any> {
     const prompt = this.constructPrompt();
     return this.llm.generate([{ role: 'user', content: prompt }]).pipe(
-      map(response => this.parseAction(response.content))
+      map(response => response && response.content ? this.parseAction(response.content) : null)
     );
   }
 
@@ -103,7 +103,7 @@ export class MagnetarAgent {
     return of(void 0);
   }
 
-  private constructPrompt(): str {
+  private constructPrompt(): string {
     const history = this.state.shortTermMemory
       .slice(-5)
       .map(m => `- ${m.content}`)
