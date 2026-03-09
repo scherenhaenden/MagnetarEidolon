@@ -19,10 +19,31 @@ This workspace contains the active TypeScript UI proof of concept for **Magnetar
 ```bash
 cd apps/magnetar-ui
 npm install
-npm run typecheck
-npm run test:ci
-npm run cli -- about
-npm run cli -- canonical-model
+npm run start
 ```
 
-> Note: This workspace is still transitional. The UI layout is now product-aligned, and the shared runtime extraction to `packages/magnetar-sdk` has started.
+## CLI Usage
+```bash
+cd apps/magnetar-ui
+npm install
+npm run cli:dev -- about
+npm run cli:dev -- canonical-model
+npm run build:cli
+npm run cli -- about
+```
+
+## Validation
+```bash
+cd apps/magnetar-ui
+npm run typecheck
+npm run test:ci
+npm run build
+```
+
+## Startup Notes
+- `npm run start` launches the current web UI locally on the Angular dev server.
+- `npm run cli:dev` is the direct development CLI path.
+- `npm run cli` runs the compiled CLI from `dist/`.
+- Local startup still requires `npm install`; no-install delivery remains a later distribution concern.
+
+> Note: This workspace is still transitional. The UI layout is product-aligned, the shared runtime extraction to `packages/magnetar-sdk` has started, and the web runtime is now being initialized around the existing UI rather than replacing it.

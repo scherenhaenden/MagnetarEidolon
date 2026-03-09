@@ -18,6 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 20:40 UTC
+  **Author:** Codex
+  **Entry:** State Change: Iniciada la rama `feature/init-runnable-web-ui` para convertir la UI existente en `apps/magnetar-ui` en un workspace Angular realmente ejecutable. Se añadieron scripts y configuración de arranque web/CLI alrededor de la UI ya existente, sin crear una segunda UI, y se vinculó el trabajo al issue `#129`.
+
+- **Timestamp:** 2026-03-09 20:20 UTC
+  **Author:** Codex
+  **Entry:** Decision: Documentado un plan detallado para convertir `apps/magnetar-ui` en una superficie realmente arrancable para web y CLI. Se añadió `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` y se registraron en la documentación raíz las ubicaciones canónicas del GitHub Issue Tracker y del project board `MagnetarEidolon`.
+
 - **Timestamp:** 2026-03-09 20:05 UTC
   **Author:** Codex
   **Entry:** State Change: Iniciada la extracción del runtime TypeScript compartido hacia `packages/magnetar-sdk` en una rama dedicada. El objetivo es separar la UI de producto (`apps/magnetar-ui`) del contrato reusable para UI y CLI, manteniendo trazabilidad documental y validación por tests/typecheck.

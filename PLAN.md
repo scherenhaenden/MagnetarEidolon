@@ -58,6 +58,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-1102` | `ms-11` | Implementar Tool Catalog | Core Team | ready | Con visibilidad de riesgo/alcance. |
 | `task-1103` | `ms-16` | Reubicar la UI TS a `apps/magnetar-ui` | Core Team | in_review | Workspace movido y referencias activas actualizadas desde el nombre temporal anterior. |
 | `task-1104` | `ms-16` | Definir separación futura UI/SDK | Core Team | in_progress | Extracción activa del runtime compartido hacia `packages/magnetar-sdk`. |
+| `task-ui-109` | `ms-16` | Habilitar entrypoints reales de UI web y CLI | Core Team | in_progress | Rama `feature/init-runnable-web-ui` activa; Angular real, scripts web/CLI y pipeline de arranque en implementación. |
 | `task-1201` | `ms-12` | Diseñar Policy Center | Core Team | ready | Reglas en lenguaje humano. |
 | `task-1301` | `ms-13` | Habilitar Trace/Replay | Core Team | planned | Vista reproducible paso a paso. |
 | `task-1401` | `ms-14` | Formalizar comandos CLI | Core Team | ready | Contratos de run/approve/logs. |

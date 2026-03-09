@@ -19,3 +19,7 @@ Starts the extraction of the shared TypeScript runtime into `packages/magnetar-s
     - Updated the UI workspace to consume the extracted SDK paths during validation.
 - **.github/workflows/ci-typescript-ui.yml**:
     - Extended validation to include SDK typecheck alongside UI tests/typecheck.
+- **docs/UI_RUNTIME_BOOTSTRAP_PLAN.md / README.md / CONTRIBUTING.md / PLAN.md / STATUS.md / BITACORA.md**:
+    - Added a detailed runtime bootstrap plan for making the TypeScript workspace actually runnable via web and CLI entrypoints.
+    - Recorded the canonical GitHub issue tracker and project board locations.
+    - Tracked the work in GitHub issue `#129`.
