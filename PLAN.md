@@ -25,13 +25,19 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `ms-13` | Observability & Replay | 2026-05-08 | planned | Trazabilidad y reproducción de ejecuciones. |
 | `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready | Interfaz de línea de comandos unificada. |
 | `ms-15` | SDK Contract Base | 2026-04-22 | ready | Contrato compartido entre UI y CLI. |
+| `ms-04` | Project Initialization | 2026-05-15 | done | Estructura inicial y archivos de gobernanza. |
+| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base del motor en Python. |
+| `ms-06` | Tool System | 2026-06-15 | done | Abstracción de herramientas y herramientas OS. |
+| `ms-07` | Memory & Knowledge | 2026-07-01 | done | Integración de LiteLLM y ChromaDB. |
+| `ms-08` | Distribution | 2026-07-15 | done | Empaquetado y CLI inicial. |
 
 ## Backlog priorizado
 
 | Task ID | Milestone | Título | Propietario | Estado | Notas |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | `task-101` | `ms-01` | Crear base de documentación canónica | Core Team | done | Archivos canónicos iniciales creados. |
-| `task-103` | `ms-02` | Construir plantilla de esquema YAML | Core Team | done | `_template.project.yml` completado. |
+| `task-102` | `ms-02` | Borrador de arquitectura Magnetar | Core Team | in_review | Validar contra docs de arquitectura. |
+| `task-103` | `ms-02` | Plantilla de esquema YAML | Core Team | done | `_template.project.yml` completado. |
 | `task-ts-101` | `ms-ts-01` | Portar estado MagnetarModel a TS | Gemini | done | Definido en `core/models.ts`. |
 | `task-ts-102` | `ms-ts-01` | Portar Reasoning Loop a TS | Gemini | done | Definido en `core/agent.ts`. |
 | `task-ts-103` | `ms-ts-01` | Implementar interfaces SDK | Gemini | done | Definido en `core/interfaces.ts`. |
@@ -39,6 +45,12 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-ts-105` | `ms-ts-01` | Crear adaptadores de Browser (Web) | Gemini | done | `core/tools/web-filesystem.ts` creado. |
 | `task-ts-106` | `ms-ts-01` | Integrar SDK en Angular Shell | Gemini | done | Integración en app.component.ts. |
 | `task-ts-107` | `ms-ts-01` | Implementar servicio LLM Provider | Gemini | done | Interfaz y uso en agente implementados. |
+| `task-ts-qa-101` | `ms-ts-qa-01` | Configurar Vitest (100% cobertura) | Gemini | planned | Umbral obligatorio. |
+| `task-ts-qa-102` | `ms-ts-qa-01` | Implementar generador Bogus/Faker | Gemini | planned | Para datos realistas en tests. |
+| `task-ts-qa-103` | `ms-ts-qa-01` | Tests unitarios de modelos de estado | Gemini | planned | |
+| `task-ts-qa-104` | `ms-ts-qa-01` | Tests unitarios de MagnetarAgent loop | Gemini | planned | |
+| `task-ts-qa-105` | `ms-ts-qa-01` | Tests de integración tool-agent-memory | Gemini | planned | |
+| `task-ts-qa-106` | `ms-ts-qa-01` | Tests E2E de aceptación (CLI/Web) | Gemini | planned | |
 | `task-1101` | `ms-11` | Definir IA UX flow de onboarding | Core Team | in_progress | 7 pasos de flujo ideal. |
 | `task-1102` | `ms-11` | Implementar Tool Catalog | Core Team | ready | Con visibilidad de riesgo/alcance. |
 | `task-1201` | `ms-12` | Diseñar Policy Center | Core Team | ready | Reglas en lenguaje humano. |
@@ -46,8 +58,21 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-1401` | `ms-14` | Formalizar comandos CLI | Core Team | ready | Contratos de run/approve/logs. |
 | `task-1402` | `ms-14` | Verificar CLI multiplataforma | Core Team | planned | Linux/macOS/Windows. |
 | `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | ready | Paridad funcional UI/CLI. |
-| `task-ts-qa-101` | `ms-ts-qa-01` | Configurar Vitest (100% cobertura) | Gemini | planned | Umbral obligatorio. |
-| `task-ts-qa-102` | `ms-ts-qa-01` | Implementar generador Bogus/Faker | Gemini | planned | Para datos realistas en tests. |
+| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | planned | Ejemplos CLI y UI. |
+| `task-104` | `ms-03` | Definir gobernanza de branching/WIP | Core Team | ready | Pendiente revisión. |
+| `task-105` | `ms-03` | Establecer controles de test/blocker | Core Team | in_progress | Borrador de mecanismos de escalado. |
+| `task-201` | `ms-04` | Crear archivos de doc canónica | Jules | done | RULES, PLAN, etc. |
+| `task-202` | `ms-04` | Setup de estructura de repositorio Git | Jules | done | |
+| `task-203` | `ms-04` | Definir plantilla YAML de proyecto | Jules | done | |
+| `task-301` | `ms-05` | Esquema Pydantic de MagnetarModel | Jules | done | |
+| `task-302` | `ms-05` | Controlador de Agent Loop | Jules | done | |
+| `task-401` | `ms-06` | Interfaz abstracta de herramientas | Jules | done | |
+| `task-402` | `ms-06` | Herramientas de sistema de archivos | Jules | done | |
+| `task-501` | `ms-07` | Proveedor LiteLLM | Jules | done | |
+| `task-502` | `ms-07` | Setup de ChromaDB para memoria | Jules | done | |
+| `task-601` | `ms-08` | Construir CLI con Typer | Jules | done | |
+| `task-voice-101` | `ms-voice-01` | Setup estructura (Voice UI) | Jules | in_progress | |
+| `task-voice-102` | `ms-voice-01` | Lógica e interfaz Voice UI | Jules | planned | |
 
 ## Criterios de éxito del plan
 - Primera automatización útil en menos de 15 minutos.
@@ -58,9 +83,10 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 - **SDK contract estable que garantice paridad funcional entre UI y CLI.**
 
 ## Esfuerzo acumulado
-- **Puntos completados**: 87 pts
+- **Total esfuerzo estimado**: 165 pts
+- **Puntos completados**: 105 pts
 - **Puntos en progreso**: 15 pts
-- **Puntos restantes**: 60 pts
+- **Puntos restantes**: 45 pts
 
 ## Control de cambios
 Toda variación de tareas o estado se refleja en `STATUS.md` y se registra en `BITACORA.md`.
