@@ -7,3 +7,4 @@
 
 ## Notes
 - The workflows intentionally use `npm install` instead of `npm ci` because this repository currently does not include a committed `package-lock.json` for `typescript-angular-skeleton`.
+- Re-scoped CI compile step to `npm run build:cli` with a dedicated `tsconfig.cli.json` so workflows validate the operational CLI path while the Angular shell dependencies are still incomplete.

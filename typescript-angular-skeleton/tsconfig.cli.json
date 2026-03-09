@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/cli/**/*.ts",
+    "src/app/core/models/canonical-model.ts",
+    "src/app/core/services/project-context.service.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
