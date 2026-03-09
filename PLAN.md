@@ -9,6 +9,7 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | :--- | :--- | :--- | :--- | :--- |
 | `ms-01` | Canon Bootstrap | 2026-03-05 | Establish canonical governance and planning artifacts. | All required canonical docs created and reviewed. |
 | `ms-02` | Magnetar Model Baseline | 2026-03-12 | Define MagnetarEidolon architecture and machine-readable project schema. | Architecture and project YAML align with requirements and rules. |
+| `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | Port the core reasoning engine and state models to TypeScript to support a unified CLI/Web SDK. | Core logic ported, environment-specific adapters (Node/Web) implemented. |
 | `ms-03` | Operational Readiness | 2026-03-20 | Finalize testing, blocker flow, and contribution processes. | Governance processes validated and initial progress reporting active. |
 | `ms-04` | Project Initialization & Governance | 2026-05-15 | Establish the canonical project structure, governance files, and initial repository setup. | All required files (`RULES.md`, `BITACORA.md`, etc.) created and verified. |
 | `ms-05` | Core Architecture Implementation | 2026-06-01 | Implement the core MagnetarModel (state) and Agent Core (reasoning engine) using Python and Pydantic. | `MagnetarModel` schema defined; `Agent Core` loop implemented; Unit tests passing. |
@@ -24,6 +25,13 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 | `task-101` | `ms-01` | Create canonical documentation baseline | Core Team | 5 | done | Initial canonical files created. |
 | `task-102` | `ms-02` | Draft Magnetar architecture and stack mapping | Core Team | 4 | in_review | Validate against architecture and stack docs. |
 | `task-103` | `ms-02` | Build project YAML schema template | Core Team | 3 | done | `_template.project.yml` completed. |
+| `task-ts-101` | `ms-ts-01` | Port MagnetarModel state to TypeScript | Gemini | 3 | done | Defined in `core/models.ts`. |
+| `task-ts-102` | `ms-ts-01` | Port Agent Reasoning Loop to TypeScript | Gemini | 8 | done | Defined in `core/agent.ts`. |
+| `task-ts-103` | `ms-ts-01` | Implement shared SDK service interfaces | Gemini | 3 | done | Defined in `core/interfaces.ts`. |
+| `task-ts-104` | `ms-ts-01` | Create Node.js (CLI) tool adapters | Gemini | 5 | done | `core/tools/node-filesystem.ts` created. |
+| `task-ts-105` | `ms-ts-01` | Create Browser (Web) tool adapters | Gemini | 5 | done | `core/tools/web-filesystem.ts` created. |
+| `task-ts-106` | `ms-ts-01` | Integrate TS SDK into Angular UI shell | Gemini | 5 | planned | |
+| `task-ts-107` | `ms-ts-01` | Implement TS-based LLM provider service | Gemini | 5 | planned | |
 | `task-104` | `ms-03` | Define governance for branching and WIP | Core Team | 4 | ready | Pending team review kickoff. |
 | `task-105` | `ms-03` | Establish testing and blocker controls | Core Team | 6 | in_progress | Drafting acceptance and escalation mechanics. |
 | `task-201` | `ms-04` | Create Canonical Documentation Files | Jules | 3 | done | Creating `RULES.md`, `PLAN.md`, etc. created. |
@@ -41,10 +49,10 @@ This plan captures the project's milestones, tasks, estimates, and status. Its s
 
 ## Effort Summary
 
-- **Total effort**: 75 pts
-- **Completed**: 53 pts
+- **Total effort**: 107 pts
+- **Completed**: 77 pts
 - **In progress**: 9 pts
-- **Remaining**: 13 pts
+- **Remaining**: 21 pts
 
 
 ## State Definitions

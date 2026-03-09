@@ -1,8 +1,8 @@
 # Status of MagnetarEidolon
 
 ## Progress Summary
-**Overall completion:** 75%
-`[███████████████░░░░░] 75%`
+**Overall completion:** 72%
+`[██████████████░░░░░░] 72%`
 
 ## Current Milestones
 
@@ -10,6 +10,7 @@
 | :--- | :--- | :--- | :--- |
 | `ms-01` | Canon Bootstrap | Completed | 2026-03-05 |
 | `ms-02` | Magnetar Model Baseline | Completed | 2026-03-12 |
+| `ms-ts-01` | TypeScript Core & SDK Migration | In Progress | 2026-03-20 |
 | `ms-03` | Operational Readiness | Not Started | 2026-03-20 |
 | `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
 | `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
@@ -34,6 +35,8 @@
     -   **Mitigation**: Implemented `ChromaMemoryStore` for long-term storage and retrieval.
 7.  **Risk**: Audio input capture in sandbox environment.
     -   **Mitigation**: Focus on verifying logic and UI launch; support file upload as fallback.
+8.  **Risk**: Environment-specific API consistency between Node.js and Browser for the shared SDK.
+    -   **Mitigation**: Defined strict interfaces in `core/interfaces.ts` and use environment-specific tool adapters.
 
 ## Reporting Cadence
 Update at least once per day and immediately after each merged PR.
