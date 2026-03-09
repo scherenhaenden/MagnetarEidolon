@@ -67,6 +67,5 @@ class ChromaMemoryStore(MemoryStore):
             SharedSystemClient.clear_system_cache()
         except Exception:
             pass
-
         self.client = None
         self.collection = None
