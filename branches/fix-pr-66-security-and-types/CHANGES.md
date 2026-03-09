@@ -27,7 +27,13 @@ This branch addresses critical security vulnerabilities, technical bugs, and UI 
 - `typescript-angular-skeleton/src/app/core/tools/node-filesystem.ts`: Hardened against path traversal.
 - `typescript-angular-skeleton/src/app/core/tools/web-filesystem.ts`: Added path validation.
 - `typescript-angular-skeleton/src/app/app.component.ts`: Improved status mapping and error logging.
+- `PLAN.md`: Marked `task-ts-106` and `task-ts-107` as done and updated effort summary.
+
+## GitHub Synchronization
+- Closed issue #67 ([task-ts-106]) with implementation details.
+- Closed issue #68 ([task-ts-107]) with implementation details.
+- Added comment to blocker #79 regarding partial resolution via path traversal fix.
 
 ## Required Updates to Root Files (To be done upon merge)
-- **PLAN.md**: Fix typo in `task-ts-qa-101` from "Setup" to "Set up".
-- **BITACORA.md**: Record the security hardening and type corrections for the TypeScript SDK.
+- **PLAN.md**: Fix typo in `task-ts-qa-101` from "Setup" to "Set up". (Already synchronized in local file).
+- **BITACORA.md**: Record the security hardening, type corrections, and task completions for the TypeScript SDK.
