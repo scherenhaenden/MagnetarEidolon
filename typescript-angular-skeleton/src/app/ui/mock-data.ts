@@ -1,26 +1,35 @@
+export type AgentStatus = 'active' | 'idle' | 'error';
+export type AgentType = 'Orchestrator' | 'Reviewer' | 'Operations' | 'assistant' | 'tool' | 'system';
+
 export interface Agent {
   id: string;
   name: string;
-  status: string;
-  type: string;
+  status: AgentStatus;
+  type: AgentType;
   runs: number;
   latency: string;
 }
 
+export type RunStatus = 'success' | 'pending_approval' | 'failed' | 'running' | 'completed';
+
 export interface Run {
   id: string;
   agent: string;
-  status: string;
+  status: RunStatus;
   time: string;
   tokens: string;
   cost: string;
 }
 
+export type ToolCategory = 'Databases' | 'Infrastructure' | 'VCS' | 'APIs' | 'Automation';
+export type ToolTrust = 'Low' | 'Medium' | 'High' | 'Critical';
+export type ToolStatus = 'connected' | 'requires_auth' | 'disconnected';
+
 export interface Tool {
   name: string;
-  category: string;
-  trust: string;
-  status: string;
+  category: ToolCategory;
+  trust: ToolTrust;
+  status: ToolStatus;
   icon: string;
 }
 
