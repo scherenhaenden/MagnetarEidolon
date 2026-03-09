@@ -21,6 +21,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `ms-ts-01` | TypeScript Core & SDK Migration | 2026-03-20 | in_progress | Migración del motor de razonamiento a TypeScript. |
 | `ms-ts-qa-01` | TypeScript Testing & QA | 2026-03-30 | planned | Pirámide de pruebas y 100% cobertura en core. |
 | `ms-11` | Experience Foundation | 2026-04-10 | in_progress | UI/UX base y catálogo de herramientas. |
+| `ms-16` | UI Workspace Rehome & TS Delivery Pipeline | 2026-04-15 | in_progress | Reubicar la UI TypeScript a una estructura de producto y activar pipeline propio de validación. |
 | `ms-12` | Trust & Policy Center | 2026-04-24 | ready | Centro de control de políticas y aprobaciones. |
 | `ms-13` | Observability & Replay | 2026-05-08 | planned | Trazabilidad y reproducción de ejecuciones. |
 | `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready | Interfaz de línea de comandos unificada. |
@@ -51,14 +52,19 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-ts-qa-104` | `ms-ts-qa-01` | Tests unitarios de MagnetarAgent loop | Gemini | planned | |
 | `task-ts-qa-105` | `ms-ts-qa-01` | Tests de integración tool-agent-memory | Gemini | planned | |
 | `task-ts-qa-106` | `ms-ts-qa-01` | Tests E2E de aceptación (CLI/Web) | Gemini | planned | |
+| `task-ts-qa-107` | `ms-16` | Activar pipeline CI para TypeScript UI | Core Team | in_review | Workflow dedicado creado para install, test y typecheck del workspace UI. |
+| `task-ts-qa-108` | `ms-16` | Validar el propio sistema de tests | Core Team | in_progress | Smoke suite inicial y cobertura activadas; falta ampliar meta-validación. |
 | `task-1101` | `ms-11` | Definir IA UX flow de onboarding | Core Team | in_progress | 7 pasos de flujo ideal. |
 | `task-1102` | `ms-11` | Implementar Tool Catalog | Core Team | ready | Con visibilidad de riesgo/alcance. |
+| `task-1103` | `ms-16` | Reubicar la UI TS a `apps/magnetar-ui` | Core Team | in_review | Workspace movido y referencias activas actualizadas desde el nombre temporal anterior. |
+| `task-1104` | `ms-16` | Definir separación futura UI/SDK | Core Team | in_progress | Extracción activa del runtime compartido hacia `packages/magnetar-sdk`. |
+| `task-ui-109` | `ms-16` | Habilitar entrypoints reales de UI web y CLI | Core Team | in_progress | Rama `feature/init-runnable-web-ui` activa; Angular real, scripts web/CLI y pipeline de arranque en implementación. |
 | `task-1201` | `ms-12` | Diseñar Policy Center | Core Team | ready | Reglas en lenguaje humano. |
 | `task-1301` | `ms-13` | Habilitar Trace/Replay | Core Team | planned | Vista reproducible paso a paso. |
 | `task-1401` | `ms-14` | Formalizar comandos CLI | Core Team | ready | Contratos de run/approve/logs. |
 | `task-1402` | `ms-14` | Verificar CLI multiplataforma | Core Team | planned | Linux/macOS/Windows. |
-| `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | ready | Paridad funcional UI/CLI. |
-| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | planned | Ejemplos CLI y UI. |
+| `task-1501` | `ms-15` | Definir contrato SDK unificado | Core Team | in_progress | El paquete `packages/magnetar-sdk` pasa a representar el contrato compartido. |
+| `task-1502` | `ms-15` | Publicar guía de integración | Core Team | in_progress | Documentar consumo desde UI y próximos clientes CLI. |
 | `task-104` | `ms-03` | Definir gobernanza de branching/WIP | Core Team | ready | Pendiente revisión. |
 | `task-105` | `ms-03` | Establecer controles de test/blocker | Core Team | in_progress | Borrador de mecanismos de escalado. |
 | `task-201` | `ms-04` | Crear archivos de doc canónica | Jules | done | RULES, PLAN, etc. |
@@ -83,10 +89,10 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 - **SDK contract estable que garantice paridad funcional entre UI y CLI.**
 
 ## Esfuerzo acumulado
-- **Total esfuerzo estimado**: 165 pts
+- **Total esfuerzo estimado**: 181 pts
 - **Puntos completados**: 105 pts
-- **Puntos en progreso**: 15 pts
-- **Puntos restantes**: 45 pts
+- **Puntos en progreso**: 25 pts
+- **Puntos restantes**: 51 pts
 
 ## Control de cambios
 Toda variación de tareas o estado se refleja en `STATUS.md` y se registra en `BITACORA.md`.

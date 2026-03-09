@@ -13,8 +13,8 @@ This document provides guidelines for contributing to the MagnetarEidolon projec
 ### Installation
 1.  **Clone the Repository**:
     ```bash
-    git clone https://github.com/your-org/magnetar-eidolon.git
-    cd magnetar-eidolon
+    git clone https://github.com/scherenhaenden/MagnetarEidolon.git
+    cd MagnetarEidolon
     ```
 2.  **Install Dependencies**:
     ```bash
@@ -60,3 +60,7 @@ pre-commit install
 
 ## Reporting Issues
 Please use the GitHub Issue Tracker for general issues or update `BLOCKERS.md` for critical project impediments.
+
+- Issue Tracker: `https://github.com/scherenhaenden/MagnetarEidolon/issues`
+- Primary Project Board: `https://github.com/users/scherenhaenden/projects/7`
+- When creating a new implementation issue, check for an existing item first and then add the new issue to the `MagnetarEidolon` GitHub project board if it is net-new work.
