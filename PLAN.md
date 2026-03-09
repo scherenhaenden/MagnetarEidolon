@@ -46,7 +46,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `task-ts-105` | `ms-ts-01` | Crear adaptadores de Browser (Web) | Gemini | done | `core/tools/web-filesystem.ts` creado. |
 | `task-ts-106` | `ms-ts-01` | Integrar SDK en Angular Shell | Gemini | done | Integración en app.component.ts. |
 | `task-ts-107` | `ms-ts-01` | Implementar servicio LLM Provider | Gemini | done | Interfaz y uso en agente implementados. |
-| `task-ts-qa-101` | `ms-ts-qa-01` | Configurar Vitest (100% cobertura) | Gemini | planned | Umbral obligatorio. |
+| `task-ts-qa-101` | `ms-ts-qa-01` | Configurar Vitest (100% cobertura) | Gemini | done | Umbral obligatorio habilitado en vitest.config.ts. |
 | `task-ts-qa-102` | `ms-ts-qa-01` | Implementar generador Bogus/Faker | Gemini | planned | Para datos realistas en tests. |
 | `task-ts-qa-103` | `ms-ts-qa-01` | Tests unitarios de modelos de estado | Gemini | planned | |
 | `task-ts-qa-104` | `ms-ts-qa-01` | Tests unitarios de MagnetarAgent loop | Gemini | planned | |
@@ -89,10 +89,10 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 - **SDK contract estable que garantice paridad funcional entre UI y CLI.**
 
 ## Esfuerzo acumulado
-- **Total esfuerzo estimado**: 181 pts
-- **Puntos completados**: 105 pts
-- **Puntos en progreso**: 25 pts
-- **Puntos restantes**: 51 pts
+- **Total esfuerzo estimado**: 165 pts
+- **Puntos completados**: 108 pts
+- **Puntos en progreso**: 15 pts
+- **Puntos restantes**: 42 pts
 
 ## Control de cambios
 Toda variación de tareas o estado se refleja en `STATUS.md` y se registra en `BITACORA.md`.
