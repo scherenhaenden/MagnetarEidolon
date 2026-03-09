@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-09 19:10 UTC
+  **Author:** Codex (GPT-5.2-Codex)
+  **Entry:** Decision: Removed the Python codebase (`src/`, `tests/`, Python packaging files and Python-only CI/release workflows) and formalized TypeScript SDK as the sole runtime baseline. Updated README, STATUS, PLAN, and TESTING to document the TypeScript-only direction.
+
 - **Timestamp:** 2026-03-09 18:30 UTC
   **Author:** Gemini CLI
   **Entry:** State Change: Merged 'origin/master' into 'fix/pr-66-security-and-types'. Resolved conflicts in PLAN.md, README.md, and STATUS.md by unifying TypeScript migration milestones with the new Spanish-localized project roadmap.

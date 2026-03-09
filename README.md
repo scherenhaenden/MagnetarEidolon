@@ -1,9 +1,6 @@
 # MagnetarEidolon
 
-[![CI (Linux)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-linux.yml)
-[![CI (macOS)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-macos.yml)
-[![CI (Windows)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-windows.yml)
-[![Release](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/release.yml)
+[![CI (TypeScript)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-typescript.yml/badge.svg)](https://github.com/scherenhaenden/MagnetarEidolon/actions/workflows/ci-typescript.yml)
 [![License](https://img.shields.io/github/license/scherenhaenden/MagnetarEidolon)](https://github.com/scherenhaenden/MagnetarEidolon/blob/master/LICENSE)
 
 ## Propósito
@@ -47,12 +44,11 @@ La CLI no debe duplicar lógica de negocio; debe consumir ese SDK/Runtime Contra
 | `STATUS.md` | Estado actual, riesgos y próximos compromisos. |
 | `TESTING.md` | Estrategia de validación técnica y de producto. |
 
-## Estado de Transición
-El repositorio se encuentra en una fase de transición estratégica:
-- La implementación en Python sigue activa mientras se evalúa el prototipo en TypeScript.
-- El **TypeScript Angular Skeleton** es el camino actual para la arquitectura unificada CLI/Web.
-- Los planes y pruebas de calidad ahora priorizan la migración a TypeScript.
-- Una vez validado el prototipo TypeScript, se procederá a retirar el código Python legado.
+## Estado actual
+El repositorio opera como **TypeScript-only**:
+- El código Python legado fue retirado del árbol principal.
+- El **TypeScript Angular Skeleton** y su SDK son la base única para CLI/Web.
+- Los planes, validaciones y CI ahora se enfocan exclusivamente en TypeScript.
 
 ## Acometidos inmediatos
 1. Consolidar experiencia MVP con Dashboard + Live Execution + Policy Center.

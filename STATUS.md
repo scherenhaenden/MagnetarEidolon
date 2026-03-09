@@ -5,7 +5,7 @@
 `[██████████████░░░░░░] 72%`
 
 ## Dirección actual
-El repositorio opera en un estado de transición controlada. La implementación en Python sigue activa mientras se valida el prototipo en TypeScript como sucesor para la arquitectura unificada CLI/Web. Una vez validado el prototipo TypeScript, se retirará el código Python legado. Hasta entonces, Python es el baseline activo y TypeScript es el track estratégico de migración.
+El repositorio opera en modo TypeScript-only. El código Python legado fue retirado y el SDK TypeScript es ahora el baseline único para la arquitectura unificada CLI/Web.
 
 ## Hitos (Milestones)
 
@@ -29,7 +29,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 | :--- | :--- | :--- |
 | Visión de producto | aligned | Principios y roadmap definidos. |
 | UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
-| Migración TS | in_progress | Core portado, adaptadores de entorno en validación. |
+| Migración TS | done | Migración completada; código Python legado eliminado del repositorio. |
 | Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
 | **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |
 | **SDK contract** | **ready** | Definición requerida para evitar divergencia entre UI y CLI. |

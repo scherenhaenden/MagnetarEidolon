@@ -26,7 +26,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | `ms-14` | CLI Operativa de Consola | 2026-04-17 | ready | Interfaz de línea de comandos unificada. |
 | `ms-15` | SDK Contract Base | 2026-04-22 | ready | Contrato compartido entre UI y CLI. |
 | `ms-04` | Project Initialization | 2026-05-15 | done | Estructura inicial y archivos de gobernanza. |
-| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base del motor en Python. |
+| `ms-05` | Core Implementation | 2026-06-01 | done | Implementación base histórica; código Python legado retirado. |
 | `ms-06` | Tool System | 2026-06-15 | done | Abstracción de herramientas y herramientas OS. |
 | `ms-07` | Memory & Knowledge | 2026-07-01 | done | Integración de LiteLLM y ChromaDB. |
 | `ms-08` | Distribution | 2026-07-15 | done | Empaquetado y CLI inicial. |

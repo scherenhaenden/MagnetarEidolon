@@ -1,7 +1,7 @@
 # Testing Strategy for MagnetarEidolon
 
 ## Introduction
-This document describes the testing strategy for the MagnetarEidolon project, encompassing both the application code (Python and TypeScript) and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to the canonical standards for documentation and process.
+This document describes the testing strategy for the MagnetarEidolon project, focused on the TypeScript SDK/application code and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to the canonical standards for documentation and process.
 
 ## Governance and Documentation Testing
 
@@ -44,23 +44,6 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 - [ ] All integration scenarios passing in both Node and Browser environments (where applicable).
 - [ ] No regressions in E2E acceptance flows.
 - [ ] Bogus data generation used to verify edge cases in state transitions.
-
-## Application Code Testing (Python Legacy)
-
-### Types of Tests
-
-#### 1. Unit Tests
-- **Focus**: Verify the correctness of individual functions and methods within `MagnetarModel` and `Agent Core`.
-- **Framework**: `pytest`.
-
-#### 2. Integration Tests
-- **Focus**: Verify interactions between components, such as the `Agent Core` calling the `Tool System` or updating the `Memory System`.
-
-#### 3. End-to-End (E2E) Tests
-- **Focus**: Verify complete user workflows from initiating a task via CLI to completion.
-
-### Code Coverage
-- **Target**: Ensure >80% code coverage for core logic.
 
 ## Bug Reporting Process
 1.  **Identify & Document**: Identify the issue. Create a bug entry with ID, summary, reproduction steps, severity, and owner.
