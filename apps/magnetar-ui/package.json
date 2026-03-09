@@ -5,24 +5,43 @@
   "description": "MagnetarEidolon TypeScript UI workspace with a shared CLI/runtime proof of concept.",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "start": "ng serve",
+    "build": "npm run build:web && npm run build:cli",
+    "build:web": "ng build",
+    "build:cli": "tsc -p tsconfig.cli.json",
+    "typecheck": "npm run typecheck:web && npm run typecheck:cli && npm run typecheck:test",
+    "typecheck:web": "ngc -p tsconfig.app.json --noEmit",
+    "typecheck:cli": "tsc -p tsconfig.cli.json --noEmit",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
     "test": "vitest",
     "test:ci": "vitest run --coverage",
+    "cli:dev": "node --import tsx src/cli/magnetar-cli.ts",
     "cli": "node dist/cli/magnetar-cli.js",
-    "start": "echo 'Use Angular CLI (ng serve) after adding framework dependencies.'"
+    "web:open": "ng serve --open"
   },
   "bin": {
     "magnetar-cli": "dist/cli/magnetar-cli.js"
   },
   "dependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
     "@magnetar/magnetar-sdk": "file:../../packages/magnetar-sdk",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "zone.js": "^0.15.0"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^21.2.1",
+    "@angular/cli": "^21.2.1",
+    "@angular/compiler-cli": "^19.2.0",
     "@faker-js/faker": "^9.7.0",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^3.2.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vitest": "^3.2.4"
   }

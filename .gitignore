@@ -37,6 +37,7 @@ agent_memory/
 
 # TypeScript UI workspace
 apps/magnetar-ui/node_modules/
+apps/magnetar-ui/.angular/
 apps/magnetar-ui/coverage/
 apps/magnetar-ui/dist/
 apps/magnetar-ui/dist-test/

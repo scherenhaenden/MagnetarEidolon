@@ -39,18 +39,34 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/magnetar-ui/package-lock.json
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Install Magnetar SDK dependencies
         working-directory: packages/magnetar-sdk
-        run: npm install
+        run: npm ci --include=dev
+
+      - name: Build Magnetar SDK
+        working-directory: packages/magnetar-sdk
+        run: npm run build
+
+      - name: Install dependencies
+        run: npm ci --include=dev
 
       - name: Run TypeScript tests
         run: npm run test:ci
 
+      - name: Run web build
+        run: npm run build:web
+
+      - name: Run CLI build
+        run: npm run build:cli
+
+      - name: Run CLI smoke command
+        run: npm run cli -- about
+
+      - name: Run development CLI smoke command
+        run: npm run cli:dev -- about
+
       - name: Run Magnetar SDK typecheck
-        run: npx tsc -p ../../packages/magnetar-sdk/tsconfig.json --noEmit
+        run: npm --prefix ../../packages/magnetar-sdk run typecheck
 
       - name: Run TypeScript typecheck
         run: npm run typecheck

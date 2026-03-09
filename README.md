@@ -46,14 +46,43 @@ La CLI no debe duplicar lógica de negocio; debe consumir ese SDK/Runtime Contra
 | `ARCHITECTURE.md` | Arquitectura objetivo para UI, motor agente, políticas y memoria. |
 | `STATUS.md` | Estado actual, riesgos y próximos compromisos. |
 | `TESTING.md` | Estrategia de validación técnica y de producto. |
+| `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` | Plan detallado para convertir la UI TS en una superficie arrancable real para web y CLI. |
 
 ## Estado de Transición
 El repositorio se encuentra en una fase de transición estratégica:
 - La implementación en Python sigue activa mientras se evalúa el prototipo en TypeScript.
 - La UI TypeScript ya vive en `apps/magnetar-ui` y deja de tratarse como un "skeleton" permanente.
 - El camino objetivo para la arquitectura unificada CLI/Web es `apps/magnetar-ui` + `packages/magnetar-sdk`; la extracción del runtime compartido está en ejecución.
+- La inicialización del runtime web real ya está en marcha: `apps/magnetar-ui` deja atrás el arranque placeholder y pasa a un workspace Angular ejecutable alrededor de la UI existente.
 - Los planes y pruebas de calidad ahora priorizan la migración a TypeScript.
 - Una vez validado el prototipo TypeScript, se procederá a retirar el código Python legado.
+
+## Arranque actual del workspace UI
+- Web local: `cd apps/magnetar-ui && npm install && npm run start`
+- CLI de desarrollo: `cd apps/magnetar-ui && npm install && npm run cli:dev -- about`
+- CLI compilada: `cd apps/magnetar-ui && npm run build:cli && npm run cli -- about`
+
+## Comandos operativos actuales
+```bash
+cd apps/magnetar-ui
+npm install
+
+# Web local
+npm run start
+
+# CLI en desarrollo
+npm run cli:dev -- about
+npm run cli:dev -- canonical-model
+
+# CLI compilada
+npm run build:cli
+npm run cli -- about
+
+# Validación
+npm run typecheck
+npm run test:ci
+npm run build
+```
 
 ## Acometidos inmediatos
 1. Consolidar experiencia MVP con Dashboard + Live Execution + Policy Center.
@@ -63,6 +92,11 @@ El repositorio se encuentra en una fase de transición estratégica:
 
 ## Información adicional
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: decisiones tecnológicas y justificación para Linux, macOS y Windows.
+
+## Seguimiento en GitHub
+- Issue tracker: `https://github.com/scherenhaenden/MagnetarEidolon/issues`
+- Project board principal: `https://github.com/users/scherenhaenden/projects/7` (`MagnetarEidolon`)
+- El tablero de GitHub debe reflejar los issues operativos activos; la documentación raíz sigue siendo la referencia canónica de alcance, arquitectura y estado.
 
 ## Nota de gobernanza
 Cualquier cambio de alcance debe sincronizarse en `NEW_PLAN.md`, `PLAN.md`, `REQUIREMENTS.md` y `STATUS.md` en el mismo PR para evitar deriva documental.

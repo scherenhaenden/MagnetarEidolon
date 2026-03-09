@@ -2,6 +2,11 @@ import { Observable, of, map, switchMap, tap } from 'rxjs';
 import { MagnetarEidolon, ToolCall } from './models.js';
 import { LLMProvider, Tool, MemoryStore, ToolResult } from './interfaces.js';
 
+export type AgentAction =
+  | { type: 'tool'; name: string; args: Record<string, unknown> }
+  | { type: 'finish'; message: string }
+  | { type: 'error'; message: string };
+
 export class MagnetarAgent {
   private tools: Map<string, Tool> = new Map();
 
@@ -41,14 +46,14 @@ export class MagnetarAgent {
     };
   }
 
-  private think(): Observable<{ type: string; name?: string; args?: Record<string, unknown>; message?: string } | null> {
+  private think(): Observable<AgentAction | null> {
     const prompt = this.constructPrompt();
     return this.llm.generate([{ role: 'user', content: prompt }]).pipe(
           map(response => response.content ? this.parseAction(response.content) : null)
     );
   }
 
-  private act(action: any): Observable<void> {
+  private act(action: AgentAction): Observable<void> {
     if (action.type === 'tool') {
       const tool = this.tools.get(action.name);
       if (tool) {
@@ -127,7 +132,7 @@ FINAL: <message>
 `;
   }
 
-  private parseAction(content: string): any {
+  private parseAction(content: string): AgentAction | null {
     const trimmed = content.trim();
     if (trimmed.startsWith('TOOL:')) {
       const lines = trimmed.split('\n');
@@ -135,7 +140,7 @@ FINAL: <message>
       const argsStr = lines.slice(1).join('\n').replace('ARGS:', '').trim();
       try {
         return { type: 'tool', name: toolName, args: JSON.parse(argsStr) };
-      } catch (e) {
+      } catch {
         return { type: 'error', message: 'Failed to parse arguments' };
       }
     } else if (trimmed.startsWith('FINAL:')) {

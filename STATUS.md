@@ -9,6 +9,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 
 ## Enfoque inmediato
 - Consolidar la UI TypeScript ya reubicada en `apps/magnetar-ui`.
+- Convertir `apps/magnetar-ui` en una superficie realmente arrancable para web y CLI, no solo validable por build/tests.
 - Activar y estabilizar pipeline propio para validación TypeScript sin depender solo del CI Python legado.
 - Ejecutar la extracción del runtime compartido a `packages/magnetar-sdk` y fijar su contrato inicial.
 
@@ -37,6 +38,7 @@ El repositorio opera en un estado de transición controlada. La implementación 
 | UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
 | Migración TS | in_progress | Core portado, adaptadores de entorno en validación. |
 | UI workspace rehome | in_review | Workspace movido a `apps/magnetar-ui`; pendiente consolidación post-move. |
+| Runtime startup UX | in_progress | La inicialización real del workspace web está activa en `feature/init-runnable-web-ui`; el build web ya forma parte de la validación local. |
 | TS test pipeline | in_review | Workflow dedicado creado y validado localmente con tests + typecheck. |
 | Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
 | **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |

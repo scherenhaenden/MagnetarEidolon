@@ -1,0 +1,25 @@
+# Changes for feature/init-runnable-web-ui
+
+## Summary
+Initializes the existing `apps/magnetar-ui` codebase as a real runnable web workspace instead of leaving it as a placeholder-only shell.
+
+## Changes
+- **apps/magnetar-ui/package.json / angular.json / tsconfig.app.json / tsconfig.cli.json**:
+    - Added real Angular workspace wiring, dedicated web and CLI build paths, and direct development commands.
+- **apps/magnetar-ui/src/index.html / src/styles.css / tailwind.config.js / .postcssrc.json**:
+    - Added browser entrypoint and styling pipeline so the existing UI can render with its intended utility-class visual system.
+- **apps/magnetar-ui/README.md**:
+    - Replaced placeholder startup guidance with real web, CLI, and validation commands.
+- **README.md / docs/UI_RUNTIME_BOOTSTRAP_PLAN.md**:
+    - Added the exact root-level command baseline for web startup, CLI usage, and validation.
+- **apps/magnetar-ui/src/app/app.component.ts**:
+    - Removed remaining `Magnetar Aegis` naming leaks so the UI consistently refers to `Magnetar Eidolon`.
+- **packages/magnetar-sdk/**:
+    - Promoted the SDK package from source-only exports to compiled `dist/` exports with declaration files and a buildable package contract.
+    - Extracted a shared `AgentAction` type and clarified the empty-file semantics of the web filesystem adapter.
+- **TESTING.md / docs/UI_RUNTIME_BOOTSTRAP_PLAN.md**:
+    - Tightened review-driven wording around Node version expectations and startup acceptance criteria.
+- **.github/workflows/ci-typescript-ui.yml / TESTING.md**:
+    - Extended validation expectations to cover real web build and CLI smoke paths.
+- **PLAN.md / STATUS.md / README.md / BITACORA.md**:
+    - Recorded that runnable web initialization is now in progress on this branch and linked it to GitHub issue `#129`.
