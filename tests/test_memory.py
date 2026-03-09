@@ -5,6 +5,7 @@ from magnetar.memory.chroma import ChromaMemoryStore
 
 @pytest.fixture
 def memory_store(tmp_path):
+    """Fixture that provides a ChromaMemoryStore instance for testing."""
     store = ChromaMemoryStore(collection_name="test_memory", persist_directory=str(tmp_path))
     yield store
     # Cleanup
