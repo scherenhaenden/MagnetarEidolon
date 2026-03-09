@@ -12,7 +12,7 @@ Este plan implementa la dirección definida en `NEW_PLAN.md`: simplicidad, contr
 | Fase 3 | Colaboración de equipos (workspaces, roles, colas de aprobación). | planned |
 | Fase 4 | Ecosistema y expansión segura (intercambio de recetas + integraciones externas con controles estrictos). | planned |
 
-## Milestones activos
+## Resumen de Milestones
 
 | Milestone ID | Nombre | Fecha objetivo | Estado | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
