@@ -39,6 +39,14 @@ MagnetarEidolon exists to provide a canonical, reusable project governance and e
 ## TypeScript + Angular Skeleton
 A starter migration skeleton is available at `typescript-angular-skeleton/`. It introduces a TypeScript OOP domain layer, Angular UI shell, and CLI entrypoint that explicitly uses the MagnetarEidolon canonical model as a core context while keeping application goals broader than model description alone.
 
+## Transition Status
+The repository is currently in a transition phase:
+
+- The Python implementation is not yet retired because the TypeScript proof of concept is still being evaluated.
+- The TypeScript skeleton is the current proof-of-concept path for a unified CLI/Web architecture.
+- Root planning and testing documents now track the TypeScript migration and quality gates explicitly.
+- Once the TypeScript proof of concept shows good results, the Python project is expected to be removed.
+
 ## Additional Documentation
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: concrete technology decisions and rationale for implementing Magnetar across Linux, macOS, and Windows.
 

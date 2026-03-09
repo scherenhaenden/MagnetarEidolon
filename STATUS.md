@@ -4,6 +4,9 @@
 **Overall completion:** 72%
 `[██████████████░░░░░░] 72%`
 
+## Current Direction
+The repository is operating in a controlled transition state. The existing Python implementation is not yet retired because the TypeScript proof of concept is still being validated as the candidate successor for a unified CLI/Web product architecture. Once the TypeScript proof of concept shows good results, the Python project is expected to be removed. Until then, Python remains the active legacy baseline and TypeScript is the strategic migration track.
+
 ## Current Milestones
 
 | Milestone ID | Name | Status | Target Date |
