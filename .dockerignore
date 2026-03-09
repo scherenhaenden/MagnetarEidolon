@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.idea
+.venv
+magnetar_voice_ui
+projects
+src
+tests
+*.log
+.env
