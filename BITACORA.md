@@ -13,10 +13,54 @@ This document is a logbook that records decisions, state changes, discoveries, a
 - **Decision**: Key architectural or process decision.
 - **Blocker**: Creation or resolution of a blocker.
 - **Discovery**: Significant finding or new idea.
--- **PR Merge**: Pull Request merged.
+- **PR Merge**: Pull Request merged.
 - **Exception**: Documented deviation from canonical rules.
 
 ## Log Entries
+
+- **Timestamp:** 2026-03-09 18:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Merged 'origin/master' into 'fix/pr-66-security-and-types'. Resolved conflicts in PLAN.md, README.md, and STATUS.md by unifying TypeScript migration milestones with the new Spanish-localized project roadmap.
+
+- **Timestamp:** 2026-03-09 17:45 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Synchronized local PLAN.md with GitHub Issue tracker. Closed issues #67 (TS SDK Integration) and #68 (LLM Provider Service) following verification of implementation in the Angular shell. Updated project effort summary to reflect 87 completed points.
+
+- **Timestamp:** 2026-03-09 17:35 UTC
+  **Author:** Gemini CLI
+  **Entry:** Security: Hardened TypeScript SDK against Absolute Path Traversal. Implemented `resolveSafePath` in `NodeFileSystemTool` to restrict all file operations to the current working directory. Added path validation to `WebFileSystemTool`.
+
+- **Timestamp:** 2026-03-09 17:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Refined TypeScript SDK type safety. Fixed critical invalid type 'str' (leftover from Python) to 'string' in `agent.ts`. Implemented robust null handling for LLM responses and enhanced UI status mapping with explicit warning logs for unexpected states.
+
+- **Timestamp:** 2026-03-09 17:15 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Merged 'origin/codex/create-angular-app-skeleton-with-typescript-oop' into 'fix/pr-66-security-and-types'. Integrated the baseline Angular OOP skeleton with current security hardening and type safety refinements.
+
+- **Timestamp:** 2026-03-09 16:45 UTC
+  **Author:** Codex
+  **Entry:** Decision: Reconciled branch changelogs with canonical root documentation. Added missing records for the TypeScript migration documentation and testing-strategy updates, and clarified in root docs that Python remains active while the TypeScript proof of concept is evaluated as the likely successor architecture.
+
+- **Timestamp:** 2026-03-09 16:40 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Formalized the TypeScript-first migration track in canonical planning and status artifacts. Added milestone `ms-ts-01`, tasks `task-ts-101` through `task-ts-107`, and related status/risk updates to document the shift toward a shared CLI/Web TypeScript architecture while implementation remains in progress.
+
+- **Timestamp:** 2026-03-09 16:35 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Defined a comprehensive TypeScript testing strategy in canonical documentation. Added milestone `ms-ts-qa-01`, tasks `task-ts-qa-101` through `task-ts-qa-106`, and acceptance criteria covering unit, integration, and end-to-end validation for the shared SDK.
+
+- **Timestamp:** 2026-03-09 16:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Ported core Agent Loop, State Models, and Service Interfaces from Python to TypeScript (Angular Skeleton). This enables the 'Think-Act-Observe' cycle to run within the TypeScript/Web environment. Work tracked in branches/feature-port-core-logic-to-typescript/.
+
+- **Timestamp:** 2026-03-09 15:50 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Implemented UI type safety and naming consistency across the TypeScript skeleton. Created union types for statuses, verified 'Infrastructure Auto-Scaler' naming, and centralized interface usage in app.component.ts. Work tracked in branches/feature-ui-consistency-and-centralized-types/.
+
+- **Timestamp:** 2026-03-09 15:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** Security: Fixed High-severity vulnerability in 'gradio' (Absolute Path Traversal) by upgrading to version 6.9.0 in magnetar_voice_ui. Updated pyproject.toml and requirements.txt. Work tracked in branches/fix-security-gradio-path-traversal/.
 
 - **Timestamp:** 2026-02-20 15:34 UTC
   **Author:** Codex

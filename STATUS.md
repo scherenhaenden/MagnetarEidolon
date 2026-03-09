@@ -1,39 +1,51 @@
-# Status of MagnetarEidolon
+# Estado actual — MagnetarEidolon
 
-## Progress Summary
-**Overall completion:** 71%
-`[███████████████░░░░░] 71%`
+## Resumen
+**Progreso global estimado:** 72%
+`[██████████████░░░░░░] 72%`
 
-## Current Milestones
+## Dirección actual
+El repositorio opera en un estado de transición controlada. La implementación en Python sigue activa mientras se valida el prototipo en TypeScript como sucesor para la arquitectura unificada CLI/Web. Una vez validado el prototipo TypeScript, se retirará el código Python legado. Hasta entonces, Python es el baseline activo y TypeScript es el track estratégico de migración.
 
-| Milestone ID | Name | Status | Target Date |
+## Hitos (Milestones)
+
+| Milestone ID | Nombre | Estado | Fecha objetivo |
 | :--- | :--- | :--- | :--- |
-| `ms-01` | Canon Bootstrap | Completed | 2026-03-05 |
-| `ms-02` | Magnetar Model Baseline | In Progress | 2026-03-12 |
-| `ms-03` | Operational Readiness | Not Started | 2026-03-20 |
-| `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
-| `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
-| `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
-| `ms-07` | Memory & Knowledge Systems | Completed | 2026-07-01 |
-| `ms-08` | Interface & Distribution | Completed | 2026-07-15 |
-| ms-voice-01 | Voice UI Prototype | In Progress | 2024-05-22 |
+| `ms-01` | Canon Bootstrap | Finalizado | 2026-03-05 |
+| `ms-02` | Magnetar Model Baseline | Finalizado | 2026-03-12 |
+| `ms-ts-01` | TypeScript Core & SDK Migration | En curso | 2026-03-20 |
+| `ms-11` | Experience Foundation | En curso | 2026-04-10 |
+| `ms-14` | CLI Operativa de Consola | Listo | 2026-04-17 |
+| `ms-15` | SDK Contract Base | Listo | 2026-04-22 |
+| `ms-04` | Project Initialization & Governance | Finalizado | 2026-05-15 |
+| `ms-05` | Core Architecture Implementation | Finalizado | 2026-06-01 |
+| `ms-06` | Tool System & OS Integration | Finalizado | 2026-06-15 |
+| `ms-07` | Memory & Knowledge Systems | Finalizado | 2026-07-01 |
+| `ms-08` | Interface & Distribution | Finalizado | 2026-07-15 |
 
-## Risks and Mitigations
+## Estado por frente
 
-1.  **Risk**: Governance drift between Markdown docs and YAML project state.
-    -   **Mitigation**: Enforce synchronized updates through PR checklist and BITACORA entries.
-2.  **Risk**: Ambiguous task transitions during rapid delivery.
-    -   **Mitigation**: Restrict to canonical states and document every change in `BITACORA.md`.
-3.  **Risk**: Blockers not escalated in time.
-    -   **Mitigation**: Apply 1-business-day escalation policy from `BLOCKERS.md`.
-4.  **Risk**: Cross-OS differences (e.g., path separators, shell commands) may complicate the `Tool System`.
-    -   **Mitigation**: Used Python's standard library (`pathlib`, `shutil`) and platform checks in `ShellCommandTool`.
-5.  **Risk**: Local LLM performance (e.g., Ollama) may be insufficient for complex reasoning.
-    -   **Mitigation**: `LLMProvider` is model-agnostic and can switch to stronger models if needed.
-6.  **Risk**: Memory management (context window limits) may impact long conversations.
-    -   **Mitigation**: Implemented `ChromaMemoryStore` for long-term storage and retrieval.
-7.  **Risk**: Audio input capture in sandbox environment.
-    -   **Mitigation**: Focus on verifying logic and UI launch; support file upload as fallback.
+| Frente | Estado | Nota |
+| :--- | :--- | :--- |
+| Visión de producto | aligned | Principios y roadmap definidos. |
+| UX MVP | in_progress | Onboarding y pantallas núcleo en definición detallada. |
+| Migración TS | in_progress | Core portado, adaptadores de entorno en validación. |
+| Trust/Policy model | ready | Reglas de aprobación listas para implementación. |
+| **CLI de consola** | **ready** | Incluida como acometido formal con validación cross-platform. |
+| **SDK contract** | **ready** | Definición requerida para evitar divergencia entre UI y CLI. |
 
-## Reporting Cadence
-Update at least once per day and immediately after each merged PR.
+## Riesgos y Mitigaciones
+
+1.  **Riesgo**: Desincronización entre docs Markdown y estado YAML del proyecto.
+    -   **Mitigación**: Sincronización obligatoria en cada PR y registros en BITACORA.
+2.  **Riesgo**: Brechas de paridad entre UI y CLI.
+    -   **Mitigación**: Uso de un SDK contract compartido y validación multiplataforma.
+3.  **Riesgo**: Diferencias de OS (rutas, shell) en el Tool System.
+    -   **Mitigación**: Uso de librerías estándar de abstracción de rutas y validación cruzada.
+4.  **Riesgo**: Rendimiento de LLM local (Ollama).
+    -   **Mitigación**: Proveedor agnóstico que permite saltar a modelos más potentes si es necesario.
+5.  **Riesgo**: Consistencia de API entre Node.js y Browser para el SDK compartido.
+    -   **Mitigación**: Interfaces estrictas en `core/interfaces.ts` y adaptadores específicos por entorno.
+
+## Cadencia de reporte
+Actualización al menos una vez al día e inmediatamente después de cada PR mergeado.

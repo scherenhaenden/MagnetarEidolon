@@ -1,6 +1,7 @@
 import uuid
 from typing import List, Dict, Any, Optional
 import chromadb
+from chromadb.api.client import SharedSystemClient
 from magnetar.memory.store import MemoryStore, MemoryResult
 
 class ChromaMemoryStore(MemoryStore):
@@ -60,7 +61,11 @@ class ChromaMemoryStore(MemoryStore):
         except Exception as e:
             return MemoryResult(success=False, error=str(e))
 
-    def close(self):
-        """Release resources."""
+    def close(self) -> None:
+        """Release resources held by the Chroma client/system cache."""
+        try:
+            SharedSystemClient.clear_system_cache()
+        except Exception:
+            pass
         self.client = None
         self.collection = None

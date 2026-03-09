@@ -1,0 +1,192 @@
+name: Release Packaging Expansion
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version without leading v (example: 0.2.0)"
+        required: true
+        type: string
+      release_notes:
+        description: "Extremely detailed release notes in markdown format"
+        required: true
+        type: string
+  push:
+    branches:
+      - release
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Prepare packaging metadata
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      release_name: ${{ steps.meta.outputs.release_name }}
+      notes_file: ${{ steps.meta.outputs.notes_file }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release metadata
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            VERSION="$INPUT_VERSION"
+            RELEASE_NAME="Release v${VERSION}"
+            NOTES_FILE="RELEASE_NOTES_VALIDATED.md"
+          else
+            VERSION=$(python - <<'PY'
+          import tomllib
+          from pathlib import Path
+
+          data = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+          print(data['tool']['poetry']['version'])
+          PY
+            )
+            RELEASE_NAME="Release v${VERSION} (${GITHUB_SHA::7})"
+            NOTES_FILE="RELEASE_NOTES_AUTOMATED.md"
+          fi
+
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "release_name=${RELEASE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "notes_file=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
+
+      - name: Persist release notes (manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cat > RELEASE_NOTES_VALIDATED.md <<'EOF'
+          ${{ github.event.inputs.release_notes }}
+          EOF
+
+      - name: Persist release notes (release branch)
+        if: github.event_name == 'push'
+        run: |
+          cat > RELEASE_NOTES_AUTOMATED.md <<EOF
+          ## Automated packaging release delivery from branch \`release\`
+
+          - Version: \`${{ steps.meta.outputs.version }}\`
+          - Commit: \`${GITHUB_SHA}\`
+          - Workflow run: \`${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}\`
+
+          This release is generated automatically after a merge/push to \`release\`.
+          Assets include: macOS Intel + Apple Silicon, Linux DEB/RPM/AppImage/SNAP, and Windows x86.
+          EOF
+
+      - name: Validate release notes structure
+        if: github.event_name == 'workflow_dispatch'
+        run: python .github/scripts/validate_release_notes.py --file RELEASE_NOTES_VALIDATED.md --min-chars 1200
+
+      - name: Ensure tag exists
+        env:
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "${TAG}" >/dev/null 2>&1; then
+            echo "Tag ${TAG} already exists; skipping creation."
+          else
+            git tag "${TAG}" "${GITHUB_SHA}"
+            git push origin "${TAG}"
+          fi
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: expanded-release-notes
+          path: ${{ steps.meta.outputs.notes_file }}
+
+  build_macos:
+    name: Build macOS standalone binary
+    needs: prepare
+    uses: ./.github/workflows/release-packaging-macos.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+
+  build_windows_x86:
+    name: Build Windows x86 standalone binary
+    needs: prepare
+    uses: ./.github/workflows/release-packaging-windows-x86.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+
+  build_linux_packages:
+    name: Build Linux package formats
+    needs: prepare
+    uses: ./.github/workflows/release-packaging-linux.yml
+    with:
+      tag: ${{ needs.prepare.outputs.tag }}
+      version: ${{ needs.prepare.outputs.version }}
+
+  github_release:
+    name: Publish GitHub release with expanded artifacts
+    if: >-
+      always() &&
+      (needs.build_macos.result == 'success' || needs.build_windows_x86.result == 'success' || needs.build_linux_packages.result == 'success')
+    needs: [prepare, build_macos, build_windows_x86, build_linux_packages]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: expanded-release-notes
+          path: release-notes
+
+      - name: Download macOS Intel artifact
+        if: needs.build_macos.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-macos-intel
+          path: release-assets/macos-intel
+
+      - name: Download macOS Apple Silicon artifact
+        if: needs.build_macos.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-macos-apple-silicon
+          path: release-assets/macos-apple-silicon
+
+      - name: Download Windows x86 artifact
+        if: needs.build_windows_x86.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-windows-x86
+          path: release-assets/windows-x86
+
+      - name: Download Linux packaging artifacts
+        if: needs.build_linux_packages.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          name: release-assets-linux-packaging
+          path: release-assets/linux-packaging
+
+      - name: Ensure at least one release artifact exists
+        run: |
+          if ! find release-assets -type f | grep -q .; then
+            echo "No expanded release artifacts were produced."
+            exit 1
+          fi
+
+      - name: Create or update GitHub release with expanded artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ needs.prepare.outputs.release_name }}
+          body_path: release-notes/${{ needs.prepare.outputs.notes_file }}
+          overwrite_files: true
+          files: |
+            release-assets/macos-intel/*
+            release-assets/macos-apple-silicon/*
+            release-assets/windows-x86/*
+            release-assets/linux-packaging/*
