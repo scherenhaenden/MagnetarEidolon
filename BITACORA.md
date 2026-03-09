@@ -13,10 +13,34 @@ This document is a logbook that records decisions, state changes, discoveries, a
 - **Decision**: Key architectural or process decision.
 - **Blocker**: Creation or resolution of a blocker.
 - **Discovery**: Significant finding or new idea.
--- **PR Merge**: Pull Request merged.
+- **PR Merge**: Pull Request merged.
 - **Exception**: Documented deviation from canonical rules.
 
 ## Log Entries
+
+- **Timestamp:** 2026-03-09 16:45 UTC
+  **Author:** Codex
+  **Entry:** Decision: Reconciled branch changelogs with canonical root documentation. Added missing records for the TypeScript migration documentation and testing-strategy updates, and clarified in root docs that Python remains active while the TypeScript proof of concept is evaluated as the likely successor architecture.
+
+- **Timestamp:** 2026-03-09 16:40 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Formalized the TypeScript-first migration track in canonical planning and status artifacts. Added milestone `ms-ts-01`, tasks `task-ts-101` through `task-ts-107`, and related status/risk updates to document the shift toward a shared CLI/Web TypeScript architecture while implementation remains in progress.
+
+- **Timestamp:** 2026-03-09 16:35 UTC
+  **Author:** Gemini CLI
+  **Entry:** Decision: Defined a comprehensive TypeScript testing strategy in canonical documentation. Added milestone `ms-ts-qa-01`, tasks `task-ts-qa-101` through `task-ts-qa-106`, and acceptance criteria covering unit, integration, and end-to-end validation for the shared SDK.
+
+- **Timestamp:** 2026-03-09 16:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Ported core Agent Loop, State Models, and Service Interfaces from Python to TypeScript (Angular Skeleton). This enables the 'Think-Act-Observe' cycle to run within the TypeScript/Web environment. Work tracked in branches/feature-port-core-logic-to-typescript/.
+
+- **Timestamp:** 2026-03-09 15:50 UTC
+  **Author:** Gemini CLI
+  **Entry:** State Change: Implemented UI type safety and naming consistency across the TypeScript skeleton. Created union types for statuses, verified 'Infrastructure Auto-Scaler' naming, and centralized interface usage in app.component.ts. Work tracked in branches/feature-ui-consistency-and-centralized-types/.
+
+- **Timestamp:** 2026-03-09 15:30 UTC
+  **Author:** Gemini CLI
+  **Entry:** Security: Fixed High-severity vulnerability in 'gradio' (Absolute Path Traversal) by upgrading to version 6.9.0 in magnetar_voice_ui. Updated pyproject.toml and requirements.txt. Work tracked in branches/fix-security-gradio-path-traversal/.
 
 - **Timestamp:** 2026-02-20 15:34 UTC
   **Author:** Codex

@@ -1,9 +1,9 @@
 import { Component, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UiBadgeComponent } from './ui/badge.component';
+import { UiBadgeComponent, BadgeStatus } from './ui/badge.component';
 import { UiIconComponent } from './ui/icon.component';
-import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS } from './ui/mock-data';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data';
 
 @Component({
   selector: 'screen-dashboard',
@@ -11,6 +11,7 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS } from './ui/mock-data';
   imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
     <div class="space-y-8 animate-fade-in pb-12">
+      <!-- ... (keeping existing template as is) ... -->
       <div class="relative group">
         <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
         <div class="relative bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
@@ -83,7 +84,7 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS } from './ui/mock-data';
                 <tr *ngFor="let run of runs" class="hover:bg-white/[0.02] transition-colors cursor-pointer">
                   <td class="px-4 py-3 font-mono text-xs text-zinc-500">{{ run.id }}</td>
                   <td class="px-4 py-3 font-medium">{{ run.agent }}</td>
-                  <td class="px-4 py-3"><ui-badge [status]="run.status">{{ run.status }}</ui-badge></td>
+                  <td class="px-4 py-3"><ui-badge [status]="getRunStatus(run)">{{ run.status }}</ui-badge></td>
                   <td class="px-4 py-3 font-mono text-xs text-zinc-400">{{ run.tokens }} tok / {{ run.cost }}</td>
                   <td class="px-4 py-3 text-right text-zinc-500">{{ run.time }}</td>
                 </tr>
@@ -117,8 +118,22 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS } from './ui/mock-data';
   `,
 })
 class DashboardScreen {
-  public readonly agents = MOCK_AGENTS;
-  public readonly runs = MOCK_RUNS;
+  public readonly agents: Agent[] = MOCK_AGENTS;
+  public readonly runs: Run[] = MOCK_RUNS;
+
+  public getRunStatus(run: Run): BadgeStatus {
+    switch (run.status) {
+      case 'success':
+        return 'success';
+      case 'failed':
+        return 'failed';
+      case 'pending_approval':
+        return 'pending_approval';
+      default:
+        console.warn(`Unexpected run status encountered: ${run.status}`);
+        return 'default';
+    }
+  }
 }
 
 @Component({
@@ -134,6 +149,7 @@ class DashboardScreen {
           </h3>
           <ui-badge status="active">Running</ui-badge>
         </div>
+        <!-- ... (keeping existing template as is) ... -->
         <div class="flex-1 overflow-y-auto p-4 space-y-6 relative">
           <div class="absolute left-[27px] top-6 bottom-6 w-px bg-white/10 z-0"></div>
           <div class="relative z-10 flex gap-4">
@@ -172,7 +188,7 @@ class DashboardScreen {
           </div>
         </div>
       </div>
-
+      <!-- ... (keeping rest of template as is) ... -->
       <div class="col-span-6 bg-[#0a0a0d] border border-white/5 rounded-xl flex flex-col relative overflow-hidden shadow-2xl">
         <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
         <div class="p-4 border-b border-white/5 flex justify-between items-center bg-black/40">
@@ -271,6 +287,7 @@ class LiveRunScreen {}
   imports: [CommonModule, UiIconComponent],
   template: `
     <div class="h-[calc(100vh-6rem)] grid grid-cols-4 gap-0 border border-white/5 rounded-xl overflow-hidden animate-fade-in shadow-2xl bg-[#08080a]">
+      <!-- ... (keeping existing template as is) ... -->
       <div class="col-span-3 relative overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent">
         <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=')]"></div>
         <div class="absolute top-4 left-4 bg-[#121216] border border-white/10 rounded-lg p-1.5 flex gap-1 z-20 shadow-lg backdrop-blur-md">
@@ -314,7 +331,7 @@ class BuilderScreen {}
             <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
               <ui-icon [name]="tool.icon" [size]="20"></ui-icon>
             </div>
-            <ui-badge [status]="tool.status === 'connected' ? 'active' : 'idle'">{{ tool.status }}</ui-badge>
+            <ui-badge [status]="getToolStatusBadge(tool)">{{ tool.status }}</ui-badge>
           </div>
           <div class="relative z-10 flex-1">
             <h3 class="font-medium text-zinc-200 text-base group-hover:text-white transition-colors">{{ tool.name }}</h3>
@@ -326,7 +343,20 @@ class BuilderScreen {}
   `,
 })
 class ToolsScreen {
-  public readonly tools = MOCK_TOOLS;
+  public readonly tools: Tool[] = MOCK_TOOLS;
+
+  public getToolStatusBadge(tool: Tool): BadgeStatus {
+    if (tool.status === 'connected') {
+      return 'active';
+    } else if (tool.status === 'requires_auth') {
+      return 'pending_approval';
+    } else if (tool.status === 'disconnected') {
+      return 'idle';
+    } else {
+      console.warn(`Unexpected tool status encountered: ${tool.status}`);
+      return 'default';
+    }
+  }
 }
 
 @Component({
