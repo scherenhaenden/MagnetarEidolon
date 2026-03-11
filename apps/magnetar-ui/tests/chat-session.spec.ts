@@ -235,9 +235,9 @@ describe('ChatSessionService', () => {
   it('streams LM Studio tokens into the chat and creates a canvas document for code responses', async () => {
     const fetchMock = vi.fn(async () =>
       createSseResponse([
-        'data: {"choices":[{"delta":{"content":"# SQL Result\\n\\n"}}]}\n\n',
-        'data: {"choices":[{"delta":{"content":"```sql\\nALTER TABLE users\\n"}}]}\n\n',
-        'data: {"choices":[{"delta":{"content":"ADD COLUMN last_login timestamptz;\\n```"}}]}\n\n',
+        'data: {"type":"content.delta","content":"# SQL Result\\n\\n"}\n\n',
+        'data: {"type":"content.delta","content":"```sql\\nALTER TABLE users\\n"}\n\n',
+        'data: {"type":"content.delta","content":"ADD COLUMN last_login timestamptz;\\n```"}\n\n',
         'data: [DONE]\n\n',
       ]),
     );
@@ -270,13 +270,13 @@ describe('ChatSessionService', () => {
     expect(await service.submitPrompt('Stream a migration')).toBe(true);
     expect(service.isStreaming()).toBe(true);
 
-    deferred.push('data: {"choices":[{"delta":{"content":"Partial"}}]}\n\n');
+    deferred.push('data: {"type":"content.delta","content":"Partial"}\n\n');
     await Promise.resolve();
 
     expect(service.messages()[2].rawText).toBe('Partial');
     expect(service.messages()[2].phase).toBe('streaming');
 
-    deferred.push('data: {"choices":[{"delta":{"content":" output"}}]}\n\n');
+    deferred.push('data: {"type":"content.delta","content":" output"}\n\n');
     deferred.push('data: [DONE]\n\n');
     deferred.close();
     await service.waitForIdle();
@@ -296,7 +296,7 @@ describe('ChatSessionService', () => {
     const replacementPromise = Promise.resolve();
     (service as any).activeStreamPromise = replacementPromise;
 
-    deferred.push('data: {"choices":[{"delta":{"content":"done"}}]}\n\n');
+    deferred.push('data: {"type":"content.delta","content":"done"}\n\n');
     deferred.push('data: [DONE]\n\n');
     deferred.close();
     await Promise.resolve();
@@ -309,7 +309,7 @@ describe('ChatSessionService', () => {
     const fetchMock = vi.fn(async () =>
       createSseResponse([
         'event: ping\n\n',
-        'data: {"choices":[{"delta":{"content":"tail"}}]}',
+        'data: {"type":"content.delta","content":"tail"}',
       ]),
     );
 
@@ -326,7 +326,7 @@ describe('ChatSessionService', () => {
 
   it('accepts trailing LM Studio content from message.content when delta is absent', async () => {
     const fetchMock = vi.fn(async () =>
-      createSseResponse(['data: {"choices":[{"message":{"content":"fallback tail"}}]}']),
+      createSseResponse(['data: {"type":"content.delta","content":"fallback tail"}']),
     );
 
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
@@ -505,7 +505,7 @@ describe('ChatSessionService', () => {
   });
 
   it('surfaces missing LM Studio completion content as an assistant error', async () => {
-    const fetchMock = vi.fn(async () => createSseResponse(['data: {"choices":[{"delta":{}}]}\n\n']));
+    const fetchMock = vi.fn(async () => createSseResponse(['data: {"type":"content.delta"}\n\n']));
 
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
 
@@ -513,6 +513,34 @@ describe('ChatSessionService', () => {
     await service.waitForIdle();
     expect(service.messages().at(-1)?.phase).toBe('error');
     expect(service.messages().at(-1)?.rawText).toContain('LM Studio returned no streamed completion content.');
+  });
+
+  it('surfaces backend SSE error events as assistant errors', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse(['data: {"type":"error","error":{"message":"LM Studio model is not loaded."}}\n\n']),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('error');
+    expect(service.messages().at(-1)?.rawText).toContain('LM Studio model is not loaded.');
+  });
+
+  it('surfaces trailing backend SSE error events as assistant errors', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse(['data: {"type":"error","error":{"message":"LM Studio stream closed unexpectedly."}}']),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('error');
+    expect(service.messages().at(-1)?.rawText).toContain('LM Studio stream closed unexpectedly.');
   });
 
   it('surfaces a readable error when LM Studio returns no streaming body', async () => {
@@ -543,8 +571,8 @@ describe('ChatSessionService', () => {
   it('records streaming failures on the assistant message when the LM Studio stream breaks mid-flight', async () => {
     const fetchMock = vi.fn(async () =>
       createSseResponse([
-        'data: {"choices":[{"delta":{"content":"partial"}}]}\n\n',
-        'data: {"choices":[{"delta":{"content":invalid}}]}\n\n',
+        'data: {"type":"content.delta","content":"partial"}\n\n',
+        'data: {"type":"content.delta","content":invalid}\n\n',
       ]),
     );
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);

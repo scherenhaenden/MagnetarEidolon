@@ -56,6 +56,14 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - run TypeScript typecheck/build validation
   - upload test/coverage artifacts on failure
 
+### Current Root Validation Path
+- Root `npm run test` must validate both:
+  - `apps/magnetar-api` backend transport tests
+  - `apps/magnetar-ui` workspace tests with 100% enforced coverage
+- Chat transport regressions must be covered at two levels:
+  - backend normalization tests for LM Studio/OpenAI-compatible upstream SSE frames
+  - UI chat-session tests against the backend's normalized SSE contract
+
 ### Next Interactive Validation Target
 - The next provider-facing validation surface should be an in-app chat flow, not only CLI smoke commands.
 - LM Studio is the first planned concrete provider target for this path.

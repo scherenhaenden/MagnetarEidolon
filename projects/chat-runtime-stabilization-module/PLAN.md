@@ -11,7 +11,7 @@
 
 | Task ID | Milestone | Title | Owner | Effort (pts) | Weight (%) | State | Notes |
 | :--- | :--- | :--- | :--- | ---: | ---: | :--- | :--- |
-| `task-chatfix-101` | `ms-chatfix-01` | Stabilize browser -> backend -> LM Studio transport path | Core Team | 3 | 16 | planned | Remove remaining browser-direct assumptions and make backend routing authoritative. |
+| `task-chatfix-101` | `ms-chatfix-01` | Stabilize browser -> backend -> LM Studio transport path | Core Team | 3 | 16 | in_progress | Browser chat now routes through the NestJS backend and receives normalized SSE delta events; manual LM Studio validation and final hardening still remain. |
 | `task-chatfix-102` | `ms-chatfix-01` | Prove the backend chat stream in isolation | Core Team | 2 | 10 | planned | Validate Nest endpoint behavior independently from Angular. |
 | `task-chatfix-103` | `ms-chatfix-01` | Prove the UI -> backend chat path end to end | Core Team | 3 | 16 | planned | Verify send behavior, proxying, response streaming, and shell-level UX. |
 | `task-chatfix-104` | `ms-chatfix-01` | Normalize the backend streaming contract for the UI | Core Team | 2 | 10 | planned | The UI should consume one stable backend event shape regardless of LM Studio event variations. |
@@ -23,8 +23,8 @@
 ## Effort Summary
 - **Total effort:** 19 pts
 - **Completed (`done`):** 0 pts
-- **In progress:** 0 pts
-- **Remaining to done:** 19 pts
+- **In progress:** 3 pts
+- **Remaining to done:** 16 pts
 
 ## Change Management
 Changes in this module must be synchronized with root `PLAN.md`, `STATUS.md`, `TESTING.md`, and `README.md`.

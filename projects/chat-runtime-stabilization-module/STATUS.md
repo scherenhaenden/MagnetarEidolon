@@ -1,14 +1,14 @@
 # Chat Runtime Stabilization Status
 
 ## Summary
-**Progress:** 10%
+**Progress:** 20%
 
 ## Current State
-The repository now has the shape needed to stabilize chat properly: Angular UI, NestJS backend-for-frontend, and the first LM Studio integration path. The remaining work is no longer "invent chat", but "make chat reliable under real runtime conditions."
+The repository now has the shape needed to stabilize chat properly: Angular UI, NestJS backend-for-frontend, and the first LM Studio integration path. The browser chat route now goes through the backend and consumes a normalized SSE delta contract instead of raw LM Studio event shapes. The remaining work is no longer "invent chat", but "prove and harden chat under real runtime conditions."
 
 ## Immediate Focus
-- Validate the backend chat stream independently from the UI.
-- Make the UI depend only on the backend contract, not provider-specific event shapes.
+- Validate the backend chat stream independently from the UI against a real LM Studio server.
+- Keep the UI dependent only on the backend contract, not provider-specific event shapes.
 - Add health/diagnostic endpoints so failures can be localized quickly.
 - Prove the root development commands start the right services for chat work.
 

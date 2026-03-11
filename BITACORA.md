@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:00 UTC
+  **Author:** Codex
+  **Entry:** State Change: Began `task-chatfix-101` by making the NestJS backend authoritative for chat transport and normalizing upstream LM Studio/OpenAI-compatible SSE frames into a stable browser-facing delta stream. Added backend transport tests, updated chat-session tests to consume the backend contract, and kept root `npm run test` aligned with both backend and UI validation.
+
 - **Timestamp:** 2026-03-11 15:35 UTC
   **Author:** Codex
   **Entry:** Decision: Introduced a dedicated NestJS backend-for-frontend in `apps/magnetar-api` so the Angular chat UI no longer needs to call LM Studio directly. The backend now owns the LM Studio request boundary and stream forwarding path, and root `npm run dev` was updated to boot backend plus UI together.

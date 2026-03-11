@@ -27,6 +27,8 @@ interface FetchLike {
 }
 
 interface LMStudioChatCompletionResponse {
+  type?: string;
+  content?: string;
   choices?: Array<{
     delta?: {
       content?: string;
@@ -331,6 +333,10 @@ export class ChatSessionService {
           }
 
           const payload = JSON.parse(data) as LMStudioChatCompletionResponse;
+          if (typeof payload.error?.message === 'string' && payload.error.message.length > 0) {
+            throw new Error(payload.error.message);
+          }
+
           const nextText = extractStreamText(payload);
           if (typeof nextText !== 'string' || nextText.length === 0) {
             continue;
@@ -345,6 +351,10 @@ export class ChatSessionService {
       const trailingData = parseSseEvent(buffer);
       if (trailingData && trailingData !== '[DONE]') {
         const payload = JSON.parse(trailingData) as LMStudioChatCompletionResponse;
+        if (typeof payload.error?.message === 'string' && payload.error.message.length > 0) {
+          throw new Error(payload.error.message);
+        }
+
         const nextText = extractStreamText(payload);
         if (typeof nextText === 'string' && nextText.length > 0) {
           accumulatedContent = mergeStreamText(accumulatedContent, nextText);
@@ -503,6 +513,10 @@ function parseSseEvent(eventChunk: string): string | null {
 }
 
 function extractStreamText(payload: LMStudioChatCompletionResponse): string | null {
+  if (typeof payload.content === 'string' && payload.content.length > 0) {
+    return payload.content;
+  }
+
   const openAiCompatibleText =
     payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
   if (typeof openAiCompatibleText === 'string' && openAiCompatibleText.length > 0) {
