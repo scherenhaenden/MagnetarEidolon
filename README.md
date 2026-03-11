@@ -62,6 +62,31 @@ El repositorio se encuentra en una fase de transición estratégica:
 - CLI de desarrollo: `cd apps/magnetar-ui && npm install && npm run cli:dev -- about`
 - CLI compilada: `cd apps/magnetar-ui && npm run build:cli && npm run cli -- about`
 
+## Arranque desde la raiz del repositorio
+Actualmente no existe un backend independiente en este repositorio. La superficie ejecutable es la UI Angular en `apps/magnetar-ui` y la CLI TypeScript del mismo workspace.
+
+```bash
+# instalar dependencias de SDK + UI
+npm run setup
+
+# levantar la UI web en desarrollo desde la raiz
+npm run dev
+
+# ejecutar la CLI en modo desarrollo desde la raiz
+npm run cli:dev -- about
+
+# validacion / build desde la raiz
+npm run test
+npm run typecheck
+npm run build
+```
+
+Opcionalmente, para un flujo containerizado:
+
+```bash
+docker compose up dev
+```
+
 ## Comandos operativos actuales
 ```bash
 cd apps/magnetar-ui
@@ -81,6 +106,15 @@ npm run cli -- about
 # Validación
 npm run typecheck
 npm run test:ci
+npm run build
+```
+
+Equivalentes desde la raiz:
+
+```bash
+npm run setup
+npm run dev
+npm run cli:dev -- canonical-model
 npm run build
 ```
 

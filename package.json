@@ -1,0 +1,18 @@
+{
+  "name": "magnetar-eidolon-workspace",
+  "private": true,
+  "description": "Root workspace scripts for running the MagnetarEidolon UI and CLI from the repository root.",
+  "scripts": {
+    "setup": "npm --prefix packages/magnetar-sdk install && npm --prefix apps/magnetar-ui install",
+    "dev": "npm --prefix apps/magnetar-ui run start -- --host 0.0.0.0",
+    "dev:open": "npm --prefix apps/magnetar-ui run web:open -- --host 0.0.0.0",
+    "cli:dev": "npm --prefix apps/magnetar-ui run cli:dev --",
+    "build": "npm --prefix apps/magnetar-ui run build",
+    "build:web": "npm --prefix apps/magnetar-ui run build:web",
+    "build:cli": "npm --prefix apps/magnetar-ui run build:cli",
+    "typecheck": "npm --prefix apps/magnetar-ui run typecheck",
+    "test": "npm --prefix apps/magnetar-ui run test:ci",
+    "docker:dev": "docker compose up dev",
+    "docker:prod": "docker compose up app"
+  }
+}

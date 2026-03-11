@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 08:27 UTC
+  **Author:** Codex
+  **Entry:** State Change: Fixed the Angular/Tailwind PostCSS startup pipeline for `apps/magnetar-ui`, added root-level workspace scripts in `package.json` (`setup`, `dev`, `cli:dev`, `build`, `typecheck`, `test`), and documented that the repository currently exposes a UI + CLI surface without a separate backend service.
+
 - **Timestamp:** 2026-03-09 22:35 UTC
   **Author:** Gemini CLI
   **Entry:** State Change: Marked milestone `ms-ts-01` (TypeScript Core & SDK Migration) as completed in `PLAN.md` and `STATUS.md`. Unified project status documentation by aligning the "Dirección actual" section with the completed core migration status. Verified all subtasks (task-ts-101 to task-ts-107) are done.
