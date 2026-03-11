@@ -1,17 +1,17 @@
-import { ApplicationDescriptor, CanonicalModel } from '../models/canonical-model.js';
+import { ApplicationDescriptor, ProductDescriptor } from '../models/application-descriptor.js';
 
 export class ProjectContextService {
-  private readonly canonicalModel = new CanonicalModel(
-    'Magnetar Canonical Project Model',
+  private readonly productDescriptor = new ProductDescriptor(
+    'MagnetarEidolon',
     '1.0',
-    'a reusable governance and execution baseline',
+    'agent orchestration, observability, and user workflow',
   );
 
   public getDescriptor(): ApplicationDescriptor {
     return new ApplicationDescriptor(
       'MagnetarEidolon UI',
       'agent orchestration, observability, and user workflow',
-      this.canonicalModel,
+      this.productDescriptor,
     );
   }
 }

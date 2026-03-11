@@ -4,12 +4,11 @@ This workspace contains the active TypeScript UI proof of concept for **Magnetar
 
 ## Design Intent
 - The product is **MagnetarEidolon**.
-- The canonical project model is used as governance/context, not as the product identity.
 - The shared runtime now begins to live in `packages/magnetar-sdk`.
 
 ## Included Pieces
-- `src/app/core/models/canonical-model.ts`: OOP domain model classes.
-- `src/app/core/services/project-context.service.ts`: service layer that centralizes canonical context.
+- `src/app/core/models/application-descriptor.ts`: product metadata model classes.
+- `src/app/core/services/project-context.service.ts`: service layer that centralizes product descriptor context.
 - `src/app/app.component.*`: Angular UI shell component.
 - `src/main.ts`: Angular bootstrap entrypoint.
 - `src/cli/magnetar-cli.ts`: CLI entrypoint for non-UI usage.
@@ -38,7 +37,6 @@ There is no separate backend service to boot yet. `npm run dev` starts the Angul
 cd apps/magnetar-ui
 npm install
 npm run cli:dev -- about
-npm run cli:dev -- canonical-model
 npm run build:cli
 npm run cli -- about
 ```

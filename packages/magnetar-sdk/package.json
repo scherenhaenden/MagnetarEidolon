@@ -25,6 +25,10 @@
       "types": "./dist/models.d.ts",
       "default": "./dist/models.js"
     },
+    "./providers/lm-studio": {
+      "types": "./dist/providers/lm-studio.d.ts",
+      "default": "./dist/providers/lm-studio.js"
+    },
     "./tools/node-filesystem": {
       "types": "./dist/tools/node-filesystem.d.ts",
       "default": "./dist/tools/node-filesystem.js"
