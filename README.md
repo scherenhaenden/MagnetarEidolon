@@ -22,6 +22,14 @@ This repository holds the documentation and technical baseline needed to turn th
 4. Permanent human control.
 5. Explicit, editable, governable memory.
 6. A premium command-center style experience.
+7. OOP-first implementation discipline, with pure methods and pure helper functions preferred whenever behavior does not require side effects.
+
+## Engineering Rules
+- Runtime and domain behavior should default to classes and explicit object boundaries instead of ad hoc procedural sprawl.
+- Methods should stay pure whenever they can operate only on inputs and controlled state transitions.
+- Standalone functions should be introduced only when they are stateless, pure helpers with no hidden side effects.
+- Side effects such as filesystem access, network calls, UI bridges, and process execution must stay isolated at clear boundary layers.
+- Pull requests that add avoidable side effects or procedural duplication should be treated as architecture regressions.
 
 ## Product Modes
 - **Execution Mode**: complete goals quickly.

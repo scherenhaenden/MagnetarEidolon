@@ -65,6 +65,8 @@ The architecture prioritizes three properties: **human control**, **full traceab
 6. Concrete provider integrations must plug into the shared SDK boundary instead of being embedded directly into Angular views.
 7. The first real provider-validation workflow should run through an in-app chat module, not only through CLI or placeholder screens.
 8. Provider configuration must be multi-provider from the start, with explicit primary and backup semantics.
+9. Runtime architecture is OOP-first: stateful orchestration belongs in explicit classes/services, while free functions should remain limited to pure stateless helpers.
+10. Side effects must stay at boundary layers so domain logic can be reasoned about and tested through pure methods whenever possible.
 
 ## Target Repository Structure
 - `apps/magnetar-ui`: product shell for Dashboard, Live Execution, Builder, Memory, and Policy Center.
@@ -79,3 +81,9 @@ The architecture prioritizes three properties: **human control**, **full traceab
 - The temporary directory `typescript-angular-skeleton` no longer represents the desired architectural destination.
 - The UI must live under an explicit product structure (`apps/magnetar-ui`) so a prototype name does not shape the long-term architecture.
 - Shared runtime extraction into `packages/magnetar-sdk` is underway to clearly separate the product UI from the reusable runtime contract.
+
+## Implementation Discipline
+- Use classes/services for orchestration, runtime coordination, policy handling, and provider state transitions.
+- Keep pure calculations, sorting, formatting, and mapping logic in pure methods or pure helper functions.
+- Avoid spreading business logic across loose utility files when that logic belongs to a stable domain object or service boundary.
+- Treat hidden side effects in supposedly pure code paths as design defects.
