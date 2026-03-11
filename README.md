@@ -136,6 +136,7 @@ npm run build
 5. Add **LM Studio** as the first concrete AI provider integration for local development and testing.
 6. Add an **in-app chat surface** so provider testing and real usage happen inside the product instead of only through placeholder views.
 7. Add **provider configuration UI** so multiple providers can be configured with primary and backup roles.
+8. Land a dedicated **Chat** tab with structured rendering, streaming, and a future canvas/document side panel.
 
 ## Additional Information
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: technology choices and cross-platform rationale for Linux, macOS, and Windows.

@@ -14,6 +14,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 - Execute the shared runtime extraction into `packages/magnetar-sdk` and lock down its initial contract.
 - Continue the first real provider integration path through LM Studio.
 - Define an embedded chat surface so provider testing happens inside the product UI.
+- Define the chat tab, structured rendering baseline, and future canvas/document side panel.
 - Add a provider configuration layer so multiple providers can be assigned to primary and backup roles.
 
 ## Milestones
@@ -50,7 +51,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | **Console CLI** | **ready** | Included as a formal deliverable with cross-platform validation goals. |
 | **SDK contract** | **in_progress** | Physical extraction of the shared runtime is underway in `packages/magnetar-sdk`. |
 | **LM Studio provider** | **in_progress** | Initial SDK adapter, integration notes, and provider smoke tests now exist; UI wiring and real runtime consumption still remain. |
-| **In-app chat** | **ready** | Planned as the first real provider-facing interaction surface inside the Angular product shell. |
+| **In-app chat** | **in_progress** | Chat tab, state service, structured renderer, and deterministic tests now exist; runtime wiring and real provider validation still remain. |
 | **Provider configuration** | **in_progress** | UI state model and first configuration screen now exist; runtime persistence and failover consumption still remain. |
 
 ## Risks and Mitigations
