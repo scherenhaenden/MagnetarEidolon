@@ -18,6 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 09:50 UTC
+  **Author:** Codex
+  **Entry:** State Change: Began the LM Studio delivery slice by adding a concrete SDK provider adapter, local integration notes, and repeatable smoke tests. The provider path is now documented and test-backed, but not yet wired into the UI runtime.
+
+- **Timestamp:** 2026-03-11 09:20 UTC
+  **Author:** Codex
+  **Entry:** Decision: Added two independent planning modules under `projects/`: `lm-studio-provider-module` for the first concrete AI-provider integration and `in-app-chat-module` for the first real embedded chat experience and provider-validation surface.
+
 - **Timestamp:** 2026-03-11 09:05 UTC
   **Author:** Codex
   **Entry:** State Change: Removed product-facing canonical-model references from the active UI/CLI surface, documentation, and governance wording. Preserved only a root-level note that the canonical model was historically used as a documentation administration framework.
