@@ -9,6 +9,56 @@ import {
 import { ChatSessionService } from '../src/app/core/services/chat-session.service.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
 
+function createSseResponse(chunks: string[], status = 200): Response {
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (const chunk of chunks) {
+        controller.enqueue(encoder.encode(chunk));
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    status,
+    headers: {
+      'Content-Type': 'text/event-stream',
+    },
+  });
+}
+
+function createDeferredSseResponse(): {
+  response: Response;
+  push: (chunk: string) => void;
+  close: () => void;
+} {
+  const encoder = new TextEncoder();
+  let controllerRef: ReadableStreamDefaultController<Uint8Array> | null = null;
+
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controllerRef = controller;
+    },
+  });
+
+  return {
+    response: new Response(stream, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/event-stream',
+      },
+    }),
+    push(chunk: string) {
+      controllerRef?.enqueue(encoder.encode(chunk));
+    },
+    close() {
+      controllerRef?.close();
+    },
+  };
+}
+
 describe('chat model helpers', () => {
   it('parses headings, lists, quotes, and code blocks', () => {
     const blocks = parseChatBlocks(`# Heading
@@ -182,32 +232,123 @@ describe('ChatSessionService', () => {
     expect(service.conversationHistory()[0]?.preview).toContain('Plan a provider diagnostic');
   });
 
-  it('calls LM Studio when it is the primary provider and creates a canvas document for code responses', async () => {
+  it('streams LM Studio tokens into the chat and creates a canvas document for code responses', async () => {
     const fetchMock = vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          choices: [
-            {
-              message: {
-                content: '# SQL Result\n\n```sql\nALTER TABLE users\nADD COLUMN last_login timestamptz;\n```',
-              },
-            },
-          ],
-        }),
-        { status: 200 },
-      ),
+      createSseResponse([
+        'data: {"choices":[{"delta":{"content":"# SQL Result\\n\\n"}}]}\n\n',
+        'data: {"choices":[{"delta":{"content":"```sql\\nALTER TABLE users\\n"}}]}\n\n',
+        'data: {"choices":[{"delta":{"content":"ADD COLUMN last_login timestamptz;\\n```"}}]}\n\n',
+        'data: [DONE]\n\n',
+      ]),
     );
 
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
 
     expect(await service.submitPrompt('Generate a SQL migration')).toBe(true);
-    service.completeStreaming();
+    await service.waitForIdle();
 
     expect(fetchMock).toHaveBeenCalledOnce();
+    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
+      '"stream":true',
+    );
+    expect(service.messages()[2].phase).toBe('complete');
     expect(service.canvasDocument()).not.toBeNull();
     expect(service.canvasDocument()?.language).toBe('sql');
     expect(service.canvasDocument()?.content).toContain('ALTER TABLE users');
     expect(service.openCanvasFromMessage('missing')).toBe(false);
+  });
+
+  it('exposes live streaming state while LM Studio tokens are still arriving', async () => {
+    const deferred = createDeferredSseResponse();
+    const fetchMock = vi.fn(async () => deferred.response);
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Stream a migration')).toBe(true);
+    expect(service.isStreaming()).toBe(true);
+
+    deferred.push('data: {"choices":[{"delta":{"content":"Partial"}}]}\n\n');
+    await Promise.resolve();
+
+    expect(service.messages()[2].rawText).toBe('Partial');
+    expect(service.messages()[2].phase).toBe('streaming');
+
+    deferred.push('data: {"choices":[{"delta":{"content":" output"}}]}\n\n');
+    deferred.push('data: [DONE]\n\n');
+    deferred.close();
+    await service.waitForIdle();
+
+    expect(service.isStreaming()).toBe(false);
+    expect(service.messages()[2].rawText).toBe('Partial output');
+    expect(service.messages()[2].phase).toBe('complete');
+  });
+
+  it('does not clear a newer active stream promise when an older live stream settles', async () => {
+    const deferred = createDeferredSseResponse();
+    const fetchMock = vi.fn(async () => deferred.response);
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Stream a migration')).toBe(true);
+
+    const replacementPromise = Promise.resolve();
+    (service as any).activeStreamPromise = replacementPromise;
+
+    deferred.push('data: {"choices":[{"delta":{"content":"done"}}]}\n\n');
+    deferred.push('data: [DONE]\n\n');
+    deferred.close();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect((service as any).activeStreamPromise).toBe(replacementPromise);
+  });
+
+  it('finalizes streamed content when LM Studio closes the stream without a done marker', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'event: ping\n\n',
+        'data: {"choices":[{"delta":{"content":"tail"}}]}',
+      ]),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+    await Promise.resolve();
+
+    expect(service.isStreaming()).toBe(false);
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('tail');
+  });
+
+  it('accepts trailing LM Studio content from message.content when delta is absent', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse(['data: {"choices":[{"message":{"content":"fallback tail"}}]}']),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('fallback tail');
+  });
+
+  it('ignores empty trailing LM Studio payloads when prior content already exists', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"choices":[{"delta":{"content":"partial"}}]}\n\n',
+        'data: {"choices":[{"delta":{}}]}',
+      ]),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('partial');
   });
 
   it('can close the canvas and reopen it from the assistant message', async () => {
@@ -231,6 +372,12 @@ describe('ChatSessionService', () => {
     const service = new ChatSessionService(new ProviderConfigService());
 
     expect(service.streamNextChunk()).toBe(false);
+  });
+
+  it('resolves waitForIdle immediately when no live stream is active', async () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+
+    await expect(service.waitForIdle()).resolves.toBeUndefined();
   });
 
   it('handles defensive stream-finalization branches', async () => {
@@ -293,20 +440,26 @@ describe('ChatSessionService', () => {
   });
 
   it('surfaces missing LM Studio completion content as an assistant error', async () => {
-    const fetchMock = vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          choices: [{ message: {} }],
-        }),
-        { status: 200 },
-      ),
-    );
+    const fetchMock = vi.fn(async () => createSseResponse(['data: {"choices":[{"delta":{}}]}\n\n']));
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+    expect(service.messages().at(-1)?.phase).toBe('error');
+    expect(service.messages().at(-1)?.rawText).toContain('LM Studio returned no streamed completion content.');
+  });
+
+  it('surfaces a readable error when LM Studio returns no streaming body', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 200 }));
 
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
 
     expect(await service.submitPrompt('Generate code')).toBe(false);
     expect(service.messages().at(-1)?.phase).toBe('error');
-    expect(service.messages().at(-1)?.rawText).toContain('LM Studio returned no completion content.');
+    expect(service.messages().at(-1)?.rawText).toContain(
+      'LM Studio did not provide a readable streaming response body.',
+    );
   });
 
   it('surfaces unknown thrown provider errors as a generic assistant error', async () => {
@@ -317,6 +470,69 @@ describe('ChatSessionService', () => {
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
 
     expect(await service.submitPrompt('Generate code')).toBe(false);
+    expect(service.messages().at(-1)?.rawText).toContain(
+      'Unknown provider error while generating chat response.',
+    );
+  });
+
+  it('records streaming failures on the assistant message when the LM Studio stream breaks mid-flight', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"choices":[{"delta":{"content":"partial"}}]}\n\n',
+        'data: {"choices":[{"delta":{"content":invalid}}]}\n\n',
+      ]),
+    );
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('error');
+    expect(service.messages().at(-1)?.rawText).toContain('partial');
+    expect(service.messages().at(-1)?.rawText).toContain('Streaming error:');
+  });
+
+  it('clears live streaming state even when the target message no longer exists', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+
+    (service as any).liveStreamState.set({
+      messageId: 'missing-message',
+      providerLabel: 'LM Studio Local',
+    });
+
+    (service as any).finalizeLiveStream({
+      messageId: 'missing-message',
+      providerLabel: 'LM Studio Local',
+    });
+
+    expect(service.isStreaming()).toBe(false);
+  });
+
+  it('uses the generic provider error text when a non-Error value reaches live-stream failure handling', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+
+    (service as any).messageState.set([
+      ...(service as any).messageState(),
+      {
+        id: 'assistant-999',
+        role: 'assistant',
+        phase: 'streaming',
+        providerLabel: 'LM Studio Local',
+        rawText: '',
+        blocks: [],
+      },
+    ]);
+
+    (service as any).failLiveStream(
+      {
+        messageId: 'assistant-999',
+        providerLabel: 'LM Studio Local',
+      },
+      'network down',
+      '',
+    );
+
+    expect(service.messages().at(-1)?.phase).toBe('error');
     expect(service.messages().at(-1)?.rawText).toContain(
       'Unknown provider error while generating chat response.',
     );

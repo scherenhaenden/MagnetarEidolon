@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, ViewEncapsulation, computed, signal } from '@angular/core';
+import { Component, Input, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
@@ -542,15 +542,9 @@ class ToolsScreen {
     </div>
   `,
 })
-export class ChatScreen implements OnDestroy {
+export class ChatScreen {
   @Input({ required: true }) public providerConfigService!: ProviderConfigService;
   @Input({ required: true }) public chatSessionService!: ChatSessionService;
-
-  private streamTimer: ReturnType<typeof setInterval> | null = null;
-
-  public ngOnDestroy(): void {
-    this.clearStreamTimer();
-  }
 
   public updateDraft(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
@@ -562,14 +556,6 @@ export class ChatScreen implements OnDestroy {
     if (!didStart) {
       return;
     }
-
-    this.clearStreamTimer();
-    this.streamTimer = setInterval(() => {
-      const didAdvance = this.chatSessionService.streamNextChunk();
-      if (!didAdvance) {
-        this.clearStreamTimer();
-      }
-    }, 120);
   }
 
   public copyMessage(message: ChatMessage): void {
@@ -604,15 +590,6 @@ export class ChatScreen implements OnDestroy {
       default:
         return 'idle';
     }
-  }
-
-  private clearStreamTimer(): void {
-    if (this.streamTimer === null) {
-      return;
-    }
-
-    clearInterval(this.streamTimer);
-    this.streamTimer = null;
   }
 }
 

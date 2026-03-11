@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 15:15 UTC
+  **Author:** Codex
+  **Entry:** State Change: Replaced the chat tab's fake LM Studio post-completion chunking with real SSE-based streaming in `ChatSessionService`. The Angular chat UI now updates assistant messages incrementally from LM Studio responses, and the automated test suite was expanded to cover stream success, partial updates, malformed events, missing bodies, fallback message-content frames, and stream-finalization edge cases at 100% coverage.
+
 - **Timestamp:** 2026-03-11 12:42 UTC
   **Author:** Codex
   **Entry:** State Change: Began implementation of the in-app chat module in the Angular shell. Added a dedicated Chat tab, `ChatSessionService`, structured message parsing/rendering, deterministic streaming behavior, a canvas side panel baseline, and 100% test coverage for the new chat state/model layer.

@@ -17,12 +17,20 @@ interface PendingStream {
   remainingChunks: string[];
 }
 
+interface ActiveLiveStream {
+  messageId: string;
+  providerLabel: string;
+}
+
 interface FetchLike {
   (input: string, init?: RequestInit): Promise<Response>;
 }
 
 interface LMStudioChatCompletionResponse {
   choices?: Array<{
+    delta?: {
+      content?: string;
+    };
     message?: {
       content?: string;
     };
@@ -44,7 +52,9 @@ export class ChatSessionService {
   private readonly draftState = signal('');
   private readonly canvasState = signal<ChatCanvasDocument | null>(null);
   private readonly pendingStreamState = signal<PendingStream | null>(null);
+  private readonly liveStreamState = signal<ActiveLiveStream | null>(null);
   private pendingStream: PendingStream | null = null;
+  private activeStreamPromise: Promise<void> | null = null;
   private nextId = 1;
 
   public readonly messages = computed(() => this.messageState());
@@ -52,7 +62,9 @@ export class ChatSessionService {
   public readonly activeProviderLabel = computed(
     () => this.providerConfigService.primaryProvider()?.name ?? 'No provider configured',
   );
-  public readonly isStreaming = computed(() => this.pendingStreamState() !== null);
+  public readonly isStreaming = computed(
+    () => this.pendingStreamState() !== null || this.liveStreamState() !== null,
+  );
   public readonly conversationHistory = computed<ChatConversationSummary[]>(() =>
     this.messageState()
       .filter((message) => message.role === 'user')
@@ -106,22 +118,26 @@ export class ChatSessionService {
       buildAssistantMessage(assistantMessageId, '', provider.name, 'streaming'),
     ]);
 
-    let responseText: string;
-    try {
-      responseText = await this.resolveResponseText(trimmedPrompt, provider);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
-      this.messageState.update((messages) =>
-        messages.map((message) =>
-          message.id === assistantMessageId
-            ? buildAssistantMessage(assistantMessageId, errorMessage, provider.name, 'error')
-            : message,
-        ),
-      );
-      return false;
+    if (provider.kind === 'lm_studio') {
+      try {
+        await this.startLiveLMStudioStream(trimmedPrompt, provider, assistantMessageId);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
+        this.messageState.update((messages) =>
+          messages.map((message) =>
+            message.id === assistantMessageId
+              ? buildAssistantMessage(assistantMessageId, errorMessage, provider.name, 'error')
+              : message,
+          ),
+        );
+        return false;
+      }
+
+      return true;
     }
 
+    const responseText = await this.resolveSyntheticResponseText(trimmedPrompt, provider);
     const responseChunks = chunkText(responseText, 96);
     this.pendingStream = {
       messageId: assistantMessageId,
@@ -174,6 +190,12 @@ export class ChatSessionService {
     }
   }
 
+  public async waitForIdle(): Promise<void> {
+    if (this.activeStreamPromise) {
+      await this.activeStreamPromise;
+    }
+  }
+
   public openCanvasFromMessage(messageId: string): boolean {
     const message = this.messageState().find((candidate) => candidate.id === messageId);
     if (!message) {
@@ -218,11 +240,11 @@ export class ChatSessionService {
     return id;
   }
 
-  private async resolveResponseText(prompt: string, provider: ProviderConfig): Promise<string> {
-    if (provider.kind !== 'lm_studio') {
-      return generateAssistantResponse(prompt, provider.name);
-    }
-
+  private async startLiveLMStudioStream(
+    prompt: string,
+    provider: ProviderConfig,
+    assistantMessageId: string,
+  ): Promise<void> {
     const response = await this.fetchFn(`${provider.baseUrl.replace(/\/+$/, '')}/chat/completions`, {
       method: 'POST',
       headers: {
@@ -232,21 +254,172 @@ export class ChatSessionService {
       body: JSON.stringify({
         model: provider.model,
         messages: [{ role: 'user', content: prompt }],
+        stream: true,
       }),
     });
 
-    const json = (await response.json()) as LMStudioChatCompletionResponse;
-
     if (!response.ok) {
+      const json = (await response.json()) as LMStudioChatCompletionResponse;
       throw new Error(json.error?.message ?? `LM Studio request failed with status ${response.status}.`);
     }
 
-    const content = json.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error('LM Studio returned no completion content.');
+    if (!response.body) {
+      throw new Error('LM Studio did not provide a readable streaming response body.');
     }
 
-    return content;
+    const liveStream = {
+      messageId: assistantMessageId,
+      providerLabel: provider.name,
+    };
+    this.liveStreamState.set(liveStream);
+
+    const streamPromise = this.consumeLMStudioStream(response.body, liveStream);
+    const settledStreamPromise = streamPromise.catch(() => undefined);
+    this.activeStreamPromise = settledStreamPromise;
+
+    try {
+      await Promise.resolve();
+    } finally {
+      void settledStreamPromise.finally(() => {
+        if (this.activeStreamPromise === settledStreamPromise) {
+          this.activeStreamPromise = null;
+        }
+      });
+    }
+  }
+
+  private async consumeLMStudioStream(
+    stream: ReadableStream<Uint8Array>,
+    liveStream: ActiveLiveStream,
+  ): Promise<void> {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let accumulatedContent = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        const segments = buffer.split('\n\n');
+        buffer = segments.pop() as string;
+
+        for (const segment of segments) {
+          const data = parseSseEvent(segment);
+          if (!data) {
+            continue;
+          }
+
+          if (data === '[DONE]') {
+            this.finalizeLiveStream(liveStream);
+            return;
+          }
+
+          const payload = JSON.parse(data) as LMStudioChatCompletionResponse;
+          const delta = payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
+          if (typeof delta !== 'string' || delta.length === 0) {
+            continue;
+          }
+
+          accumulatedContent += delta;
+          this.appendAssistantChunk(liveStream.messageId, accumulatedContent);
+        }
+      }
+
+      buffer += decoder.decode();
+      const trailingData = parseSseEvent(buffer);
+      if (trailingData && trailingData !== '[DONE]') {
+        const payload = JSON.parse(trailingData) as LMStudioChatCompletionResponse;
+        const delta = payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
+        if (typeof delta === 'string' && delta.length > 0) {
+          accumulatedContent += delta;
+          this.appendAssistantChunk(liveStream.messageId, accumulatedContent);
+        }
+      }
+
+      if (!accumulatedContent.trim()) {
+        throw new Error('LM Studio returned no streamed completion content.');
+      }
+
+      this.finalizeLiveStream(liveStream);
+    } catch (error) {
+      this.failLiveStream(liveStream, error, accumulatedContent);
+      throw error;
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  private appendAssistantChunk(messageId: string, rawText: string): void {
+    this.messageState.update((messages) =>
+      messages.map((message) =>
+        message.id === messageId
+          ? {
+              ...message,
+              rawText,
+              blocks: parseChatBlocks(rawText),
+              phase: 'streaming',
+            }
+          : message,
+      ),
+    );
+  }
+
+  private finalizeLiveStream(liveStream: ActiveLiveStream): void {
+    const completedMessage = this.messageState().find((message) => message.id === liveStream.messageId);
+
+    if (completedMessage) {
+      this.messageState.update((messages) =>
+        messages.map((message) =>
+          message.id === liveStream.messageId ? { ...message, phase: 'complete' } : message,
+        ),
+      );
+
+      const canvasDocument = extractCanvasDocument(completedMessage);
+      if (canvasDocument) {
+        this.canvasState.set(canvasDocument);
+      }
+    }
+
+    this.liveStreamState.set(null);
+  }
+
+  private failLiveStream(
+    liveStream: ActiveLiveStream,
+    error: unknown,
+    accumulatedContent: string,
+  ): void {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
+
+    this.messageState.update((messages) =>
+      messages.map((message) => {
+        if (message.id !== liveStream.messageId) {
+          return message;
+        }
+
+        const rawText =
+          accumulatedContent.trim().length > 0
+            ? `${accumulatedContent}\n\n[Streaming error: ${errorMessage}]`
+            : errorMessage;
+        return {
+          ...message,
+          rawText,
+          blocks: parseChatBlocks(rawText),
+          phase: 'error',
+        };
+      }),
+    );
+
+    this.liveStreamState.set(null);
+  }
+
+  private async resolveSyntheticResponseText(prompt: string, provider: ProviderConfig): Promise<string> {
+    return generateAssistantResponse(prompt, provider.name);
   }
 }
 
@@ -285,6 +458,22 @@ function chunkText(text: string, chunkSize: number): string[] {
   }
 
   return chunks;
+}
+
+function parseSseEvent(eventChunk: string): string | null {
+  const trimmed = eventChunk.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const payload = trimmed
+    .split('\n')
+    .filter((line) => line.startsWith('data:'))
+    .map((line) => line.slice(5).trimStart())
+    .join('\n')
+    .trim();
+
+  return payload || null;
 }
 
 function generateAssistantResponse(prompt: string, providerLabel: string): string {

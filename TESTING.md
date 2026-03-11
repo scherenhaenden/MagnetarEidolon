@@ -65,9 +65,12 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - provider unreachable
   - invalid model/config selection
   - successful generation from the embedded UI
+  - real LM Studio SSE/token streaming updates the assistant message incrementally
   - structured blocks such as code and quotes render predictably
   - copy actions return exact source content for code and prompt snippets
   - streaming preserves scroll stability during incremental rendering
+  - stream termination without `[DONE]` is handled safely
+  - stream parse failures surface as user-visible assistant errors instead of silent stalls
 - Provider-configuration validation should also cover:
   - one primary provider exists
   - backups remain ordered for failover
