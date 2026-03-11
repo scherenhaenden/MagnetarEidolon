@@ -2,6 +2,10 @@
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:08 UTC
+  **Author:** Codex
+  **Entry:** State Change: Simplified backend startup from `tsx watch` to plain `tsx` so the stabilization branch can bring up a reliable API process on `3100` during root development runs.
+
 - **Timestamp:** 2026-03-11 16:00 UTC
   **Author:** Codex
   **Entry:** State Change: Started `task-chatfix-101`. The browser chat route now goes only through the NestJS backend, and the backend emits a normalized SSE delta contract instead of forwarding raw provider event shapes directly to the UI.
