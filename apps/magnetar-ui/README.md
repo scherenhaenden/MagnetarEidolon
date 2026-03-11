@@ -4,12 +4,11 @@ This workspace contains the active TypeScript UI proof of concept for **Magnetar
 
 ## Design Intent
 - The product is **MagnetarEidolon**.
-- The canonical project model is used as governance/context, not as the product identity.
 - The shared runtime now begins to live in `packages/magnetar-sdk`.
 
 ## Included Pieces
-- `src/app/core/models/canonical-model.ts`: OOP domain model classes.
-- `src/app/core/services/project-context.service.ts`: service layer that centralizes canonical context.
+- `src/app/core/models/application-descriptor.ts`: product metadata model classes.
+- `src/app/core/services/project-context.service.ts`: service layer that centralizes product descriptor context.
 - `src/app/app.component.*`: Angular UI shell component.
 - `src/main.ts`: Angular bootstrap entrypoint.
 - `src/cli/magnetar-cli.ts`: CLI entrypoint for non-UI usage.
@@ -22,12 +21,22 @@ npm install
 npm run start
 ```
 
+## Run From Repository Root
+If you prefer not to `cd` into the workspace, the repository root now exposes wrapper scripts:
+
+```bash
+cd /path/to/MagnetarEidolon
+npm run setup
+npm run dev
+```
+
+There is no separate backend service to boot yet. `npm run dev` starts the Angular UI workspace, and `npm run cli:dev -- <command>` runs the TypeScript CLI through the same shared SDK boundary.
+
 ## CLI Usage
 ```bash
 cd apps/magnetar-ui
 npm install
 npm run cli:dev -- about
-npm run cli:dev -- canonical-model
 npm run build:cli
 npm run cli -- about
 ```
@@ -45,5 +54,6 @@ npm run build
 - `npm run cli:dev` is the direct development CLI path.
 - `npm run cli` runs the compiled CLI from `dist/`.
 - Local startup still requires `npm install`; no-install delivery remains a later distribution concern.
+- Root-level wrappers exist for the same flows: `npm run dev`, `npm run cli:dev -- about`, `npm run build`.
 
 > Note: This workspace is still transitional. The UI layout is product-aligned, the shared runtime extraction to `packages/magnetar-sdk` has started, and the web runtime is now being initialized around the existing UI rather than replacing it.

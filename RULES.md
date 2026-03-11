@@ -1,7 +1,7 @@
-# Canonical Ruleset of MagnetarEidolon
+# MagnetarEidolon Project Rules
 
 ## Introduction
-This document establishes the fundamental rules and workflow standards for the MagnetarEidolon project. These rules codify the Magnetar standard, and the entire project must comply unless a formal exception is documented in `BITACORA.md`.
+This document establishes the fundamental rules and workflow standards for the MagnetarEidolon project. The entire project must comply unless a formal exception is documented in `BITACORA.md`.
 
 ## Naming Conventions
 - **Repositories**: `magnetar-<domain>-<descriptor>` (e.g., `magnetar-core-agent`, `magnetar-memory-chroma`)
@@ -13,7 +13,7 @@ This document establishes the fundamental rules and workflow standards for the M
   - `hotfix`: Urgent production fixes
 - **Tasks and Blockers**: `kebab-case` (e.g., `task-202`, `blocker-db-outage`)
 - **YAML Keys**: `lower_snake_case`
-- **File Names**: Must mirror those in the canonical repository.
+- **File Names**: Must match the required project documentation set.
 
 ## Required Files
 Every Magnetar project must include:
@@ -80,4 +80,4 @@ Tasks must be in one of the following states:
 
 ## Compliance and Enforcement
 - Continuous Integration (CI) should validate the presence and structure of required files.
-- Periodic audits will be conducted to ensure adherence to the canonical model.
+- Periodic audits will be conducted to ensure adherence to the project governance model.

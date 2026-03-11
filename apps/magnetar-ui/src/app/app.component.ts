@@ -1,9 +1,13 @@
-import { Component, ViewEncapsulation, computed, signal } from '@angular/core';
+import { Component, Input, OnDestroy, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
+import { ChatBlock, ChatMessage } from './core/models/chat.js';
+import { ProviderConfig } from './core/models/provider-config.js';
+import { ChatSessionService } from './core/services/chat-session.service.js';
+import { ProviderConfigService } from './core/services/provider-config.service.js';
 
 @Component({
   selector: 'screen-dashboard',
@@ -360,6 +364,527 @@ class ToolsScreen {
 }
 
 @Component({
+  selector: 'screen-chat',
+  standalone: true,
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  template: `
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 animate-fade-in pb-12">
+      <aside class="xl:col-span-3 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden">
+        <div class="px-4 py-4 border-b border-white/5 bg-black/20">
+          <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+            <ui-icon name="message-square" [size]="16" cssClass="text-cyan-400"></ui-icon>
+            Conversations
+          </div>
+          <p class="text-xs text-zinc-500 mt-2">
+            Chat is the main UI path for provider validation and execution-oriented prompting.
+          </p>
+        </div>
+        <div class="p-4 space-y-3">
+          <div class="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-3 py-3">
+            <div class="text-xs uppercase tracking-wider text-cyan-300">Active provider</div>
+            <div class="text-sm font-medium text-cyan-100 mt-1">{{ providerConfigService.primaryProvider()?.name ?? 'Unassigned' }}</div>
+          </div>
+          <div
+            *ngFor="let conversation of chatSessionService.conversationHistory()"
+            class="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
+            <div class="text-sm text-zinc-200">{{ conversation.title }}</div>
+            <div class="text-xs text-zinc-500 mt-1">{{ conversation.preview }}</div>
+          </div>
+          <div *ngIf="chatSessionService.conversationHistory().length === 0" class="rounded-xl border border-dashed border-white/10 px-3 py-4 text-xs text-zinc-500">
+            The first prompt you send will appear here as the initial conversation record.
+          </div>
+        </div>
+      </aside>
+
+      <section class="xl:col-span-6 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden flex flex-col min-h-[42rem]">
+        <div class="px-5 py-4 border-b border-white/5 bg-black/20 flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-light text-white tracking-tight">Chat</h2>
+            <p class="text-xs text-zinc-500 mt-1">
+              Structured conversation with provider visibility, streaming responses, and artifact handoff.
+            </p>
+          </div>
+          <ui-badge [status]="chatSessionService.isStreaming() ? 'active' : 'idle'">
+            {{ chatSessionService.isStreaming() ? 'streaming' : 'idle' }}
+          </ui-badge>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+          <div
+            *ngFor="let message of chatSessionService.messages()"
+            class="rounded-2xl border p-4"
+            [ngClass]="message.role === 'user'
+              ? 'border-cyan-500/20 bg-cyan-500/10 ml-8'
+              : 'border-white/5 bg-[#0f0f13] mr-8'">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <div class="text-xs uppercase tracking-wider text-zinc-500">
+                  {{ message.role }} <span *ngIf="message.providerLabel">· {{ message.providerLabel }}</span>
+                </div>
+                <div class="text-[11px] text-zinc-600 mt-1">message {{ message.id }}</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <ui-badge [status]="getMessageBadge(message)">{{ message.phase }}</ui-badge>
+                <button
+                  (click)="copyMessage(message)"
+                  class="px-2 py-1 rounded border border-white/10 bg-white/5 text-xs text-zinc-300 hover:bg-white/10">
+                  Copy
+                </button>
+                <button
+                  *ngIf="hasCanvasCandidate(message)"
+                  (click)="openCanvas(message.id)"
+                  class="px-2 py-1 rounded border border-cyan-500/20 bg-cyan-500/10 text-xs text-cyan-100 hover:bg-cyan-500/20">
+                  Canvas
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              <ng-container *ngFor="let block of message.blocks">
+                <h3 *ngIf="block.type === 'heading' && block.level === 1" class="text-xl font-light text-white">{{ block.text }}</h3>
+                <h4 *ngIf="block.type === 'heading' && block.level === 2" class="text-lg font-medium text-zinc-100">{{ block.text }}</h4>
+                <h5 *ngIf="block.type === 'heading' && block.level === 3" class="text-base font-medium text-zinc-200">{{ block.text }}</h5>
+                <p *ngIf="block.type === 'paragraph'" class="text-sm leading-7 text-zinc-200">{{ block.text }}</p>
+                <blockquote *ngIf="block.type === 'quote'" class="border-l-2 border-cyan-500/40 pl-4 text-sm leading-7 text-zinc-300">
+                  {{ block.text }}
+                </blockquote>
+                <ul *ngIf="block.type === 'list' && !block.ordered" class="list-disc pl-6 text-sm leading-7 text-zinc-200 space-y-1">
+                  <li *ngFor="let item of block.items">{{ item }}</li>
+                </ul>
+                <ol *ngIf="block.type === 'list' && block.ordered" class="list-decimal pl-6 text-sm leading-7 text-zinc-200 space-y-1">
+                  <li *ngFor="let item of block.items">{{ item }}</li>
+                </ol>
+                <div *ngIf="block.type === 'code'" class="rounded-xl border border-cyan-500/20 bg-[#050508] overflow-hidden">
+                  <div class="px-3 py-2 border-b border-white/5 flex items-center justify-between text-xs text-zinc-400">
+                    <span>{{ block.language }}</span>
+                    <button
+                      (click)="copyCode(block)"
+                      class="px-2 py-1 rounded border border-white/10 bg-white/5 text-zinc-300 hover:bg-white/10">
+                      Copy
+                    </button>
+                  </div>
+                  <pre class="p-4 overflow-x-auto text-sm text-cyan-100 font-mono whitespace-pre-wrap">{{ block.code }}</pre>
+                </div>
+              </ng-container>
+              <div *ngIf="message.phase === 'streaming'" class="inline-flex items-center gap-2 text-xs text-cyan-300">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                Response still streaming
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-t border-white/5 bg-black/20 space-y-3">
+          <textarea
+            [value]="chatSessionService.draft()"
+            (input)="updateDraft($event)"
+            rows="4"
+            placeholder="Ask MagnetarEidolon to plan, explain, generate code, or validate a provider path..."
+            class="w-full rounded-2xl border border-white/10 bg-[#050508] px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500/40"></textarea>
+          <div class="flex items-center justify-between gap-4">
+            <div class="text-xs text-zinc-500">
+              Streaming through {{ chatSessionService.activeProviderLabel() }}
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                (click)="chatSessionService.completeStreaming()"
+                *ngIf="chatSessionService.isStreaming()"
+                class="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm text-zinc-200 hover:bg-white/10">
+                Complete Stream
+              </button>
+              <button
+                (click)="submitPrompt()"
+                class="px-4 py-2 rounded-lg bg-cyan-500 text-slate-900 text-sm font-semibold hover:bg-cyan-400">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="xl:col-span-3 space-y-4">
+        <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+          <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+            <ui-icon name="git-branch" [size]="16" cssClass="text-violet-400"></ui-icon>
+            Canvas Panel
+          </div>
+          <div *ngIf="chatSessionService.canvasDocument() as canvas; else emptyCanvas" class="mt-4 space-y-3">
+            <div>
+              <div class="text-sm text-zinc-100">{{ canvas.title }}</div>
+              <div class="text-xs uppercase tracking-wider text-zinc-500 mt-1">{{ canvas.language }}</div>
+            </div>
+            <pre class="rounded-xl border border-white/5 bg-[#050508] p-4 overflow-x-auto text-xs font-mono text-cyan-100 whitespace-pre-wrap">{{ canvas.content }}</pre>
+            <button
+              (click)="chatSessionService.closeCanvas()"
+              class="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm text-zinc-200 hover:bg-white/10">
+              Close Canvas
+            </button>
+          </div>
+          <ng-template #emptyCanvas>
+            <p class="mt-4 text-sm leading-7 text-zinc-500">
+              Code-oriented assistant responses can be lifted into this side panel as the first step toward document or canvas mode.
+            </p>
+          </ng-template>
+        </div>
+
+        <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
+          <div class="text-sm font-medium text-cyan-300 flex items-center gap-2">
+            <ui-icon name="shield" [size]="16"></ui-icon>
+            Rendering Baseline
+          </div>
+          <ul class="mt-3 space-y-2 text-xs leading-6 text-cyan-100/80">
+            <li>Semantic block rendering for headings, paragraphs, lists, quotes, and code.</li>
+            <li>Provider identity visible in the response header.</li>
+            <li>Streaming behavior backed by explicit chat-session state.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  `,
+})
+export class ChatScreen implements OnDestroy {
+  @Input({ required: true }) public providerConfigService!: ProviderConfigService;
+  @Input({ required: true }) public chatSessionService!: ChatSessionService;
+
+  private streamTimer: ReturnType<typeof setInterval> | null = null;
+
+  public ngOnDestroy(): void {
+    this.clearStreamTimer();
+  }
+
+  public updateDraft(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.chatSessionService.setDraft(target.value);
+  }
+
+  public async submitPrompt(): Promise<void> {
+    const didStart = await this.chatSessionService.submitDraft();
+    if (!didStart) {
+      return;
+    }
+
+    this.clearStreamTimer();
+    this.streamTimer = setInterval(() => {
+      const didAdvance = this.chatSessionService.streamNextChunk();
+      if (!didAdvance) {
+        this.clearStreamTimer();
+      }
+    }, 120);
+  }
+
+  public copyMessage(message: ChatMessage): void {
+    void navigator.clipboard?.writeText(message.rawText);
+  }
+
+  public copyCode(block: ChatBlock): void {
+    if (block.type !== 'code') {
+      return;
+    }
+
+    void navigator.clipboard?.writeText(block.code);
+  }
+
+  public hasCanvasCandidate(message: ChatMessage): boolean {
+    return message.blocks.some((block) => block.type === 'code');
+  }
+
+  public openCanvas(messageId: string): void {
+    this.chatSessionService.openCanvasFromMessage(messageId);
+  }
+
+  public getMessageBadge(message: ChatMessage): BadgeStatus {
+    switch (message.phase) {
+      case 'complete':
+        return 'success';
+      case 'streaming':
+        return 'active';
+      case 'error':
+        return 'failed';
+      case 'idle':
+      default:
+        return 'idle';
+    }
+  }
+
+  private clearStreamTimer(): void {
+    if (this.streamTimer === null) {
+      return;
+    }
+
+    clearInterval(this.streamTimer);
+    this.streamTimer = null;
+  }
+}
+
+@Component({
+  selector: 'screen-memory',
+  standalone: true,
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  template: `
+    <div class="space-y-6 animate-fade-in pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 class="text-2xl font-light text-white tracking-tight">Memory Inspector</h2>
+          <p class="text-sm text-zinc-400 mt-1">
+            Review session memory, durable notes, and the context fragments currently shaping execution.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Session Items: {{ sessionMemory.length }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Durable Notes: {{ durableMemory.length }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+              <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
+              Active Context Stack
+            </div>
+            <ui-badge status="active">Inspectable</ui-badge>
+          </div>
+          <div class="divide-y divide-white/5">
+            <div *ngFor="let item of sessionMemory" class="px-5 py-4 flex items-start justify-between gap-4">
+              <div>
+                <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
+                <div class="text-xs text-zinc-500 mt-1">{{ item.scope }}</div>
+                <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
+              </div>
+              <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+              <ui-icon name="book-open" [size]="16" cssClass="text-violet-400"></ui-icon>
+              Durable Notes
+            </div>
+            <div class="mt-4 space-y-3">
+              <div *ngFor="let note of durableMemory" class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                <div class="text-sm text-zinc-200">{{ note.title }}</div>
+                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-1">{{ note.tag }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
+            <div class="text-sm font-medium text-cyan-300 flex items-center gap-2">
+              <ui-icon name="shield" [size]="16"></ui-icon>
+              Memory Rule
+            </div>
+            <p class="mt-3 text-xs leading-relaxed text-cyan-100/80">
+              Memory must remain visible, governable, and separable from runtime orchestration. Hidden memory is not
+              acceptable product behavior.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
+class MemoryScreen {
+  public readonly sessionMemory = [
+    {
+      title: 'Current execution objective',
+      scope: 'session / goal',
+      summary: 'Prepare a migration script with explicit approval before any write-capable execution path is enabled.',
+      badge: 'Pinned',
+      status: 'active' as BadgeStatus,
+    },
+    {
+      title: 'Recent schema evidence',
+      scope: 'session / tool output',
+      summary: 'Users table inspected successfully. Runtime should preserve the evidence trail before proposing changes.',
+      badge: 'Fresh',
+      status: 'pending_approval' as BadgeStatus,
+    },
+    {
+      title: 'Policy reminder',
+      scope: 'session / governance',
+      summary: 'Write operations remain approval-gated by default, even when a provider returns a valid migration plan.',
+      badge: 'Guarded',
+      status: 'idle' as BadgeStatus,
+    },
+  ];
+
+  public readonly durableMemory = [
+    { title: 'Default provider path starts local-first with LM Studio', tag: 'provider' },
+    { title: 'Traceability required for every sensitive action', tag: 'policy' },
+    { title: 'SDK contract remains shared between UI and CLI', tag: 'architecture' },
+  ];
+}
+
+@Component({
+  selector: 'screen-providers',
+  standalone: true,
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  template: `
+    <div class="space-y-6 animate-fade-in pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 class="text-2xl font-light text-white tracking-tight">AI Providers</h2>
+          <p class="text-sm text-zinc-400 mt-1">
+            Configure multiple providers, define the primary runtime, and keep backups ready for failover.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Primary: {{ primaryProvider()?.name || 'Unassigned' }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Backups Ready: {{ healthyFailoverCount() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div
+            *ngFor="let provider of providers()"
+            class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-start gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
+                  <ui-icon name="server" [size]="20"></ui-icon>
+                </div>
+                <div>
+                  <div class="text-base font-medium text-zinc-100">{{ provider.name }}</div>
+                  <div class="text-xs text-zinc-500 mt-1">{{ provider.kind }} · {{ provider.apiStyle }}</div>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <ui-badge [status]="getHealthBadge(provider)">{{ provider.health }}</ui-badge>
+                <span class="text-[11px] uppercase tracking-wider text-zinc-500">
+                  {{ describeRole(provider) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                <div class="text-zinc-500 uppercase tracking-wider mb-1">Base URL</div>
+                <div class="font-mono text-zinc-300 break-all">{{ provider.baseUrl }}</div>
+              </div>
+              <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                <div class="text-zinc-500 uppercase tracking-wider mb-1">Model</div>
+                <div class="font-mono text-zinc-300">{{ provider.model }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-zinc-500">
+              <span>Failover priority {{ provider.priority }}</span>
+              <span *ngIf="provider.role === 'backup'">Eligible backup</span>
+              <span *ngIf="provider.role === 'primary'">Current default route</span>
+              <span *ngIf="provider.role === 'disabled'">Not used by runtime</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                (click)="setPrimary(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'primary'
+                  ? 'bg-cyan-500 text-slate-900 border-cyan-400'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Primary
+              </button>
+              <button
+                (click)="setBackup(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'backup'
+                  ? 'bg-amber-400 text-amber-950 border-amber-300'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Backup
+              </button>
+              <button
+                (click)="disable(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'disabled'
+                  ? 'bg-zinc-700 text-zinc-100 border-zinc-600'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Disable
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
+              <ui-icon name="activity" [size]="16" cssClass="text-cyan-400"></ui-icon>
+              Failover Chain
+            </div>
+            <div class="mt-4 space-y-3">
+              <div
+                *ngFor="let provider of providers()"
+                class="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2">
+                <div>
+                  <div class="text-sm text-zinc-200">{{ provider.name }}</div>
+                  <div class="text-[11px] uppercase tracking-wider text-zinc-500">{{ describeRole(provider) }}</div>
+                </div>
+                <div class="text-xs font-mono text-zinc-400">#{{ provider.priority }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-cyan-300">
+              <ui-icon name="shield" [size]="16"></ui-icon>
+              Runtime Intent
+            </div>
+            <p class="mt-3 text-xs leading-relaxed text-cyan-100/80">
+              Provider configuration should live independently from chat and runtime execution. The UI can reorder and
+              assign providers, while the SDK later decides how to consume that chain.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
+export class ProvidersScreen {
+  @Input({ required: true }) public providerConfigService!: ProviderConfigService;
+
+  public providers(): ProviderConfig[] {
+    return this.providerConfigService.providers();
+  }
+
+  public primaryProvider(): ProviderConfig | null {
+    return this.providerConfigService.primaryProvider();
+  }
+
+  public healthyFailoverCount(): number {
+    return this.providerConfigService.healthyFailoverProviders().length;
+  }
+
+  public setPrimary(providerId: string): void {
+    this.providerConfigService.setPrimary(providerId);
+  }
+
+  public setBackup(providerId: string): void {
+    this.providerConfigService.setBackup(providerId);
+  }
+
+  public disable(providerId: string): void {
+    this.providerConfigService.disable(providerId);
+  }
+
+  public describeRole(provider: ProviderConfig): string {
+    return this.providerConfigService.describeRole(provider.id);
+  }
+
+  public getHealthBadge(provider: ProviderConfig): BadgeStatus {
+    return this.providerConfigService.getHealthTone(provider.health);
+  }
+}
+
+@Component({
   selector: 'screen-policy',
   standalone: true,
   imports: [CommonModule, UiIconComponent],
@@ -385,8 +910,11 @@ class PolicyScreen {}
     UiIconComponent,
     DashboardScreen,
     LiveRunScreen,
+    ChatScreen,
     BuilderScreen,
     ToolsScreen,
+    MemoryScreen,
+    ProvidersScreen,
     PolicyScreen,
   ],
   template: `
@@ -418,10 +946,18 @@ class PolicyScreen {}
           <screen-dashboard></screen-dashboard>
         } @else if (activeTab() === 'liverun') {
           <screen-live-run></screen-live-run>
+        } @else if (activeTab() === 'chat') {
+          <screen-chat
+            [providerConfigService]="providerConfigService"
+            [chatSessionService]="chatSessionService"></screen-chat>
         } @else if (activeTab() === 'builder') {
           <screen-builder></screen-builder>
         } @else if (activeTab() === 'tools') {
           <screen-tools></screen-tools>
+        } @else if (activeTab() === 'memory') {
+          <screen-memory></screen-memory>
+        } @else if (activeTab() === 'providers') {
+          <screen-providers [providerConfigService]="providerConfigService"></screen-providers>
         } @else if (activeTab() === 'policy') {
           <screen-policy></screen-policy>
         }
@@ -462,12 +998,17 @@ class PolicyScreen {}
   encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
+  public readonly providerConfigService = new ProviderConfigService();
+  public readonly chatSessionService = new ChatSessionService(this.providerConfigService);
+
   public readonly tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: 'home' },
     { id: 'liverun', label: 'Live Run', icon: 'activity' },
+    { id: 'chat', label: 'Chat', icon: 'message-square' },
     { id: 'builder', label: 'Builder', icon: 'git-branch' },
     { id: 'tools', label: 'Catalog', icon: 'wrench' },
     { id: 'memory', label: 'Memory', icon: 'database' },
+    { id: 'providers', label: 'Providers', icon: 'server' },
     { id: 'policy', label: 'Policies', icon: 'shield' },
   ];
 

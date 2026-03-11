@@ -77,7 +77,7 @@ Success conditions:
 Clarify which launch modes are supported and what each one means.
 
 Deliverables:
-- Canonical definition of:
+- Clear definition of:
   - `web-dev`
   - `web-build`
   - `cli-dev`
@@ -206,7 +206,6 @@ npm run start
 
 # CLI in development
 npm run cli:dev -- about
-npm run cli:dev -- canonical-model
 
 # Built CLI
 npm run build:cli
