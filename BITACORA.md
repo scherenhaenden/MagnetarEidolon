@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 09:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Removed product-facing canonical-model references from the active UI/CLI surface, documentation, and governance wording. Preserved only a root-level note that the canonical model was historically used as a documentation administration framework.
+
 - **Timestamp:** 2026-03-11 08:45 UTC
   **Author:** Codex
   **Entry:** Decision: Split the documentation cleanup into two branches. `feature/docs-english-translation` is dedicated to translating the active repository documentation into English, while a follow-up branch will remove product-facing canonical-model references and leave only a root-level governance note about the historical documentation framework.

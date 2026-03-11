@@ -1,12 +1,12 @@
 # Testing Strategy for MagnetarEidolon
 
 ## Introduction
-This document describes the testing strategy for the MagnetarEidolon project, focused on the TypeScript SDK/application code and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to the canonical standards for documentation and process.
+This document describes the testing strategy for the MagnetarEidolon project, focused on the TypeScript SDK/application code and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to its documentation and process standards.
 
 ## Governance and Documentation Testing
 
 ### Testing Objectives
-Ensure governance artifacts are complete, consistent, and operationally enforceable for canonical Magnetar projects.
+Ensure governance artifacts are complete, consistent, and operationally enforceable for this repository.
 
 ### Types of Tests
 - **Documentation integrity tests:** verify required files exist and contain expected section headers.
@@ -15,7 +15,7 @@ Ensure governance artifacts are complete, consistent, and operationally enforcea
 - **Process tests (manual/audit):** verify `BITACORA.md` chronology and blocker lifecycle compliance.
 
 ### Code Coverage Targets
-- **Automated checks coverage target:** 90% of canonical governance rules represented by machine-checkable assertions.
+- **Automated checks coverage target:** 90% of governance rules represented by machine-checkable assertions.
 - **Minimum accepted threshold:** 80% before release tagging.
 
 ## TypeScript SDK Testing Strategy (New)
@@ -29,7 +29,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
     - **Focus**: Pure functions, state models, and individual agent logic steps.
     - **Tooling**: `Vitest`.
     - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
-    - **Requirement**: Ningun codigo en `packages/magnetar-sdk/src/` puede mergearse sin cobertura completa del modulo afectado; mientras exista codigo compartido aun dentro de la UI, aplica la misma exigencia a ese path temporal.
+    - **Requirement**: No code in `packages/magnetar-sdk/src/` may be merged without complete coverage for the affected module. While shared code still lives temporarily inside the UI workspace, the same standard applies there.
 
 2.  **Integration Tests**
     - **Focus**: Interaction between `MagnetarAgent`, `Tool` adapters, and `MemoryStore`.

@@ -37,7 +37,7 @@ Yes. If the product has an operational CLI and a UI that share semantics, it mus
 
 The CLI must not duplicate business logic; it should consume the shared SDK/runtime contract.
 
-## Canonical Documentation
+## Core Documentation
 | File | Role |
 | :--- | :--- |
 | `NEW_PLAN.md` | Base product vision and strategic direction. |
@@ -97,7 +97,6 @@ npm run start
 
 # Development CLI
 npm run cli:dev -- about
-npm run cli:dev -- canonical-model
 
 # Built CLI
 npm run build:cli
@@ -114,7 +113,7 @@ Equivalent commands from the project root:
 ```bash
 npm run setup
 npm run dev
-npm run cli:dev -- canonical-model
+npm run cli:dev -- about
 npm run build
 ```
 
@@ -130,7 +129,7 @@ npm run build
 ## GitHub Tracking
 - Issue tracker: `https://github.com/scherenhaenden/MagnetarEidolon/issues`
 - Main project board: `https://github.com/users/scherenhaenden/projects/7` (`MagnetarEidolon`)
-- The GitHub board should reflect active operational issues; the root documentation remains the canonical source of scope, architecture, and status.
+- The GitHub board should reflect active operational issues; the root documentation remains the source of truth for scope, architecture, and status.
 
 ## Governance Note
 The project previously used a canonical project model as a documentation/governance framework. That model is administrative context only, not the product identity.
