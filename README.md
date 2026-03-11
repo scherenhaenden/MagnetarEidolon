@@ -57,6 +57,7 @@ The CLI must not duplicate business logic; it should consume the shared SDK/runt
 | `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` | Detailed plan for turning the TypeScript UI into a real runnable web and CLI surface. |
 | `projects/lm-studio-provider-module/` | Standalone planning module for the first local AI provider integration via LM Studio. |
 | `projects/in-app-chat-module/` | Standalone planning module for the embedded chat surface and testing workflows. |
+| `projects/chat-runtime-stabilization-module/` | Standalone planning module for getting the chat runtime from partial integration to reliable end-to-end behavior. |
 | `projects/provider-configuration-module/` | Standalone planning module for multi-provider configuration, primary/backup routing, and failover policy. |
 
 ## Transition Status
@@ -74,14 +75,17 @@ The repository is in an active transition phase:
 - Built CLI: `cd apps/magnetar-ui && npm run build:cli && npm run cli -- about`
 
 ## Startup From the Project Root
-There is currently no separate backend service in this repository. The runnable surface is the Angular UI in `apps/magnetar-ui` plus the TypeScript CLI in the same workspace.
+The repository now includes a dedicated backend-for-frontend service in `apps/magnetar-api`. In development, the Angular UI talks to that backend, and the backend talks to LM Studio.
 
 ```bash
-# install SDK + UI dependencies
+# install SDK + backend + UI dependencies
 npm run setup
 
-# start the web UI in development from the project root
+# start backend + web UI together from the project root
 npm run dev
+
+# start only the backend
+npm run dev:api
 
 # run the CLI in development from the project root
 npm run cli:dev -- about
@@ -100,10 +104,14 @@ docker compose up dev
 
 ## Current Operational Commands
 ```bash
-cd apps/magnetar-ui
+cd apps/magnetar-api
+npm install
+npm run start:dev
+
+cd ../magnetar-ui
 npm install
 
-# Local web UI
+# Local web UI (expects backend on port 3100)
 npm run start
 
 # Development CLI
@@ -137,6 +145,8 @@ npm run build
 6. Add an **in-app chat surface** so provider testing and real usage happen inside the product instead of only through placeholder views.
 7. Add **provider configuration UI** so multiple providers can be configured with primary and backup roles.
 8. Land a dedicated **Chat** tab with structured rendering, streaming, and a future canvas/document side panel.
+9. Keep browser-to-provider traffic behind the NestJS backend/BFF instead of calling LM Studio directly from Angular.
+10. Stabilize the chat runtime end to end before expanding more provider or chat-surface complexity.
 
 ## Additional Information
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: technology choices and cross-platform rationale for Linux, macOS, and Windows.

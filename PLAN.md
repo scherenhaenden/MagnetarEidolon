@@ -73,11 +73,19 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-lm-103` | `ms-17` | Add provider smoke tests and local setup docs for LM Studio | Core Team | in_review | Tests and integration notes now cover models, completions, healthcheck, and failure mapping. |
 | `task-lm-104` | `ms-17` | Validate LM Studio path through repeatable smoke coverage | Core Team | in_progress | Vitest coverage now includes chat-consumed streaming cases, request shape, model listing, healthcheck, and error cases. |
 | `task-chat-101` | `ms-18` | Define chat tab IA and UX acceptance criteria | Core Team | in_review | Chat must be a top-level tab with explicit provider visibility, conversation flow, and message actions. |
-| `task-chat-102` | `ms-18` | Implement Angular chat tab shell and layout regions | Core Team | in_progress | Chat tab, conversation rail, stream column, canvas side panel, and real LM Studio streaming updates now exist in the Angular shell. |
-| `task-chat-103` | `ms-18` | Implement conversation state and provider session model | Core Team | in_progress | `ChatSessionService` now tracks prompt, response, live LM Studio streaming, provider identity, and canvas state. |
+| `task-chat-102` | `ms-18` | Implement Angular chat tab shell and layout regions | Core Team | in_progress | Chat tab, conversation rail, stream column, canvas side panel, and backend-routed LM Studio streaming now exist in the Angular shell. |
+| `task-chat-103` | `ms-18` | Implement conversation state and provider session model | Core Team | in_progress | `ChatSessionService` now tracks prompt, response, backend-routed live LM Studio streaming, provider identity, and canvas state. |
 | `task-chat-104` | `ms-18` | Implement structured chat block rendering baseline | Core Team | in_progress | Headings, paragraphs, lists, quotes, code blocks, copy actions, and canvas extraction are now modeled and rendered. |
 | `task-chat-105` | `ms-18` | Define canvas/document side panel mode | Core Team | planned | Specify how longer-form generated artifacts move from the chat stream into an editable side workspace. |
-| `task-chat-106` | `ms-18` | Add streaming and provider-validation test plan | Core Team | in_progress | Deterministic parser and chat-session tests now cover live LM Studio SSE streaming; manual provider-connected UI validation still remains. |
+| `task-chat-106` | `ms-18` | Add streaming and provider-validation test plan | Core Team | in_progress | Deterministic parser and chat-session tests now cover backend-routed LM Studio SSE streaming; manual provider-connected UI validation still remains. |
+| `task-chatfix-101` | `ms-18` | Stabilize browser -> backend -> LM Studio transport path | Core Team | done | The browser now reaches LM Studio only through the NestJS backend, and the working local default uses the verified LM Studio OpenAI-compatible path. |
+| `task-chatfix-102` | `ms-18` | Prove the backend chat stream in isolation | Core Team | done | Backend transport tests now cover upstream normalization and error mapping independently from Angular. |
+| `task-chatfix-103` | `ms-18` | Prove the UI -> backend chat path end to end | Core Team | done | The Angular chat flow was manually validated against the real LM Studio server and now streams responses successfully. |
+| `task-chatfix-104` | `ms-18` | Normalize the backend streaming contract for the UI | Core Team | done | The browser consumes a normalized backend SSE delta contract instead of raw provider event variations. |
+| `task-chatfix-105` | `ms-18` | Add runtime diagnostics and health endpoints | Core Team | planned | Distinguish UI, backend, provider, and model-level failures. |
+| `task-chatfix-106` | `ms-19` | Make provider configuration backend-aware for chat transport | Core Team | planned | UI selects providers, backend owns transport execution details. |
+| `task-chatfix-107` | `ms-16` | Lock the root development workflow for backend + UI | Core Team | in_progress | Root `npm run setup` and `npm run dev` now boot the backend plus UI together; the workflow still needs final hardening and health diagnostics. |
+| `task-chatfix-108` | `ms-18` | Add regression coverage and manual acceptance checklist | Core Team | planned | Cover send semantics, routing, streaming, failures, and manual acceptance. |
 | `task-provider-101` | `ms-19` | Define provider configuration model and failover semantics | Core Team | in_review | Primary, backup, disabled, and priority semantics are now modeled in the UI workspace state layer. |
 | `task-provider-102` | `ms-19` | Implement provider configuration screen in Angular | Core Team | in_review | New Providers screen added to the shell with primary/backup/disable controls. |
 | `task-provider-103` | `ms-19` | Add state tests for provider ordering and failover eligibility | Core Team | in_review | Vitest now covers provider sorting, promotion, disablement, and badge-state mapping. |
@@ -110,9 +118,9 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 
 ## Cumulative Effort
 - **Total estimated effort**: 165 pts
-- **Completed points**: 108 pts
-- **In-progress points**: 15 pts
-- **Remaining points**: 42 pts
+- **Completed points**: 118 pts
+- **In-progress points**: 17 pts
+- **Remaining points**: 30 pts
 
 ## Change Control
 Every task or status variation must be reflected in `STATUS.md` and recorded in `BITACORA.md`.

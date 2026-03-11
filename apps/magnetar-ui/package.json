@@ -5,7 +5,7 @@
   "description": "MagnetarEidolon TypeScript UI workspace with a shared CLI/runtime proof of concept.",
   "type": "module",
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve --proxy-config proxy.conf.json",
     "build": "npm run build:web && npm run build:cli",
     "build:web": "ng build",
     "build:cli": "tsc -p tsconfig.cli.json",
@@ -17,7 +17,7 @@
     "test:ci": "vitest run --coverage",
     "cli:dev": "node --import tsx src/cli/magnetar-cli.ts",
     "cli": "node dist/cli/magnetar-cli.js",
-    "web:open": "ng serve --open"
+    "web:open": "ng serve --proxy-config proxy.conf.json --open"
   },
   "bin": {
     "magnetar-cli": "dist/cli/magnetar-cli.js"

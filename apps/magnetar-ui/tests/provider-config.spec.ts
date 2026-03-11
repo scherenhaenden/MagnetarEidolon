@@ -46,6 +46,9 @@ describe('ProviderConfigService', () => {
     const service = new ProviderConfigService();
 
     expect(service.primaryProvider()?.name).toBe('LM Studio Local');
+    expect(service.primaryProvider()?.baseUrl).toBe('http://127.0.0.1:1234/v1');
+    expect(service.primaryProvider()?.model).toBe('local-model');
+    expect(service.primaryProvider()?.apiStyle).toBe('openai-compatible');
     expect(service.backupProviders().map((provider) => provider.name)).toContain('OpenAI Cloud');
     expect(service.healthyFailoverProviders().map((provider) => provider.name)).toEqual([
       'OpenAI Cloud',

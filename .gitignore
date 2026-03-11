@@ -41,6 +41,8 @@ apps/magnetar-ui/.angular/
 apps/magnetar-ui/coverage/
 apps/magnetar-ui/dist/
 apps/magnetar-ui/dist-test/
+apps/magnetar-api/node_modules/
+apps/magnetar-api/dist/
 packages/magnetar-sdk/node_modules/
 packages/magnetar-sdk/dist/
 
