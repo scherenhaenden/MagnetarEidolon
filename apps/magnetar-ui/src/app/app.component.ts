@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, computed, signal } from '@angular/core';
+import { Component, Input, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
@@ -362,6 +362,111 @@ class ToolsScreen {
 }
 
 @Component({
+  selector: 'screen-memory',
+  standalone: true,
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  template: `
+    <div class="space-y-6 animate-fade-in pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 class="text-2xl font-light text-white tracking-tight">Memory Inspector</h2>
+          <p class="text-sm text-zinc-400 mt-1">
+            Review session memory, durable notes, and the context fragments currently shaping execution.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Session Items: {{ sessionMemory.length }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Durable Notes: {{ durableMemory.length }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+              <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
+              Active Context Stack
+            </div>
+            <ui-badge status="active">Inspectable</ui-badge>
+          </div>
+          <div class="divide-y divide-white/5">
+            <div *ngFor="let item of sessionMemory" class="px-5 py-4 flex items-start justify-between gap-4">
+              <div>
+                <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
+                <div class="text-xs text-zinc-500 mt-1">{{ item.scope }}</div>
+                <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
+              </div>
+              <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+              <ui-icon name="book-open" [size]="16" cssClass="text-violet-400"></ui-icon>
+              Durable Notes
+            </div>
+            <div class="mt-4 space-y-3">
+              <div *ngFor="let note of durableMemory" class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                <div class="text-sm text-zinc-200">{{ note.title }}</div>
+                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-1">{{ note.tag }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
+            <div class="text-sm font-medium text-cyan-300 flex items-center gap-2">
+              <ui-icon name="shield" [size]="16"></ui-icon>
+              Memory Rule
+            </div>
+            <p class="mt-3 text-xs leading-relaxed text-cyan-100/80">
+              Memory must remain visible, governable, and separable from runtime orchestration. Hidden memory is not
+              acceptable product behavior.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
+class MemoryScreen {
+  public readonly sessionMemory = [
+    {
+      title: 'Current execution objective',
+      scope: 'session / goal',
+      summary: 'Prepare a migration script with explicit approval before any write-capable execution path is enabled.',
+      badge: 'Pinned',
+      status: 'active' as BadgeStatus,
+    },
+    {
+      title: 'Recent schema evidence',
+      scope: 'session / tool output',
+      summary: 'Users table inspected successfully. Runtime should preserve the evidence trail before proposing changes.',
+      badge: 'Fresh',
+      status: 'pending_approval' as BadgeStatus,
+    },
+    {
+      title: 'Policy reminder',
+      scope: 'session / governance',
+      summary: 'Write operations remain approval-gated by default, even when a provider returns a valid migration plan.',
+      badge: 'Guarded',
+      status: 'idle' as BadgeStatus,
+    },
+  ];
+
+  public readonly durableMemory = [
+    { title: 'Default provider path starts local-first with LM Studio', tag: 'provider' },
+    { title: 'Traceability required for every sensitive action', tag: 'policy' },
+    { title: 'SDK contract remains shared between UI and CLI', tag: 'architecture' },
+  ];
+}
+
+@Component({
   selector: 'screen-providers',
   standalone: true,
   imports: [CommonModule, UiIconComponent, UiBadgeComponent],
@@ -488,14 +593,20 @@ class ToolsScreen {
     </div>
   `,
 })
-class ProvidersScreen {
-  private readonly providerConfigService = new ProviderConfigService();
+export class ProvidersScreen {
+  @Input({ required: true }) public providerConfigService!: ProviderConfigService;
 
-  public readonly providers = this.providerConfigService.providers;
-  public readonly primaryProvider = this.providerConfigService.primaryProvider;
-  public readonly healthyFailoverCount = computed(
-    () => this.providerConfigService.healthyFailoverProviders().length,
-  );
+  public providers(): ProviderConfig[] {
+    return this.providerConfigService.providers();
+  }
+
+  public primaryProvider(): ProviderConfig | null {
+    return this.providerConfigService.primaryProvider();
+  }
+
+  public healthyFailoverCount(): number {
+    return this.providerConfigService.healthyFailoverProviders().length;
+  }
 
   public setPrimary(providerId: string): void {
     this.providerConfigService.setPrimary(providerId);
@@ -546,6 +657,7 @@ class PolicyScreen {}
     LiveRunScreen,
     BuilderScreen,
     ToolsScreen,
+    MemoryScreen,
     ProvidersScreen,
     PolicyScreen,
   ],
@@ -582,8 +694,10 @@ class PolicyScreen {}
           <screen-builder></screen-builder>
         } @else if (activeTab() === 'tools') {
           <screen-tools></screen-tools>
+        } @else if (activeTab() === 'memory') {
+          <screen-memory></screen-memory>
         } @else if (activeTab() === 'providers') {
-          <screen-providers></screen-providers>
+          <screen-providers [providerConfigService]="providerConfigService"></screen-providers>
         } @else if (activeTab() === 'policy') {
           <screen-policy></screen-policy>
         }
@@ -624,11 +738,14 @@ class PolicyScreen {}
   encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
+  public readonly providerConfigService = new ProviderConfigService();
+
   public readonly tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: 'home' },
     { id: 'liverun', label: 'Live Run', icon: 'activity' },
     { id: 'builder', label: 'Builder', icon: 'git-branch' },
     { id: 'tools', label: 'Catalog', icon: 'wrench' },
+    { id: 'memory', label: 'Memory', icon: 'database' },
     { id: 'providers', label: 'Providers', icon: 'server' },
     { id: 'policy', label: 'Policies', icon: 'shield' },
   ];
