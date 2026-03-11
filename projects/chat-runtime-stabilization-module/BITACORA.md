@@ -2,6 +2,10 @@
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:13 UTC
+  **Author:** Codex
+  **Entry:** State Change: Made controller-side injection explicit with `@Inject(ChatGatewayService)` so the dev runtime no longer depends on inferred constructor metadata for chat transport wiring.
+
 - **Timestamp:** 2026-03-11 16:11 UTC
   **Author:** Codex
   **Entry:** State Change: Removed the Nest provider-constructor ambiguity in `ChatGatewayService` so the backend controller now resolves a real service instance at runtime while tests still override fetch behavior through a subclass hook.

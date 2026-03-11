@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import type { Response } from 'express';
 
 import {
@@ -8,7 +8,10 @@ import {
 
 @Controller('chat')
 export class ChatController {
-  public constructor(private readonly chatGatewayService: ChatGatewayService) {}
+  public constructor(
+    @Inject(ChatGatewayService)
+    private readonly chatGatewayService: ChatGatewayService,
+  ) {}
 
   @Post('stream')
   public async stream(

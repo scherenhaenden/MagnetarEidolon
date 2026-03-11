@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:13 UTC
+  **Author:** Codex
+  **Entry:** State Change: Made `ChatController` inject `ChatGatewayService` explicitly with `@Inject(ChatGatewayService)` so the Nest dev runtime does not depend on decorator-metadata inference for controller wiring.
+
 - **Timestamp:** 2026-03-11 16:11 UTC
   **Author:** Codex
   **Entry:** State Change: Removed the NestJS dependency-injection ambiguity in `ChatGatewayService` by taking the fetch override out of the provider constructor. The service now exposes an internal fetch hook for tests while remaining a clean Nest provider at runtime.
