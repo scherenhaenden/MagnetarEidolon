@@ -49,6 +49,7 @@ The CLI must not duplicate business logic; it should consume the shared SDK/runt
 | `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` | Detailed plan for turning the TypeScript UI into a real runnable web and CLI surface. |
 | `projects/lm-studio-provider-module/` | Standalone planning module for the first local AI provider integration via LM Studio. |
 | `projects/in-app-chat-module/` | Standalone planning module for the embedded chat surface and testing workflows. |
+| `projects/provider-configuration-module/` | Standalone planning module for multi-provider configuration, primary/backup routing, and failover policy. |
 
 ## Transition Status
 The repository is in an active transition phase:
@@ -126,6 +127,7 @@ npm run build
 4. Formalize the **SDK contract** shared by the UI and CLI.
 5. Add **LM Studio** as the first concrete AI provider integration for local development and testing.
 6. Add an **in-app chat surface** so provider testing and real usage happen inside the product instead of only through placeholder views.
+7. Add **provider configuration UI** so multiple providers can be configured with primary and backup roles.
 
 ## Additional Information
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: technology choices and cross-platform rationale for Linux, macOS, and Windows.

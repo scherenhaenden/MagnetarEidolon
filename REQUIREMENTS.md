@@ -30,6 +30,8 @@ Build an agent platform that combines operational power with explicit human cont
 - **FR-15 (Should)**: The SDK should expose high-level commands and operations such as `run`, `status`, `approve`, `deny`, `logs`, and `trace`.
 - **FR-16 (Must)**: The provider layer must support at least one concrete local AI provider, with LM Studio as the first planned integration target.
 - **FR-17 (Must)**: Provider configuration and health status must be visible to the UI and testable through the in-app chat surface.
+- **FR-18 (Must)**: The UI must allow configuring more than one provider and assigning at least one primary provider plus one or more backups.
+- **FR-19 (Should)**: Provider ordering and failover priority should be visible and editable in the UI.
 
 ## Non-Functional Requirements (NFR)
 - **NFR-01 (Must)**: Linux/macOS/Windows portability.
@@ -39,6 +41,7 @@ Build an agent platform that combines operational power with explicit human cont
 - **NFR-05 (Should)**: Modular architecture that allows changing model providers and tool adapters without rewriting the system.
 - **NFR-06 (Must)**: Reasonable backward compatibility of the SDK contract across minor versions.
 - **NFR-07 (Must)**: Provider integrations must remain modular so LM Studio and future providers can be added or removed without coupling them to the chat UI module.
+- **NFR-08 (Must)**: Provider configuration state must remain independent from provider transport implementations so the UI can evolve without rewriting SDK adapters.
 
 ## Acceptance Criteria
 1. The user understands what the agent will do before executing risky actions.
