@@ -64,6 +64,10 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - provider unreachable
   - invalid model/config selection
   - successful generation from the embedded UI
+- Provider-configuration validation should also cover:
+  - one primary provider exists
+  - backups remain ordered for failover
+  - disabling the primary promotes the next eligible backup
 
 ### Testing the Tests
 - The TypeScript test system itself must be validated, not only the application code.

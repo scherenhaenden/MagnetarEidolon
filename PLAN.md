@@ -28,6 +28,7 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `ms-15` | SDK Contract Base | 2026-04-22 | ready | Shared contract between UI and CLI. |
 | `ms-17` | LM Studio Provider Integration | 2026-04-29 | ready | First concrete local AI provider integration through LM Studio. |
 | `ms-18` | In-App Chat Surface | 2026-05-02 | ready | Embedded chat UI for provider testing, debugging, and user-facing conversation flows. |
+| `ms-19` | Provider Configuration & Failover | 2026-05-06 | in_progress | Configure multiple AI providers, assign primary and backup roles, and prepare failover behavior. |
 | `ms-04` | Project Initialization | 2026-05-15 | done | Initial structure and governance files. |
 | `ms-05` | Core Implementation | 2026-06-01 | done | Historical base implementation; legacy Python code retired from the primary path. |
 | `ms-06` | Tool System | 2026-06-15 | done | Tool abstraction and OS tools. |
@@ -74,6 +75,10 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-chat-101` | `ms-18` | Define product chat workflow and acceptance criteria | Core Team | ready | Chat must support prompt entry, streamed responses, provider selection visibility, and execution context. |
 | `task-chat-102` | `ms-18` | Implement embedded chat panel/module in the Angular workspace | Core Team | planned | Treat chat as its own UI module, not a temporary placeholder. |
 | `task-chat-103` | `ms-18` | Add chat-driven test scenarios for provider validation and regression coverage | Core Team | planned | Use the in-app chat flow as the primary manual and automated provider verification path. |
+| `task-provider-101` | `ms-19` | Define provider configuration model and failover semantics | Core Team | in_review | Primary, backup, disabled, and priority semantics are now modeled in the UI workspace state layer. |
+| `task-provider-102` | `ms-19` | Implement provider configuration screen in Angular | Core Team | in_review | New Providers screen added to the shell with primary/backup/disable controls. |
+| `task-provider-103` | `ms-19` | Add state tests for provider ordering and failover eligibility | Core Team | in_review | Vitest now covers provider sorting, promotion, disablement, and badge-state mapping. |
+| `task-provider-104` | `ms-19` | Document runtime wiring path for multi-provider consumption | Core Team | planned | The SDK/runtime still needs to consume the UI-configured provider chain. |
 | `task-104` | `ms-03` | Define branching/WIP governance | Core Team | ready | Pending review. |
 | `task-105` | `ms-03` | Establish test/blocker controls | Core Team | in_progress | Draft escalation mechanisms. |
 | `task-201` | `ms-04` | Create canonical documentation files | Jules | done | RULES, PLAN, etc. |
@@ -98,6 +103,7 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 - **Stable SDK contract that guarantees functional parity between UI and CLI.**
 - **At least one real AI provider integrated end-to-end, starting with LM Studio.**
 - **A first-class in-app chat experience that validates provider behavior inside the product.**
+- **Configurable multi-provider routing with a clear primary/backup chain.**
 
 ## Cumulative Effort
 - **Total estimated effort**: 165 pts
