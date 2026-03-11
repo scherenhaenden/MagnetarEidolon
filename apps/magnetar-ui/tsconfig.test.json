@@ -1,8 +1,29 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": ".",
+    "baseUrl": ".",
+    "rootDir": "../..",
     "outDir": "dist-test",
+    "paths": {
+      "@magnetar/magnetar-sdk/agent": [
+        "../../packages/magnetar-sdk/src/agent.ts"
+      ],
+      "@magnetar/magnetar-sdk/interfaces": [
+        "../../packages/magnetar-sdk/src/interfaces.ts"
+      ],
+      "@magnetar/magnetar-sdk/models": [
+        "../../packages/magnetar-sdk/src/models.ts"
+      ],
+      "@magnetar/magnetar-sdk/providers/lm-studio": [
+        "../../packages/magnetar-sdk/src/providers/lm-studio.ts"
+      ],
+      "@magnetar/magnetar-sdk/tools/node-filesystem": [
+        "../../packages/magnetar-sdk/src/tools/node-filesystem.ts"
+      ],
+      "@magnetar/magnetar-sdk/tools/web-filesystem": [
+        "../../packages/magnetar-sdk/src/tools/web-filesystem.ts"
+      ]
+    },
     "types": [
       "node",
       "vitest/globals"

@@ -1,12 +1,12 @@
 # Testing Strategy for MagnetarEidolon
 
 ## Introduction
-This document describes the testing strategy for the MagnetarEidolon project, focused on the TypeScript SDK/application code and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to the canonical standards for documentation and process.
+This document describes the testing strategy for the MagnetarEidolon project, focused on the TypeScript SDK/application code and the governance model. This ensures that the `MagnetarModel` and `Agent Core` logic operate reliably and that the project adheres to its documentation and process standards.
 
 ## Governance and Documentation Testing
 
 ### Testing Objectives
-Ensure governance artifacts are complete, consistent, and operationally enforceable for canonical Magnetar projects.
+Ensure governance artifacts are complete, consistent, and operationally enforceable for this repository.
 
 ### Types of Tests
 - **Documentation integrity tests:** verify required files exist and contain expected section headers.
@@ -15,7 +15,7 @@ Ensure governance artifacts are complete, consistent, and operationally enforcea
 - **Process tests (manual/audit):** verify `BITACORA.md` chronology and blocker lifecycle compliance.
 
 ### Code Coverage Targets
-- **Automated checks coverage target:** 90% of canonical governance rules represented by machine-checkable assertions.
+- **Automated checks coverage target:** 90% of governance rules represented by machine-checkable assertions.
 - **Minimum accepted threshold:** 80% before release tagging.
 
 ## TypeScript SDK Testing Strategy (New)
@@ -29,7 +29,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
     - **Focus**: Pure functions, state models, and individual agent logic steps.
     - **Tooling**: `Vitest`.
     - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
-    - **Requirement**: Ningun codigo en `packages/magnetar-sdk/src/` puede mergearse sin cobertura completa del modulo afectado; mientras exista codigo compartido aun dentro de la UI, aplica la misma exigencia a ese path temporal.
+    - **Requirement**: No code in `packages/magnetar-sdk/src/` may be merged without complete coverage for the affected module. While shared code still lives temporarily inside the UI workspace, the same standard applies there.
 
 2.  **Integration Tests**
     - **Focus**: Interaction between `MagnetarAgent`, `Tool` adapters, and `MemoryStore`.
@@ -55,6 +55,23 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - run unit tests in CI mode
   - run TypeScript typecheck/build validation
   - upload test/coverage artifacts on failure
+
+### Next Interactive Validation Target
+- The next provider-facing validation surface should be an in-app chat flow, not only CLI smoke commands.
+- LM Studio is the first planned concrete provider target for this path.
+- Chat-driven validation should cover:
+  - chat tab shell renders and remains navigable
+  - provider reachable and healthy
+  - provider unreachable
+  - invalid model/config selection
+  - successful generation from the embedded UI
+  - structured blocks such as code and quotes render predictably
+  - copy actions return exact source content for code and prompt snippets
+  - streaming preserves scroll stability during incremental rendering
+- Provider-configuration validation should also cover:
+  - one primary provider exists
+  - backups remain ordered for failover
+  - disabling the primary promotes the next eligible backup
 
 ### Testing the Tests
 - The TypeScript test system itself must be validated, not only the application code.

@@ -26,6 +26,9 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `ms-13` | Observability & Replay | 2026-05-08 | planned | Execution tracing and replay. |
 | `ms-14` | Console CLI Operations | 2026-04-17 | ready | Unified command-line interface. |
 | `ms-15` | SDK Contract Base | 2026-04-22 | ready | Shared contract between UI and CLI. |
+| `ms-17` | LM Studio Provider Integration | 2026-04-29 | ready | First concrete local AI provider integration through LM Studio. |
+| `ms-18` | In-App Chat Surface | 2026-05-02 | ready | Embedded chat UI for provider testing, debugging, and user-facing conversation flows. |
+| `ms-19` | Provider Configuration & Failover | 2026-05-06 | in_progress | Configure multiple AI providers, assign primary and backup roles, and prepare failover behavior. |
 | `ms-04` | Project Initialization | 2026-05-15 | done | Initial structure and governance files. |
 | `ms-05` | Core Implementation | 2026-06-01 | done | Historical base implementation; legacy Python code retired from the primary path. |
 | `ms-06` | Tool System | 2026-06-15 | done | Tool abstraction and OS tools. |
@@ -65,6 +68,20 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-1402` | `ms-14` | Verify cross-platform CLI behavior | Core Team | planned | Linux/macOS/Windows. |
 | `task-1501` | `ms-15` | Define the unified SDK contract | Core Team | in_progress | `packages/magnetar-sdk` is becoming the shared contract package. |
 | `task-1502` | `ms-15` | Publish the integration guide | Core Team | in_progress | Document consumption from the UI and future CLI clients. |
+| `task-lm-101` | `ms-17` | Define LM Studio provider contract and configuration model | Core Team | in_review | Base URL, model identifier, timeout, healthcheck, and local-only defaults are documented in the SDK adapter and module docs. |
+| `task-lm-102` | `ms-17` | Implement LM Studio adapter through the shared provider abstraction | Core Team | in_review | Initial SDK adapter added under `packages/magnetar-sdk/src/providers/lm-studio.ts`. |
+| `task-lm-103` | `ms-17` | Add provider smoke tests and local setup docs for LM Studio | Core Team | in_review | Tests and integration notes now cover models, completions, healthcheck, and failure mapping. |
+| `task-lm-104` | `ms-17` | Validate LM Studio path through repeatable smoke coverage | Core Team | in_review | Vitest coverage added for request shape, model listing, healthcheck, and error cases. |
+| `task-chat-101` | `ms-18` | Define chat tab IA and UX acceptance criteria | Core Team | in_review | Chat must be a top-level tab with explicit provider visibility, conversation flow, and message actions. |
+| `task-chat-102` | `ms-18` | Implement Angular chat tab shell and layout regions | Core Team | in_progress | Chat tab, conversation rail, stream column, and canvas side panel baseline now exist in the Angular shell. |
+| `task-chat-103` | `ms-18` | Implement conversation state and provider session model | Core Team | in_progress | `ChatSessionService` now tracks prompt, response, streaming, provider identity, and canvas state. |
+| `task-chat-104` | `ms-18` | Implement structured chat block rendering baseline | Core Team | in_progress | Headings, paragraphs, lists, quotes, code blocks, copy actions, and canvas extraction are now modeled and rendered. |
+| `task-chat-105` | `ms-18` | Define canvas/document side panel mode | Core Team | planned | Specify how longer-form generated artifacts move from the chat stream into an editable side workspace. |
+| `task-chat-106` | `ms-18` | Add streaming and provider-validation test plan | Core Team | in_progress | Deterministic parser and chat-session tests now exist; provider-connected UI validation still remains. |
+| `task-provider-101` | `ms-19` | Define provider configuration model and failover semantics | Core Team | in_review | Primary, backup, disabled, and priority semantics are now modeled in the UI workspace state layer. |
+| `task-provider-102` | `ms-19` | Implement provider configuration screen in Angular | Core Team | in_review | New Providers screen added to the shell with primary/backup/disable controls. |
+| `task-provider-103` | `ms-19` | Add state tests for provider ordering and failover eligibility | Core Team | in_review | Vitest now covers provider sorting, promotion, disablement, and badge-state mapping. |
+| `task-provider-104` | `ms-19` | Document runtime wiring path for multi-provider consumption | Core Team | planned | The SDK/runtime still needs to consume the UI-configured provider chain. |
 | `task-104` | `ms-03` | Define branching/WIP governance | Core Team | ready | Pending review. |
 | `task-105` | `ms-03` | Establish test/blocker controls | Core Team | in_progress | Draft escalation mechanisms. |
 | `task-201` | `ms-04` | Create canonical documentation files | Jules | done | RULES, PLAN, etc. |
@@ -87,6 +104,9 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 - Low-friction recipe reuse.
 - **Operational console CLI as a verifiable fallback and automation channel.**
 - **Stable SDK contract that guarantees functional parity between UI and CLI.**
+- **At least one real AI provider integrated end-to-end, starting with LM Studio.**
+- **A first-class in-app chat experience that validates provider behavior inside the product.**
+- **Configurable multi-provider routing with a clear primary/backup chain.**
 
 ## Cumulative Effort
 - **Total estimated effort**: 165 pts

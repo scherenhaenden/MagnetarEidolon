@@ -1,4 +1,4 @@
-# Canonical Project Schema for MagnetarEidolon
+# Project Schema for MagnetarEidolon
 # This file serves as the template for defining new projects or sub-projects.
 
 metadata:
@@ -33,7 +33,7 @@ milestones:
   - id: "ms-04"
     name: "Project Initialization & Governance"
     target_date: "2026-05-15"
-    description: "Establish the canonical project structure and governance files."
+    description: "Establish the project structure and governance files."
     status: "planned"
   - id: "ms-05"
     name: "Core Architecture Implementation"
@@ -58,7 +58,7 @@ milestones:
 
 tasks:
   - id: "task-101"
-    title: "Create canonical documentation baseline"
+    title: "Create documentation baseline"
     owner: "Core Team"
     state: "done"
   - id: "task-102"
@@ -79,7 +79,7 @@ tasks:
     state: "in_progress"
   - id: "task-201"
     milestone_id: "ms-04"
-    title: "Create Canonical Documentation Files"
+    title: "Create Documentation Files"
     owner: "Jules"
     status: "planned"
   - id: "task-202"
