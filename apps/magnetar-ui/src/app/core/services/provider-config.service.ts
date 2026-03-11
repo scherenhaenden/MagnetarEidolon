@@ -77,10 +77,6 @@ export class ProviderConfigService {
   }
 
   public setBackup(providerId: string): void {
-    const wasPrimary = this.providerState().some(
-      (provider) => provider.id === providerId && provider.role === 'primary',
-    );
-
     this.providerState.update((providers) =>
       providers.map((provider) =>
         provider.id === providerId
@@ -92,7 +88,7 @@ export class ProviderConfigService {
           : provider,
       ),
     );
-    this.ensurePrimaryExists(wasPrimary ? providerId : undefined);
+    this.ensurePrimaryExists();
     this.normalizePriorities();
   }
 
@@ -127,13 +123,13 @@ export class ProviderConfigService {
     }
   }
 
-  private ensurePrimaryExists(excludedProviderId?: string): void {
+  private ensurePrimaryExists(): void {
     if (this.providerState().some((provider) => provider.role === 'primary')) {
       return;
     }
 
     const firstBackup = sortProvidersByPriority(this.providerState()).find(
-      (provider) => provider.role === 'backup' && provider.id !== excludedProviderId,
+      (provider) => provider.role === 'backup',
     );
 
     if (!firstBackup) {
