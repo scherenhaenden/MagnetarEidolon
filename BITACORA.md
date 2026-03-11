@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 11:18 UTC
+  **Author:** Codex
+  **Entry:** Decision: Documented an explicit OOP-first engineering rule in the root project standards. Runtime and domain logic should prefer classes/services, while standalone functions are reserved for pure stateless helpers and side effects must remain isolated at boundary layers.
+
 - **Timestamp:** 2026-03-11 10:05 UTC
   **Author:** Codex
   **Entry:** State Change: Added the first provider-configuration UI slice on `feature/provider-config-ui`, including multi-provider state modeling, primary/backup/disabled roles, ordering tests, and a new standalone planning module for provider configuration and failover.

@@ -127,14 +127,18 @@ export class ProviderConfigService {
     }
   }
 
-  private ensurePrimaryExists(excludedProviderId?: string): void {
+  private ensurePrimaryExists(preferredFallbackProviderId?: string): void {
     if (this.providerState().some((provider) => provider.role === 'primary')) {
       return;
     }
 
-    const firstBackup = sortProvidersByPriority(this.providerState()).find(
-      (provider) => provider.role === 'backup' && provider.id !== excludedProviderId,
-    );
+    const orderedProviders = sortProvidersByPriority(this.providerState());
+    const firstBackup =
+      orderedProviders.find(
+        (provider) =>
+          provider.role === 'backup' && provider.id !== preferredFallbackProviderId,
+      ) ??
+      orderedProviders.find((provider) => provider.role === 'backup');
 
     if (!firstBackup) {
       return;
