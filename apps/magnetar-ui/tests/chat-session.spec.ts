@@ -330,6 +330,20 @@ describe('ChatSessionService', () => {
     expect(service.messages().at(-1)?.rawText).toBe('tail');
   });
 
+  it('handles an empty trailing stream buffer without failing', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse(['data: {"type":"content.delta","content":"ok"}\n\n', '\n\n', 'data: [DONE]\n\n']),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('ok');
+  });
+
   it('accepts trailing LM Studio content from message.content when delta is absent', async () => {
     const fetchMock = vi.fn(async () =>
       createSseResponse(['data: {"type":"content.delta","content":"fallback tail"}']),

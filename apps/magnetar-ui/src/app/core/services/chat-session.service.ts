@@ -319,7 +319,7 @@ export class ChatSessionService {
 
         buffer += decoder.decode(value, { stream: true });
         const segments = buffer.split('\n\n');
-        buffer = segments.pop() as string;
+        buffer = segments.splice(-1, 1).join('');
 
         for (const segment of segments) {
           const data = parseSseEvent(segment);
