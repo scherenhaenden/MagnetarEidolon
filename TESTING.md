@@ -60,10 +60,14 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 - The next provider-facing validation surface should be an in-app chat flow, not only CLI smoke commands.
 - LM Studio is the first planned concrete provider target for this path.
 - Chat-driven validation should cover:
+  - chat tab shell renders and remains navigable
   - provider reachable and healthy
   - provider unreachable
   - invalid model/config selection
   - successful generation from the embedded UI
+  - structured blocks such as code and quotes render predictably
+  - copy actions return exact source content for code and prompt snippets
+  - streaming preserves scroll stability during incremental rendering
 - Provider-configuration validation should also cover:
   - one primary provider exists
   - backups remain ordered for failover

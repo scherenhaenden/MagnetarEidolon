@@ -18,6 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 12:42 UTC
+  **Author:** Codex
+  **Entry:** State Change: Began implementation of the in-app chat module in the Angular shell. Added a dedicated Chat tab, `ChatSessionService`, structured message parsing/rendering, deterministic streaming behavior, a canvas side panel baseline, and 100% test coverage for the new chat state/model layer.
+
+- **Timestamp:** 2026-03-11 12:35 UTC
+  **Author:** Codex
+  **Entry:** Decision: Expanded the in-app chat planning module into a concrete delivery plan with a dedicated Chat tab, structured message rendering, streaming-validation requirements, and a future canvas/document side panel. Root roadmap, requirements, architecture, testing, and status docs were synchronized accordingly.
+
 - **Timestamp:** 2026-03-11 11:18 UTC
   **Author:** Codex
   **Entry:** Decision: Documented an explicit OOP-first engineering rule in the root project standards. Runtime and domain logic should prefer classes/services, while standalone functions are reserved for pure stateless helpers and side effects must remain isolated at boundary layers.

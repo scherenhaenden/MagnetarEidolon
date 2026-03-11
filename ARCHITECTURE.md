@@ -55,6 +55,7 @@ The architecture prioritizes three properties: **human control**, **full traceab
 - **Memory System**: immediate context plus persistent memory for reusable learning.
 - **CLI Interface**: official console and automation channel, plus the no-UI fallback.
 - **Chat Module**: first-class in-app interaction surface for prompt/response flows, provider testing, and runtime diagnostics.
+- **Canvas / Document Panel**: optional secondary workspace for generated artifacts that should diverge from the linear conversation stream.
 
 ## Design Decisions
 1. UI and CLI share the same execution contract and state semantics through the SDK.
@@ -67,6 +68,7 @@ The architecture prioritizes three properties: **human control**, **full traceab
 8. Provider configuration must be multi-provider from the start, with explicit primary and backup semantics.
 9. Runtime architecture is OOP-first: stateful orchestration belongs in explicit classes/services, while free functions should remain limited to pure stateless helpers.
 10. Side effects must stay at boundary layers so domain logic can be reasoned about and tested through pure methods whenever possible.
+11. Chat rendering should use semantic block components instead of direct raw-text injection so rich outputs remain testable and evolvable.
 
 ## Target Repository Structure
 - `apps/magnetar-ui`: product shell for Dashboard, Live Execution, Builder, Memory, and Policy Center.
