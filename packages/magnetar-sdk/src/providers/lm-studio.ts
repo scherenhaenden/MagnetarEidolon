@@ -148,8 +148,8 @@ export class LMStudioProvider implements LLMProvider {
     const response = await this.fetchWithTimeout(this.buildUrl(path), {
       method: body ? 'POST' : 'GET',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
       },
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
