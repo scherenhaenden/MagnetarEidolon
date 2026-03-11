@@ -35,6 +35,7 @@ Build an agent platform that combines operational power with explicit human cont
 - **FR-19 (Should)**: Provider ordering and failover priority should be visible and editable in the UI.
 - **FR-20 (Must)**: The chat UI must render structured content such as headings, lists, quotes, code blocks, and provider/tool output blocks.
 - **FR-21 (Should)**: The chat architecture should reserve a canvas or document side-panel mode for generated artifacts that should be edited outside the linear message stream.
+- **FR-22 (Must)**: Browser-facing provider traffic must go through a backend/BFF boundary instead of calling local AI providers directly from the Angular UI.
 
 ## Non-Functional Requirements (NFR)
 - **NFR-01 (Must)**: Linux/macOS/Windows portability.
@@ -48,6 +49,7 @@ Build an agent platform that combines operational power with explicit human cont
 - **NFR-09 (Must)**: Implementation should be OOP-first for runtime and domain layers, with side effects isolated at explicit boundaries.
 - **NFR-10 (Must)**: Methods and helper functions should remain pure by default; standalone functions are preferred only when they are stateless pure functions.
 - **NFR-11 (Must)**: Streaming chat responses must preserve layout stability and keep partial rendering readable while responses are still incomplete.
+- **NFR-12 (Must)**: Secrets, provider host routing, and provider-specific HTTP contracts must remain on the backend/BFF side so the browser UI stays provider-agnostic.
 
 ## Acceptance Criteria
 1. The user understands what the agent will do before executing risky actions.

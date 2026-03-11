@@ -38,6 +38,20 @@ interface LMStudioChatCompletionResponse {
   error?: {
     message?: string;
   };
+  output?: Array<{
+    type?: string;
+    content?: string;
+  }>;
+}
+
+interface BackendChatStreamRequest {
+  prompt: string;
+  provider: {
+    baseUrl: string;
+    model: string;
+    apiStyle: 'native' | 'openai-compatible';
+    apiKey: string | null;
+  };
 }
 
 const WELCOME_MESSAGE = buildAssistantMessage(
@@ -75,7 +89,7 @@ export class ChatSessionService {
 
   public constructor(
     private readonly providerConfigService: ProviderConfigService,
-    private readonly fetchFn: FetchLike = fetch,
+    private readonly fetchFn: FetchLike = globalThis.fetch.bind(globalThis),
   ) {}
 
   public setDraft(value: string): void {
@@ -245,17 +259,14 @@ export class ChatSessionService {
     provider: ProviderConfig,
     assistantMessageId: string,
   ): Promise<void> {
-    const response = await this.fetchFn(`${provider.baseUrl.replace(/\/+$/, '')}/chat/completions`, {
+    const request = this.buildBackendChatRequest(prompt, provider);
+    const response = await this.fetchFn('/api/chat/stream', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer lm-studio',
+        Accept: 'text/event-stream',
       },
-      body: JSON.stringify({
-        model: provider.model,
-        messages: [{ role: 'user', content: prompt }],
-        stream: true,
-      }),
+      body: JSON.stringify(request),
     });
 
     if (!response.ok) {
@@ -320,12 +331,12 @@ export class ChatSessionService {
           }
 
           const payload = JSON.parse(data) as LMStudioChatCompletionResponse;
-          const delta = payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
-          if (typeof delta !== 'string' || delta.length === 0) {
+          const nextText = extractStreamText(payload);
+          if (typeof nextText !== 'string' || nextText.length === 0) {
             continue;
           }
 
-          accumulatedContent += delta;
+          accumulatedContent = mergeStreamText(accumulatedContent, nextText);
           this.appendAssistantChunk(liveStream.messageId, accumulatedContent);
         }
       }
@@ -334,9 +345,9 @@ export class ChatSessionService {
       const trailingData = parseSseEvent(buffer);
       if (trailingData && trailingData !== '[DONE]') {
         const payload = JSON.parse(trailingData) as LMStudioChatCompletionResponse;
-        const delta = payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
-        if (typeof delta === 'string' && delta.length > 0) {
-          accumulatedContent += delta;
+        const nextText = extractStreamText(payload);
+        if (typeof nextText === 'string' && nextText.length > 0) {
+          accumulatedContent = mergeStreamText(accumulatedContent, nextText);
           this.appendAssistantChunk(liveStream.messageId, accumulatedContent);
         }
       }
@@ -421,6 +432,21 @@ export class ChatSessionService {
   private async resolveSyntheticResponseText(prompt: string, provider: ProviderConfig): Promise<string> {
     return generateAssistantResponse(prompt, provider.name);
   }
+
+  private buildBackendChatRequest(
+    prompt: string,
+    provider: ProviderConfig,
+  ): BackendChatStreamRequest {
+    return {
+      prompt,
+      provider: {
+        baseUrl: provider.baseUrl,
+        model: provider.model,
+        apiStyle: provider.apiStyle,
+        apiKey: null,
+      },
+    };
+  }
 }
 
 function buildUserMessage(id: string, prompt: string): ChatMessage {
@@ -474,6 +500,29 @@ function parseSseEvent(eventChunk: string): string | null {
     .trim();
 
   return payload || null;
+}
+
+function extractStreamText(payload: LMStudioChatCompletionResponse): string | null {
+  const openAiCompatibleText =
+    payload.choices?.[0]?.delta?.content ?? payload.choices?.[0]?.message?.content;
+  if (typeof openAiCompatibleText === 'string' && openAiCompatibleText.length > 0) {
+    return openAiCompatibleText;
+  }
+
+  const nativeOutputText = (payload.output ?? [])
+    .filter((item) => item.type === 'message' || item.type === 'reasoning')
+    .map((item) => item.content ?? '')
+    .join('');
+
+  return nativeOutputText.length > 0 ? nativeOutputText : null;
+}
+
+function mergeStreamText(previousText: string, nextText: string): string {
+  if (nextText.startsWith(previousText)) {
+    return nextText;
+  }
+
+  return `${previousText}${nextText}`;
 }
 
 function generateAssistantResponse(prompt: string, providerLabel: string): string {

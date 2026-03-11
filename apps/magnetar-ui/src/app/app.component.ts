@@ -478,6 +478,7 @@ class ToolsScreen {
           <textarea
             [value]="chatSessionService.draft()"
             (input)="updateDraft($event)"
+            (keydown)="handlePromptKeydown($event)"
             rows="4"
             placeholder="Ask MagnetarEidolon to plan, explain, generate code, or validate a provider path..."
             class="w-full rounded-2xl border border-white/10 bg-[#050508] px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500/40"></textarea>
@@ -556,6 +557,15 @@ export class ChatScreen {
     if (!didStart) {
       return;
     }
+  }
+
+  public handlePromptKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    void this.submitPrompt();
   }
 
   public copyMessage(message: ChatMessage): void {

@@ -248,8 +248,12 @@ describe('ChatSessionService', () => {
     await service.waitForIdle();
 
     expect(fetchMock).toHaveBeenCalledOnce();
+    expect((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[0]).toBe('/api/chat/stream');
     expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"stream":true',
+      '"prompt":"Generate a SQL migration"',
+    );
+    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
+      '"baseUrl":"http://127.0.0.1:1234/api/v1"',
     );
     expect(service.messages()[2].phase).toBe('complete');
     expect(service.canvasDocument()).not.toBeNull();
@@ -332,6 +336,67 @@ describe('ChatSessionService', () => {
 
     expect(service.messages().at(-1)?.phase).toBe('complete');
     expect(service.messages().at(-1)?.rawText).toBe('fallback tail');
+  });
+
+  it('accepts native LM Studio output items while streaming', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"output":[{"type":"message","content":"Native "}]}\n\n',
+        'data: {"output":[{"type":"message","content":"Native output"}]}\n\n',
+        'data: [DONE]\n\n',
+      ]),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Generate code')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('Native output');
+  });
+
+  it('ignores empty native output items and accepts reasoning output content', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"output":[{"type":"message"},{"type":"reasoning","content":"Reasoned output"}]}\n\n',
+        'data: [DONE]\n\n',
+      ]),
+    );
+
+    const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+
+    expect(await service.submitPrompt('Explain this')).toBe(true);
+    await service.waitForIdle();
+
+    expect(service.messages().at(-1)?.phase).toBe('complete');
+    expect(service.messages().at(-1)?.rawText).toBe('Reasoned output');
+  });
+
+  it('builds a backend chat request for OpenAI-compatible LM Studio providers', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+
+    const request = (service as any).buildBackendChatRequest('hello', {
+      id: 'provider-lmstudio-openai',
+      name: 'LM Studio Compat',
+      kind: 'lm_studio',
+      baseUrl: 'http://localhost:1234/v1',
+      model: 'qwen/test',
+      role: 'primary',
+      priority: 1,
+      health: 'healthy',
+      apiStyle: 'openai-compatible',
+    });
+
+    expect(request).toEqual({
+      prompt: 'hello',
+      provider: {
+        baseUrl: 'http://localhost:1234/v1',
+        model: 'qwen/test',
+        apiStyle: 'openai-compatible',
+        apiKey: null,
+      },
+    });
   });
 
   it('ignores empty trailing LM Studio payloads when prior content already exists', async () => {

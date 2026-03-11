@@ -18,6 +18,14 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 15:35 UTC
+  **Author:** Codex
+  **Entry:** Decision: Introduced a dedicated NestJS backend-for-frontend in `apps/magnetar-api` so the Angular chat UI no longer needs to call LM Studio directly. The backend now owns the LM Studio request boundary and stream forwarding path, and root `npm run dev` was updated to boot backend plus UI together.
+
+- **Timestamp:** 2026-03-11 15:40 UTC
+  **Author:** Codex
+  **Entry:** Decision: Added a dedicated chat-runtime stabilization planning module so the remaining work from partial integration to reliable end-to-end chat behavior is tracked explicitly in milestones, tasks, and acceptance steps.
+
 - **Timestamp:** 2026-03-11 15:15 UTC
   **Author:** Codex
   **Entry:** State Change: Replaced the chat tab's fake LM Studio post-completion chunking with real SSE-based streaming in `ChatSessionService`. The Angular chat UI now updates assistant messages incrementally from LM Studio responses, and the automated test suite was expanded to cover stream success, partial updates, malformed events, missing bodies, fallback message-content frames, and stream-finalization edge cases at 100% coverage.

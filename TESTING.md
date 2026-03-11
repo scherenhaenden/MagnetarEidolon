@@ -60,6 +60,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
 - The next provider-facing validation surface should be an in-app chat flow, not only CLI smoke commands.
 - LM Studio is the first planned concrete provider target for this path.
 - Chat-driven validation should cover:
+  - Angular UI reaches providers only through the backend/BFF layer
   - chat tab shell renders and remains navigable
   - provider reachable and healthy
   - provider unreachable
@@ -71,6 +72,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - streaming preserves scroll stability during incremental rendering
   - stream termination without `[DONE]` is handled safely
   - stream parse failures surface as user-visible assistant errors instead of silent stalls
+  - root `npm run dev` boots the backend and UI required for chat validation
 - Provider-configuration validation should also cover:
   - one primary provider exists
   - backups remain ordered for failover
