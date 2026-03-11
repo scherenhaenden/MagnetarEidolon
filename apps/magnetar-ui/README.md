@@ -30,7 +30,7 @@ npm run setup
 npm run dev
 ```
 
-There is no separate backend service to boot yet. `npm run dev` starts the Angular UI workspace, and `npm run cli:dev -- <command>` runs the TypeScript CLI through the same shared SDK boundary.
+The UI now expects the NestJS backend in `apps/magnetar-api` for provider/chat traffic. Root `npm run dev` starts both services together, and `npm run cli:dev -- <command>` still runs the TypeScript CLI through the same shared SDK boundary.
 
 ## CLI Usage
 ```bash
@@ -54,6 +54,6 @@ npm run build
 - `npm run cli:dev` is the direct development CLI path.
 - `npm run cli` runs the compiled CLI from `dist/`.
 - Local startup still requires `npm install`; no-install delivery remains a later distribution concern.
-- Root-level wrappers exist for the same flows: `npm run dev`, `npm run cli:dev -- about`, `npm run build`.
+- Root-level wrappers exist for the same flows: `npm run dev`, `npm run dev:api`, `npm run cli:dev -- about`, `npm run build`.
 
 > Note: This workspace is still transitional. The UI layout is product-aligned, the shared runtime extraction to `packages/magnetar-sdk` has started, and the web runtime is now being initialized around the existing UI rather than replacing it.

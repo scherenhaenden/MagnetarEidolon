@@ -12,6 +12,12 @@ The architecture prioritizes three properties: **human control**, **full traceab
               |
               v
 +-----------------------------+
+| Backend / BFF Layer         |
+| API proxy / stream gateway  |
++-------------+---------------+
+              |
+              v
++-----------------------------+
 | Orchestrator / Agent Core   |
 | plan -> decide -> act       |
 +------+------+---------------+
@@ -46,6 +52,7 @@ The architecture prioritizes three properties: **human control**, **full traceab
 ## Key Components
 - **UX Layer**: primary interface for onboarding, execution, and debugging.
 - **Agent Core**: executes goals step by step and updates serializable cognitive state.
+- **Backend / BFF Layer**: browser-safe HTTP boundary that owns provider calls, stream forwarding, and future auth/secrets handling.
 - **Policy Gate**: decides when approval is required and applies risk rules.
 - **Observability Hub**: captures events, decisions, costs, and auditable evidence.
 - **Tool Runtime**: cross-platform adapters for filesystem, shell, web, and connectors.
@@ -72,6 +79,7 @@ The architecture prioritizes three properties: **human control**, **full traceab
 
 ## Target Repository Structure
 - `apps/magnetar-ui`: product shell for Dashboard, Live Execution, Builder, Memory, and Policy Center.
+- `apps/magnetar-api`: NestJS backend-for-frontend for chat/provider endpoints and future server-side integrations.
 - `packages/magnetar-sdk`: shared contract/runtime for state, agent logic, tools, and operations consumed by UI and CLI.
 - `projects/lm-studio-provider-module`: planning and architecture module for the first real local-provider integration.
 - `projects/in-app-chat-module`: planning and architecture module for the first embedded chat experience.
