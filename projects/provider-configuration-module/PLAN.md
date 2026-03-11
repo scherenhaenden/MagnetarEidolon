@@ -20,4 +20,4 @@
 - **Completed (`done`):** 0 pts
 - **In review:** 10 pts
 - **In progress:** 0 pts
-- **Remaining to done:** 13 pts
+- **Remaining to do:** 13 pts
