@@ -24,3 +24,4 @@
 ## Log Entry (BITACORA.md candidate)
 - **2026-03-11 12:35**: Expanded the in-app chat module planning and aligned root project docs in branch `feature/chat-module-planning-and-issues`.
 - **2026-03-11 12:42**: Began implementation of the chat baseline in the Angular shell, including LM Studio-backed requests for the local provider path and full automated coverage for the new chat model/service layer.
+- **2026-03-11 14:05**: Added reusable progress tables to `STATUS.md` and clarified legacy voice-planning records so the historical Python track is preserved while the active target is TypeScript/Angular.

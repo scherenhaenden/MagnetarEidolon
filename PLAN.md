@@ -94,8 +94,8 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-501` | `ms-07` | LiteLLM provider | Jules | done | |
 | `task-502` | `ms-07` | ChromaDB memory setup | Jules | done | |
 | `task-601` | `ms-08` | Build CLI with Typer | Jules | done | |
-| `task-voice-101` | `ms-voice-01` | Voice UI structural setup | Jules | in_progress | |
-| `task-voice-102` | `ms-voice-01` | Voice UI logic and interface | Jules | planned | |
+| `task-voice-101` | `ms-voice-01` | Re-scope voice UI foundations for the TypeScript workspace | Jules | in_progress | Legacy Python/Poetry/Gradio setup was superseded by the Angular workspace. Remaining work is to define the TS voice module structure, provider boundaries, browser/runtime constraints, and acceptance criteria. |
+| `task-voice-102` | `ms-voice-01` | Implement voice capture and interaction flow in the TypeScript UI | Jules | planned | Depends on the TypeScript re-scope. No Angular voice capture, transcription, or interaction flow is implemented yet. |
 
 ## Success Criteria
 - First useful automation in under 15 minutes.
