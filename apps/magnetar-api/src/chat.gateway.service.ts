@@ -76,8 +76,6 @@ interface FetchLike {
 
 @Injectable()
 export class ChatGatewayService {
-  public constructor(private readonly fetchFn: FetchLike = fetch) {}
-
   public async streamChat(
     request: BackendChatRequest,
     response: ExpressResponse,
@@ -313,5 +311,13 @@ export class ChatGatewayService {
 
   private writeBackendEvent(event: BackendStreamEvent, response: ExpressResponse): void {
     response.write(`data: ${JSON.stringify(event)}\n\n`);
+  }
+
+  protected getFetchFn(): FetchLike {
+    return fetch;
+  }
+
+  private get fetchFn(): FetchLike {
+    return this.getFetchFn();
   }
 }

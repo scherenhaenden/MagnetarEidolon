@@ -8,6 +8,16 @@ import {
   type BackendChatRequest,
 } from './chat.gateway.service.js';
 
+class TestChatGatewayService extends ChatGatewayService {
+  public constructor(private readonly mockedFetchFn: (input: string, init?: RequestInit) => Promise<globalThis.Response>) {
+    super();
+  }
+
+  protected override getFetchFn(): (input: string, init?: RequestInit) => Promise<globalThis.Response> {
+    return this.mockedFetchFn;
+  }
+}
+
 function createSseResponse(chunks: string[], status = 200): globalThis.Response {
   const encoder = new TextEncoder();
 
@@ -120,7 +130,7 @@ test('ChatGatewayService normalizes native LM Studio deltas for the browser', as
     ]);
   };
 
-  const service = new ChatGatewayService(fetchMock);
+  const service = new TestChatGatewayService(fetchMock);
   const recorder = createResponseRecorder();
 
   await service.streamChat(createBackendRequest(), recorder.response);
@@ -146,7 +156,7 @@ test('ChatGatewayService normalizes OpenAI-compatible deltas for the browser', a
       'data: [DONE]\n\n',
     ]);
 
-  const service = new ChatGatewayService(fetchMock);
+  const service = new TestChatGatewayService(fetchMock);
   const recorder = createResponseRecorder();
 
   await service.streamChat(
@@ -174,7 +184,7 @@ test('ChatGatewayService returns upstream errors before opening the SSE stream',
       },
     });
 
-  const service = new ChatGatewayService(fetchMock);
+  const service = new TestChatGatewayService(fetchMock);
   const recorder = createResponseRecorder();
 
   await service.streamChat(createBackendRequest(), recorder.response);
