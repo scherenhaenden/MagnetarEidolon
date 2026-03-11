@@ -22,6 +22,14 @@ This repository holds the documentation and technical baseline needed to turn th
 4. Permanent human control.
 5. Explicit, editable, governable memory.
 6. A premium command-center style experience.
+7. OOP-first implementation discipline, with pure methods and pure helper functions preferred whenever behavior does not require side effects.
+
+## Engineering Rules
+- Runtime and domain behavior should default to classes and explicit object boundaries instead of ad hoc procedural sprawl.
+- Methods should stay pure whenever they can operate only on inputs and controlled state transitions.
+- Standalone functions should be introduced only when they are stateless, pure helpers with no hidden side effects.
+- Side effects such as filesystem access, network calls, UI bridges, and process execution must stay isolated at clear boundary layers.
+- Pull requests that add avoidable side effects or procedural duplication should be treated as architecture regressions.
 
 ## Product Modes
 - **Execution Mode**: complete goals quickly.
@@ -47,6 +55,9 @@ The CLI must not duplicate business logic; it should consume the shared SDK/runt
 | `STATUS.md` | Current status, risks, and immediate commitments. |
 | `TESTING.md` | Technical and product validation strategy. |
 | `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` | Detailed plan for turning the TypeScript UI into a real runnable web and CLI surface. |
+| `projects/lm-studio-provider-module/` | Standalone planning module for the first local AI provider integration via LM Studio. |
+| `projects/in-app-chat-module/` | Standalone planning module for the embedded chat surface and testing workflows. |
+| `projects/provider-configuration-module/` | Standalone planning module for multi-provider configuration, primary/backup routing, and failover policy. |
 
 ## Transition Status
 The repository is in an active transition phase:
@@ -122,6 +133,10 @@ npm run build
 2. Guarantee traceability for sensitive actions with human approval.
 3. Keep the **console CLI** as the official operations and diagnostics interface.
 4. Formalize the **SDK contract** shared by the UI and CLI.
+5. Add **LM Studio** as the first concrete AI provider integration for local development and testing.
+6. Add an **in-app chat surface** so provider testing and real usage happen inside the product instead of only through placeholder views.
+7. Add **provider configuration UI** so multiple providers can be configured with primary and backup roles.
+8. Land a dedicated **Chat** tab with structured rendering, streaming, and a future canvas/document side panel.
 
 ## Additional Information
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: technology choices and cross-platform rationale for Linux, macOS, and Windows.
