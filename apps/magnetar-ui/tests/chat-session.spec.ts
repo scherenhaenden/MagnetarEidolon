@@ -253,7 +253,13 @@ describe('ChatSessionService', () => {
       '"prompt":"Generate a SQL migration"',
     );
     expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"baseUrl":"http://127.0.0.1:1234/api/v1"',
+      '"baseUrl":"http://127.0.0.1:1234/v1"',
+    );
+    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
+      '"model":"local-model"',
+    );
+    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
+      '"apiStyle":"openai-compatible"',
     );
     expect(service.messages()[2].phase).toBe('complete');
     expect(service.canvasDocument()).not.toBeNull();

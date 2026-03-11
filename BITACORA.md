@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:18 UTC
+  **Author:** Codex
+  **Entry:** State Change: Switched the default LM Studio provider configuration to the OpenAI-compatible `/v1/chat/completions` path with `model: "local-model"`, matching the verified local LM Studio behavior where the server resolves the loaded model automatically.
+
 - **Timestamp:** 2026-03-11 16:13 UTC
   **Author:** Codex
   **Entry:** State Change: Made `ChatController` inject `ChatGatewayService` explicitly with `@Inject(ChatGatewayService)` so the Nest dev runtime does not depend on decorator-metadata inference for controller wiring.

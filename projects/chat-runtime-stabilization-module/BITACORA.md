@@ -2,6 +2,10 @@
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 16:18 UTC
+  **Author:** Codex
+  **Entry:** State Change: Switched the default LM Studio transport path to the OpenAI-compatible `/v1` endpoint with `local-model`, because that path was manually verified against the local LM Studio server and avoids the strict native-model identifier problem for the immediate chat flow.
+
 - **Timestamp:** 2026-03-11 16:13 UTC
   **Author:** Codex
   **Entry:** State Change: Made controller-side injection explicit with `@Inject(ChatGatewayService)` so the dev runtime no longer depends on inferred constructor metadata for chat transport wiring.
