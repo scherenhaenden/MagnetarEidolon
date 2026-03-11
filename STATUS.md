@@ -4,6 +4,66 @@
 **Estimated overall progress:** 72%
 `[██████████████░░░░░░] 72%`
 
+## Progress Tables
+
+Update rule:
+- `Done % = done_points / total_points`
+- `In Progress % = in_progress_points / total_points`
+- `Remaining % = remaining_points / total_points`
+
+### Overall
+
+| Scope | Done % | In Progress % | Remaining % | Notes |
+| :--- | ---: | ---: | ---: | :--- |
+| Project overall | 65.5% | 9.1% | 25.5% | Based on `108 done / 15 in progress / 42 remaining` out of `165 pts` |
+
+### By Feature
+
+| Feature | Done % | In Progress % | Remaining % | Notes |
+| :--- | ---: | ---: | ---: | :--- |
+| Documentation and governance | 95% | 5% | 0% | Very mature |
+| TypeScript core and SDK | 90% | 5% | 5% | Core exists and works |
+| TypeScript QA baseline | 70% | 10% | 20% | Strong UI-side coverage, broader runtime QA pending |
+| Web and CLI startup | 85% | 10% | 5% | Root startup path is usable |
+| LM Studio provider | 55% | 20% | 25% | Adapter exists, chat can call LM Studio, deeper integration pending |
+| Provider configuration and failover | 70% | 15% | 15% | UI, state, persistence, and failover logic exist |
+| In-app chat | 42% | 33% | 25% | Baseline implemented, rich rendering and deeper runtime flow pending |
+| Memory inspector | 45% | 10% | 45% | Basic surface exists, real workflow not done |
+| Trust / Policy Center | 35% | 10% | 55% | Mostly planned |
+| Observability / Replay | 15% | 5% | 80% | Early-stage only |
+| UX / Experience Foundation | 65% | 15% | 20% | Shell is real, not fully integrated |
+| Distribution / packaged operations | 60% | 10% | 30% | Usable, not polished |
+
+### Chat Breakdown
+
+| Chat feature | Done % | In Progress % | Remaining % | Notes |
+| :--- | ---: | ---: | ---: | :--- |
+| Chat tab IA / UX definition | 85% | 15% | 0% | Well documented |
+| Chat tab shell and layout | 75% | 15% | 10% | Implemented baseline |
+| Conversation state model | 80% | 15% | 5% | `ChatSessionService` exists |
+| Structured rendering baseline | 70% | 20% | 10% | Headings, paragraphs, lists, quotes, and code blocks work |
+| Copy actions | 75% | 10% | 15% | Message and code copy exist |
+| Canvas side panel baseline | 45% | 20% | 35% | Extraction exists, no real editor yet |
+| LM Studio calls from chat | 50% | 20% | 30% | Local provider path wired |
+| Real provider streaming | 20% | 10% | 70% | Not true transport streaming yet |
+| Rich markdown / AST rendering | 20% | 10% | 70% | Planned, not fully implemented |
+| Chat validation plan and tests | 65% | 20% | 15% | Deterministic tests done, runtime QA pending |
+
+### Traffic Light
+
+| Feature | Status | Rule |
+| :--- | :--- | :--- |
+| Documentation and governance | Green | 80%+ |
+| TypeScript core and SDK | Green | 80%+ |
+| Web and CLI startup | Green | 80%+ |
+| Provider configuration and failover | Yellow | 40%-79% |
+| LM Studio provider | Yellow | 40%-79% |
+| In-app chat | Yellow | 40%-79% |
+| UX / Experience Foundation | Yellow | 40%-79% |
+| Memory inspector | Yellow | 40%-79% |
+| Trust / Policy Center | Red | under 40% |
+| Observability / Replay | Red | under 40% |
+
 ## Current Direction
 The repository is in a controlled transition state. The core migration to TypeScript has been completed and the shared SDK is operational. The Python implementation remains available only as a historical reference and cross-validation baseline until the TypeScript prototype is declared production-stable. The strategic focus is now the consolidation of the UI in `apps/magnetar-ui` and the final extraction of the shared runtime.
 
