@@ -8,3 +8,4 @@
 - Added backend transport tests and expanded chat-session coverage so root validation now covers both backend and UI chat transport behavior.
 - Simplified backend development startup to `tsx src/main.ts` so the API process stays reachable on `3100` during root `npm run dev`.
 - Switched the default LM Studio provider to the verified OpenAI-compatible `/v1` route with `local-model`.
+- Reached a working live chat path in the UI against LM Studio and updated the root/module status percentages to reflect that progress.

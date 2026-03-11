@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 17:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Manually validated the end-to-end LM Studio chat path through the Angular UI and NestJS backend. The working default route now uses the OpenAI-compatible LM Studio endpoint with `local-model`, and copyable code blocks were confirmed in the live UI.
+
 - **Timestamp:** 2026-03-11 16:18 UTC
   **Author:** Codex
   **Entry:** State Change: Switched the default LM Studio provider configuration to the OpenAI-compatible `/v1/chat/completions` path with `model: "local-model"`, matching the verified local LM Studio behavior where the server resolves the loaded model automatically.

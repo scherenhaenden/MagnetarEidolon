@@ -2,6 +2,10 @@
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 17:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Confirmed the first real end-to-end chat path through `UI -> backend -> LM Studio` in the live application. The current working default uses the OpenAI-compatible LM Studio endpoint with `local-model`.
+
 - **Timestamp:** 2026-03-11 16:18 UTC
   **Author:** Codex
   **Entry:** State Change: Switched the default LM Studio transport path to the OpenAI-compatible `/v1` endpoint with `local-model`, because that path was manually verified against the local LM Studio server and avoids the strict native-model identifier problem for the immediate chat flow.

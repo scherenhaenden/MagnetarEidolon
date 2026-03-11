@@ -1,8 +1,8 @@
 # Current Status — MagnetarEidolon
 
 ## Summary
-**Estimated overall progress:** 66%
-`[█████████████░░░░░░░] 66%`
+**Estimated overall progress:** 72%
+`[██████████████░░░░░░] 72%`
 
 ## Progress Tables
 
@@ -15,7 +15,7 @@ Update rule:
 
 | Scope | Done % | In Progress % | Remaining % | Notes |
 | :--- | ---: | ---: | ---: | :--- |
-| Project overall | 65.5% | 10.9% | 23.6% | Based on `108 done / 18 in progress / 39 remaining` out of `165 pts` |
+| Project overall | 71.5% | 10.3% | 18.2% | Based on `118 done / 17 in progress / 30 remaining` out of `165 pts` |
 
 ### By Feature
 
@@ -28,7 +28,7 @@ Update rule:
 | LM Studio provider | 65% | 20% | 15% | Matches the LM Studio module status: adapter, docs, and smoke coverage exist, with broader runtime integration still pending |
 | Provider configuration and failover | 55% | 25% | 20% | Matches the provider-configuration module status: baseline UI/state exists, while persistence and runtime handoff remain |
 | In-app chat | 55% | 25% | 20% | Matches the chat module status: baseline chat exists with LM Studio runtime wiring, but richer rendering and broader provider flow still remain |
-| Chat runtime stabilization | 20% | 15% | 65% | Backend-routed chat transport and normalized SSE deltas now exist; real LM Studio validation, diagnostics, and broader hardening still remain |
+| Chat runtime stabilization | 55% | 10% | 35% | Backend-routed chat transport is working end to end against LM Studio; remaining work is diagnostics, backend-side model handling, and workflow hardening |
 | Memory inspector | 45% | 10% | 45% | Basic surface exists, real workflow not done |
 | Trust / Policy Center | 35% | 10% | 55% | Mostly planned |
 | Observability / Replay | 15% | 5% | 80% | Early-stage only |
@@ -115,7 +115,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | **SDK contract** | **in_progress** | Physical extraction of the shared runtime is underway in `packages/magnetar-sdk`. |
 | **LM Studio provider** | **in_progress** | SDK adapter, integration notes, smoke tests, and chat-consumed streaming are now in place; broader orchestration and runtime settings still remain. |
 | **In-app chat** | **in_progress** | Chat tab, state service, real LM Studio streaming, and a NestJS BFF path now exist; richer rendering and production validation still remain. |
-| **Chat runtime stabilization** | **in_progress** | The browser chat path now routes through the NestJS backend with a normalized stream contract; real LM Studio validation and diagnostics are the next delivery steps. |
+| **Chat runtime stabilization** | **in_progress** | The browser chat path now works through the NestJS backend against LM Studio with a normalized stream contract; the next steps are diagnostics, backend-side model handling, and workflow hardening. |
 | **Provider configuration** | **in_progress** | UI state model and first configuration screen now exist; runtime persistence and failover consumption still remain. |
 
 ## Risks and Mitigations
