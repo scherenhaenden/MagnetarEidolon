@@ -47,6 +47,8 @@ The CLI must not duplicate business logic; it should consume the shared SDK/runt
 | `STATUS.md` | Current status, risks, and immediate commitments. |
 | `TESTING.md` | Technical and product validation strategy. |
 | `docs/UI_RUNTIME_BOOTSTRAP_PLAN.md` | Detailed plan for turning the TypeScript UI into a real runnable web and CLI surface. |
+| `projects/lm-studio-provider-module/` | Standalone planning module for the first local AI provider integration via LM Studio. |
+| `projects/in-app-chat-module/` | Standalone planning module for the embedded chat surface and testing workflows. |
 
 ## Transition Status
 The repository is in an active transition phase:
@@ -122,6 +124,8 @@ npm run build
 2. Guarantee traceability for sensitive actions with human approval.
 3. Keep the **console CLI** as the official operations and diagnostics interface.
 4. Formalize the **SDK contract** shared by the UI and CLI.
+5. Add **LM Studio** as the first concrete AI provider integration for local development and testing.
+6. Add an **in-app chat surface** so provider testing and real usage happen inside the product instead of only through placeholder views.
 
 ## Additional Information
 - `docs/MAGNETAR_TECHNOLOGY_STACK.md`: technology choices and cross-platform rationale for Linux, macOS, and Windows.

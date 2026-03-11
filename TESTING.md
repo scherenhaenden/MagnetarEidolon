@@ -56,6 +56,15 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - run TypeScript typecheck/build validation
   - upload test/coverage artifacts on failure
 
+### Next Interactive Validation Target
+- The next provider-facing validation surface should be an in-app chat flow, not only CLI smoke commands.
+- LM Studio is the first planned concrete provider target for this path.
+- Chat-driven validation should cover:
+  - provider reachable and healthy
+  - provider unreachable
+  - invalid model/config selection
+  - successful generation from the embedded UI
+
 ### Testing the Tests
 - The TypeScript test system itself must be validated, not only the application code.
 - Minimum meta-validation plan:

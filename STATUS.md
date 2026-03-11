@@ -12,6 +12,8 @@ The repository is in a controlled transition state. The core migration to TypeSc
 - Turn `apps/magnetar-ui` into a genuinely runnable web and CLI surface, not only something that builds and tests.
 - Activate and stabilize a dedicated TypeScript validation pipeline instead of relying only on the legacy Python CI.
 - Execute the shared runtime extraction into `packages/magnetar-sdk` and lock down its initial contract.
+- Continue the first real provider integration path through LM Studio.
+- Define an embedded chat surface so provider testing happens inside the product UI.
 
 ## Milestones
 
@@ -24,6 +26,8 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | `ms-16` | UI Workspace Rehome & TS Delivery Pipeline | In Progress | 2026-04-15 |
 | `ms-14` | Console CLI Operations | Ready | 2026-04-17 |
 | `ms-15` | SDK Contract Base | Ready | 2026-04-22 |
+| `ms-17` | LM Studio Provider Integration | Ready | 2026-04-29 |
+| `ms-18` | In-App Chat Surface | Ready | 2026-05-02 |
 | `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
 | `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
 | `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
@@ -43,6 +47,8 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | Trust/Policy model | ready | Approval rules are ready for implementation. |
 | **Console CLI** | **ready** | Included as a formal deliverable with cross-platform validation goals. |
 | **SDK contract** | **in_progress** | Physical extraction of the shared runtime is underway in `packages/magnetar-sdk`. |
+| **LM Studio provider** | **in_progress** | Initial SDK adapter, integration notes, and provider smoke tests now exist; UI wiring and real runtime consumption still remain. |
+| **In-app chat** | **ready** | Planned as the first real provider-facing interaction surface inside the Angular product shell. |
 
 ## Risks and Mitigations
 
