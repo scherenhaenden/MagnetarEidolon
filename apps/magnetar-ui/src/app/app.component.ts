@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
+import { ProviderConfig } from './core/models/provider-config.js';
+import { ProviderConfigService } from './core/services/provider-config.service.js';
 
 @Component({
   selector: 'screen-dashboard',
@@ -360,6 +362,163 @@ class ToolsScreen {
 }
 
 @Component({
+  selector: 'screen-providers',
+  standalone: true,
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  template: `
+    <div class="space-y-6 animate-fade-in pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h2 class="text-2xl font-light text-white tracking-tight">AI Providers</h2>
+          <p class="text-sm text-zinc-400 mt-1">
+            Configure multiple providers, define the primary runtime, and keep backups ready for failover.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Primary: {{ primaryProvider()?.name || 'Unassigned' }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Backups Ready: {{ healthyFailoverCount() }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div
+            *ngFor="let provider of providers()"
+            class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-start gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
+                  <ui-icon name="server" [size]="20"></ui-icon>
+                </div>
+                <div>
+                  <div class="text-base font-medium text-zinc-100">{{ provider.name }}</div>
+                  <div class="text-xs text-zinc-500 mt-1">{{ provider.kind }} · {{ provider.apiStyle }}</div>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <ui-badge [status]="getHealthBadge(provider)">{{ provider.health }}</ui-badge>
+                <span class="text-[11px] uppercase tracking-wider text-zinc-500">
+                  {{ describeRole(provider) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                <div class="text-zinc-500 uppercase tracking-wider mb-1">Base URL</div>
+                <div class="font-mono text-zinc-300 break-all">{{ provider.baseUrl }}</div>
+              </div>
+              <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                <div class="text-zinc-500 uppercase tracking-wider mb-1">Model</div>
+                <div class="font-mono text-zinc-300">{{ provider.model }}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-zinc-500">
+              <span>Failover priority {{ provider.priority }}</span>
+              <span *ngIf="provider.role === 'backup'">Eligible backup</span>
+              <span *ngIf="provider.role === 'primary'">Current default route</span>
+              <span *ngIf="provider.role === 'disabled'">Not used by runtime</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <button
+                (click)="setPrimary(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'primary'
+                  ? 'bg-cyan-500 text-slate-900 border-cyan-400'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Primary
+              </button>
+              <button
+                (click)="setBackup(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'backup'
+                  ? 'bg-amber-400 text-amber-950 border-amber-300'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Backup
+              </button>
+              <button
+                (click)="disable(provider.id)"
+                class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                [ngClass]="provider.role === 'disabled'
+                  ? 'bg-zinc-700 text-zinc-100 border-zinc-600'
+                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                Disable
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
+              <ui-icon name="activity" [size]="16" cssClass="text-cyan-400"></ui-icon>
+              Failover Chain
+            </div>
+            <div class="mt-4 space-y-3">
+              <div
+                *ngFor="let provider of providers()"
+                class="flex items-center justify-between gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2">
+                <div>
+                  <div class="text-sm text-zinc-200">{{ provider.name }}</div>
+                  <div class="text-[11px] uppercase tracking-wider text-zinc-500">{{ describeRole(provider) }}</div>
+                </div>
+                <div class="text-xs font-mono text-zinc-400">#{{ provider.priority }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-cyan-300">
+              <ui-icon name="shield" [size]="16"></ui-icon>
+              Runtime Intent
+            </div>
+            <p class="mt-3 text-xs leading-relaxed text-cyan-100/80">
+              Provider configuration should live independently from chat and runtime execution. The UI can reorder and
+              assign providers, while the SDK later decides how to consume that chain.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+})
+class ProvidersScreen {
+  private readonly providerConfigService = new ProviderConfigService();
+
+  public readonly providers = this.providerConfigService.providers;
+  public readonly primaryProvider = this.providerConfigService.primaryProvider;
+  public readonly healthyFailoverCount = computed(
+    () => this.providerConfigService.healthyFailoverProviders().length,
+  );
+
+  public setPrimary(providerId: string): void {
+    this.providerConfigService.setPrimary(providerId);
+  }
+
+  public setBackup(providerId: string): void {
+    this.providerConfigService.setBackup(providerId);
+  }
+
+  public disable(providerId: string): void {
+    this.providerConfigService.disable(providerId);
+  }
+
+  public describeRole(provider: ProviderConfig): string {
+    return this.providerConfigService.describeRole(provider.id);
+  }
+
+  public getHealthBadge(provider: ProviderConfig): BadgeStatus {
+    return this.providerConfigService.getHealthTone(provider.health);
+  }
+}
+
+@Component({
   selector: 'screen-policy',
   standalone: true,
   imports: [CommonModule, UiIconComponent],
@@ -387,6 +546,7 @@ class PolicyScreen {}
     LiveRunScreen,
     BuilderScreen,
     ToolsScreen,
+    ProvidersScreen,
     PolicyScreen,
   ],
   template: `
@@ -422,6 +582,8 @@ class PolicyScreen {}
           <screen-builder></screen-builder>
         } @else if (activeTab() === 'tools') {
           <screen-tools></screen-tools>
+        } @else if (activeTab() === 'providers') {
+          <screen-providers></screen-providers>
         } @else if (activeTab() === 'policy') {
           <screen-policy></screen-policy>
         }
@@ -467,7 +629,7 @@ export class AppComponent {
     { id: 'liverun', label: 'Live Run', icon: 'activity' },
     { id: 'builder', label: 'Builder', icon: 'git-branch' },
     { id: 'tools', label: 'Catalog', icon: 'wrench' },
-    { id: 'memory', label: 'Memory', icon: 'database' },
+    { id: 'providers', label: 'Providers', icon: 'server' },
     { id: 'policy', label: 'Policies', icon: 'shield' },
   ];
 
