@@ -102,6 +102,17 @@ describe('ProviderConfigService', () => {
     expect(service.backupProviders().map((provider) => provider.id)).toContain('provider-lmstudio');
   });
 
+  it('re-promotes the same provider when no other backup exists', () => {
+    const service = new ProviderConfigService();
+
+    service.disable('provider-openai');
+    service.disable('provider-anthropic');
+    service.setBackup('provider-lmstudio');
+
+    expect(service.primaryProvider()?.id).toBe('provider-lmstudio');
+    expect(service.backupProviders()).toEqual([]);
+  });
+
   it('returns Unknown when describing a missing provider id', () => {
     const service = new ProviderConfigService();
 
