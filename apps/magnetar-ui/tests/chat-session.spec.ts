@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   buildConversationSummary,
@@ -6,6 +6,7 @@ import {
   extractCopyText,
   parseChatBlocks,
 } from '../src/app/core/models/chat.js';
+import { ChatSessionStore } from '../src/app/core/services/chat-session-store.js';
 import { ChatSessionService } from '../src/app/core/services/chat-session.service.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
 
@@ -266,13 +267,20 @@ console.log("hi");
 });
 
 describe('ChatSessionService', () => {
+  beforeEach(() => {
+    const store = new ChatSessionStore('magnetar.chat.sessions.v1', 'magnetar.chat.active-session.v1');
+    store.saveSessions([]);
+    store.saveActiveSessionId('');
+  });
+
   it('starts with a welcome message and current provider label', () => {
     const service = new ChatSessionService(new ProviderConfigService());
 
     expect(service.messages()).toHaveLength(1);
     expect(service.draft()).toBe('');
     expect(service.activeProviderLabel()).toBe('LM Studio Local');
-    expect(service.conversationHistory()).toEqual([]);
+    expect(service.conversationHistory()).toHaveLength(1);
+    expect(service.conversationHistory()[0]?.title).toBe('New Chat');
   });
 
   it('ignores empty prompts', async () => {
@@ -741,8 +749,8 @@ describe('ChatSessionService', () => {
   it('uses the generic provider error text when a non-Error value reaches live-stream failure handling', () => {
     const service = new ChatSessionService(new ProviderConfigService());
 
-    (service as any).messageState.set([
-      ...(service as any).messageState(),
+    (service as any).updateCurrentSessionMessages((messages: any[]) => [
+      ...messages,
       {
         id: 'assistant-999',
         role: 'assistant',
@@ -766,5 +774,45 @@ describe('ChatSessionService', () => {
     expect(service.messages().at(-1)?.rawText).toContain(
       'Unknown provider error while generating chat response.',
     );
+  });
+
+  it('can rename a persisted session', async () => {
+    const providerConfigService = new ProviderConfigService();
+    providerConfigService.setPrimary('provider-openai');
+    const service = new ChatSessionService(providerConfigService);
+
+    expect(await service.submitPrompt('Original title source')).toBe(true);
+    await service.waitForIdle();
+
+    const activeSessionId = service.currentSession()?.id ?? '';
+    expect(service.renameSession(activeSessionId, 'Renamed Chat')).toBe(true);
+    expect(service.conversationHistory()[0]?.title).toBe('Renamed Chat');
+  });
+
+  it('can delete a non-active session and keep the remaining rail entries', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const firstSessionId = service.currentSession()?.id ?? '';
+
+    service.createNewSession();
+    const secondSessionId = service.currentSession()?.id ?? '';
+
+    expect(service.sessions()).toHaveLength(2);
+    expect(service.deleteSession(firstSessionId)).toBe(true);
+    expect(service.sessions()).toHaveLength(1);
+    expect(service.currentSession()?.id).toBe(secondSessionId);
+  });
+
+  it('restores the previously active session from local storage', () => {
+    const firstInstance = new ChatSessionService(new ProviderConfigService());
+    const firstSessionId = firstInstance.currentSession()?.id ?? '';
+
+    firstInstance.createNewSession();
+    const secondSessionId = firstInstance.currentSession()?.id ?? '';
+    expect(secondSessionId).not.toBe(firstSessionId);
+    expect(firstInstance.switchToSession(firstSessionId)).toBe(true);
+    expect(firstInstance.switchToSession(secondSessionId)).toBe(true);
+
+    const secondInstance = new ChatSessionService(new ProviderConfigService());
+    expect(secondInstance.currentSession()?.id).toBe(secondSessionId);
   });
 });

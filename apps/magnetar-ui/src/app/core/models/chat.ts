@@ -21,6 +21,16 @@ export interface ChatConversationSummary {
   id: string;
   title: string;
   preview: string;
+  updatedAt?: string;
+}
+
+export interface ChatConversationSession {
+  id: string;
+  title: string;
+  preview: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ChatCanvasDocument {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Response as ExpressResponse } from 'express';
 
 import {
@@ -77,6 +77,7 @@ interface FetchLike {
 @Injectable()
 export class ChatGatewayService {
   public constructor(
+    @Inject(ProviderRegistryService)
     private readonly providerRegistryService: ProviderRegistryService,
   ) {}
 
