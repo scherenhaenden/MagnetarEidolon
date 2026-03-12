@@ -1,9 +1,9 @@
 metadata:
-  project_name: "Magnetar Voice UI"
-  description: "A Python-based Voice-to-Text UI application using Gradio and SpeechRecognition."
+  project_name: "MagnetarEidolon Voice Interface"
+  description: "A voice interaction track that began as a Python/Gradio prototype and now needs to be re-scoped for the TypeScript/Angular workspace."
   version: "0.1.0"
   start_date: "2024-05-22"
-  repository: "https://github.com/your-org/magnetar-eidolon/tree/master/magnetar_voice_ui"
+  repository: "https://github.com/scherenhaenden/MagnetarEidolon"
 
 stakeholders:
   - name: "Project Lead"
@@ -15,29 +15,31 @@ stakeholders:
 
 milestones:
   - id: "ms-voice-01"
-    name: "Voice UI Prototype"
-    target_date: "2024-05-22"
-    description: "Create a functional prototype with UI and Voice-to-Text capabilities."
+    name: "Voice Interaction Re-scope"
+    target_date: "2026-03-31"
+    description: "Reframe the legacy voice track for the TypeScript UI, then implement browser-compatible capture and transcription flows."
     status: "in_progress"
 
 tasks:
   - id: "task-voice-101"
     milestone_id: "ms-voice-01"
-    title: "Setup Project Structure"
+    title: "Re-scope voice UI foundations for the TypeScript workspace"
     owner: "Jules"
     status: "in_progress"
+    notes: "The original Python/Poetry/Gradio setup no longer matches the current architecture. Define Angular module boundaries, service interfaces, browser permissions model, and testing strategy."
   - id: "task-voice-102"
     milestone_id: "ms-voice-01"
-    title: "Implement Voice UI & Logic"
+    title: "Implement voice capture and interaction flow in the TypeScript UI"
     owner: "Jules"
     status: "planned"
+    notes: "Blocked on task-voice-101. No TS voice UI, microphone capture, transcription adapter, or conversation flow exists yet."
 
 risks:
   - id: "risk-voice-001"
-    description: "Audio input might not work in sandbox environment."
+    description: "Browser microphone permissions, local-runtime constraints, and provider compatibility may complicate the first voice implementation."
     probability: "High"
     impact: "Medium"
-    mitigation: "Focus on verifying UI launch and logic with file input."
+    mitigation: "Design the feature for browser-safe capture first, keep adapters isolated, and allow staged validation with mocked or file-based audio inputs."
 
 reporting:
   frequency: "On Completion"

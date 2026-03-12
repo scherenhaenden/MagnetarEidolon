@@ -18,6 +18,42 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-11 17:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Manually validated the end-to-end LM Studio chat path through the Angular UI and NestJS backend. The working default route now uses the OpenAI-compatible LM Studio endpoint with `local-model`, and copyable code blocks were confirmed in the live UI.
+
+- **Timestamp:** 2026-03-11 16:18 UTC
+  **Author:** Codex
+  **Entry:** State Change: Switched the default LM Studio provider configuration to the OpenAI-compatible `/v1/chat/completions` path with `model: "local-model"`, matching the verified local LM Studio behavior where the server resolves the loaded model automatically.
+
+- **Timestamp:** 2026-03-11 16:13 UTC
+  **Author:** Codex
+  **Entry:** State Change: Made `ChatController` inject `ChatGatewayService` explicitly with `@Inject(ChatGatewayService)` so the Nest dev runtime does not depend on decorator-metadata inference for controller wiring.
+
+- **Timestamp:** 2026-03-11 16:11 UTC
+  **Author:** Codex
+  **Entry:** State Change: Removed the NestJS dependency-injection ambiguity in `ChatGatewayService` by taking the fetch override out of the provider constructor. The service now exposes an internal fetch hook for tests while remaining a clean Nest provider at runtime.
+
+- **Timestamp:** 2026-03-11 16:08 UTC
+  **Author:** Codex
+  **Entry:** State Change: Switched the NestJS backend development command from `tsx watch src/main.ts` to `tsx src/main.ts` so root `npm run dev` starts a stable API process on port `3100` without relying on the watch-mode IPC path.
+
+- **Timestamp:** 2026-03-11 16:00 UTC
+  **Author:** Codex
+  **Entry:** State Change: Began `task-chatfix-101` by making the NestJS backend authoritative for chat transport and normalizing upstream LM Studio/OpenAI-compatible SSE frames into a stable browser-facing delta stream. Added backend transport tests, updated chat-session tests to consume the backend contract, and kept root `npm run test` aligned with both backend and UI validation.
+
+- **Timestamp:** 2026-03-11 15:35 UTC
+  **Author:** Codex
+  **Entry:** Decision: Introduced a dedicated NestJS backend-for-frontend in `apps/magnetar-api` so the Angular chat UI no longer needs to call LM Studio directly. The backend now owns the LM Studio request boundary and stream forwarding path, and root `npm run dev` was updated to boot backend plus UI together.
+
+- **Timestamp:** 2026-03-11 15:40 UTC
+  **Author:** Codex
+  **Entry:** Decision: Added a dedicated chat-runtime stabilization planning module so the remaining work from partial integration to reliable end-to-end chat behavior is tracked explicitly in milestones, tasks, and acceptance steps.
+
+- **Timestamp:** 2026-03-11 15:15 UTC
+  **Author:** Codex
+  **Entry:** State Change: Replaced the chat tab's fake LM Studio post-completion chunking with real SSE-based streaming in `ChatSessionService`. The Angular chat UI now updates assistant messages incrementally from LM Studio responses, and the automated test suite was expanded to cover stream success, partial updates, malformed events, missing bodies, fallback message-content frames, and stream-finalization edge cases at 100% coverage.
+
 - **Timestamp:** 2026-03-11 12:42 UTC
   **Author:** Codex
   **Entry:** State Change: Began implementation of the in-app chat module in the Angular shell. Added a dedicated Chat tab, `ChatSessionService`, structured message parsing/rendering, deterministic streaming behavior, a canvas side panel baseline, and 100% test coverage for the new chat state/model layer.

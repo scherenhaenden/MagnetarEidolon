@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, ViewEncapsulation, computed, signal } from '@angular/core';
+import { Component, Input, ViewEncapsulation, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
@@ -478,6 +478,7 @@ class ToolsScreen {
           <textarea
             [value]="chatSessionService.draft()"
             (input)="updateDraft($event)"
+            (keydown)="handlePromptKeydown($event)"
             rows="4"
             placeholder="Ask MagnetarEidolon to plan, explain, generate code, or validate a provider path..."
             class="w-full rounded-2xl border border-white/10 bg-[#050508] px-4 py-3 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500/40"></textarea>
@@ -542,15 +543,9 @@ class ToolsScreen {
     </div>
   `,
 })
-export class ChatScreen implements OnDestroy {
+export class ChatScreen {
   @Input({ required: true }) public providerConfigService!: ProviderConfigService;
   @Input({ required: true }) public chatSessionService!: ChatSessionService;
-
-  private streamTimer: ReturnType<typeof setInterval> | null = null;
-
-  public ngOnDestroy(): void {
-    this.clearStreamTimer();
-  }
 
   public updateDraft(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
@@ -562,14 +557,15 @@ export class ChatScreen implements OnDestroy {
     if (!didStart) {
       return;
     }
+  }
 
-    this.clearStreamTimer();
-    this.streamTimer = setInterval(() => {
-      const didAdvance = this.chatSessionService.streamNextChunk();
-      if (!didAdvance) {
-        this.clearStreamTimer();
-      }
-    }, 120);
+  public handlePromptKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    void this.submitPrompt();
   }
 
   public copyMessage(message: ChatMessage): void {
@@ -604,15 +600,6 @@ export class ChatScreen implements OnDestroy {
       default:
         return 'idle';
     }
-  }
-
-  private clearStreamTimer(): void {
-    if (this.streamTimer === null) {
-      return;
-    }
-
-    clearInterval(this.streamTimer);
-    this.streamTimer = null;
   }
 }
 

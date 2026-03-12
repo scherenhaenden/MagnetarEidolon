@@ -34,6 +34,7 @@ Core promise:
 - Reusable flows (recipes/skills).
 - History and traces for debugging.
 - Human approval for sensitive actions.
+- A backend-controlled boundary for provider and integration traffic so the browser UI does not own local-provider transport details.
 
 ### Avoid
 - Unnecessary initial complexity.
