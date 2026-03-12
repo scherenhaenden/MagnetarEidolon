@@ -896,158 +896,172 @@ export class MemoryScreen {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 xl:grid-cols-[1.4fr,1fr] gap-6">
-        <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5 space-y-4">
-          <div class="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <div class="text-sm font-medium text-zinc-100 flex items-center gap-2">
-                <ui-icon name="plus-circle" [size]="16" cssClass="text-cyan-400"></ui-icon>
-                Quick Add
-              </div>
-              <p class="text-xs text-zinc-500 mt-1">Use a known preset or start from a fully custom provider shell.</p>
+      <div class="grid grid-cols-1 lg:grid-cols-[18rem,minmax(0,1fr),24rem] gap-6 items-start">
+        <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-5 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
+          <div class="space-y-2">
+            <div class="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-cyan-200">
+              <ui-icon name="plus-circle" [size]="14"></ui-icon>
+              Quick Add
             </div>
-            <div class="inline-flex rounded-xl border border-white/10 bg-white/[0.03] p-1 text-xs">
-              <button
-                (click)="setViewMode('grid')"
-                class="px-3 py-1.5 rounded-lg transition-colors"
-                [ngClass]="viewMode() === 'grid' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
-                Cards
-              </button>
-              <button
-                (click)="setViewMode('list')"
-                class="px-3 py-1.5 rounded-lg transition-colors"
-                [ngClass]="viewMode() === 'list' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
-                List
-              </button>
-            </div>
+            <h3 class="text-lg font-medium text-white">Provider Actions</h3>
+            <p class="text-xs leading-6 text-zinc-400">
+              Add known providers from the left rail first. The editor on the right remains for deeper configuration.
+            </p>
           </div>
-          <div class="flex flex-wrap gap-3">
+
+          <div class="space-y-3">
             <button
               (click)="addPreset('openrouter')"
-              class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-900 text-sm font-semibold hover:bg-cyan-400">
-              Add OpenRouter
+              class="w-full rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400 to-teal-300 px-4 py-3 text-left text-sm font-semibold text-slate-950 shadow-[0_12px_40px_rgba(34,211,238,0.25)] transition-transform hover:-translate-y-0.5">
+              <div>OpenRouter</div>
+              <div class="mt-1 text-xs font-medium text-slate-800/80">Cloud routing and multi-model access</div>
             </button>
             <button
               (click)="addPreset('openai')"
-              class="px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-sm text-zinc-100 hover:bg-white/10">
-              Add OpenAI
+              class="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm text-zinc-100 hover:bg-white/[0.07]">
+              <div class="font-medium">OpenAI</div>
+              <div class="mt-1 text-xs text-zinc-500">Hosted OpenAI-compatible endpoint</div>
             </button>
             <button
               (click)="addPreset('lm_studio')"
-              class="px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-sm text-zinc-100 hover:bg-white/10">
-              Add LM Studio
+              class="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm text-zinc-100 hover:bg-white/[0.07]">
+              <div class="font-medium">LM Studio</div>
+              <div class="mt-1 text-xs text-zinc-500">Local-first smoke and development path</div>
             </button>
             <button
               (click)="addCustomProvider()"
-              class="px-4 py-2 rounded-xl border border-violet-500/30 bg-violet-500/10 text-sm text-violet-100 hover:bg-violet-500/20">
-              Add Custom Provider
+              class="w-full rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-left text-sm text-violet-100 hover:bg-violet-500/15">
+              <div class="font-medium">Custom Provider</div>
+              <div class="mt-1 text-xs text-violet-100/70">Start from a blank configurable shell</div>
             </button>
           </div>
-        </div>
 
-        <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
-          <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
-            <ui-icon name="layers" [size]="16" cssClass="text-violet-400"></ui-icon>
-            Preset Catalog
-          </div>
-          <div class="mt-4 grid grid-cols-1 gap-3">
-            <button
-              *ngFor="let preset of presets()"
-              (click)="addPreset(preset.kind)"
-              class="rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-left hover:border-cyan-500/20 hover:bg-white/[0.05] transition-colors">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <div class="text-sm text-zinc-100">{{ preset.label }}</div>
-                  <div class="text-xs text-zinc-500 mt-1">{{ preset.description }}</div>
-                </div>
-                <span
-                  class="shrink-0 px-2 py-1 rounded-full text-[11px] border"
-                  [ngClass]="hasConfiguredProvider(preset.kind)
-                    ? 'border-amber-500/20 bg-amber-500/10 text-amber-100'
-                    : 'border-cyan-500/20 bg-cyan-500/10 text-cyan-100'">
-                  {{ hasConfiguredProvider(preset.kind) ? 'Add another' : 'Add' }}
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div
-          class="lg:col-span-2"
-          [ngClass]="viewMode() === 'grid' ? 'grid grid-cols-1 xl:grid-cols-2 gap-4' : 'space-y-3'">
-          <div
-            *ngFor="let provider of providers()"
-            (click)="selectProvider(provider.id)"
-            class="bg-[#0f0f13] border rounded-2xl p-5 shadow-xl cursor-pointer transition-colors"
-            [ngClass]="[
-              viewMode() === 'grid' ? 'flex flex-col gap-4' : 'flex flex-col md:flex-row md:items-start md:justify-between gap-4',
-              selectedProvider()?.id === provider.id ? 'border-cyan-500/30' : 'border-white/5 hover:border-white/10'
-            ]">
-            <div class="flex-1 space-y-4">
-              <div class="flex items-start justify-between gap-4">
-                <div class="flex items-start gap-3">
-                  <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
-                    <ui-icon name="server" [size]="20"></ui-icon>
-                  </div>
-                  <div>
-                    <div class="text-base font-medium text-zinc-100">{{ provider.name }}</div>
-                    <div class="text-xs text-zinc-500 mt-1">{{ provider.kind }} · {{ provider.apiStyle }}</div>
-                  </div>
-                </div>
-                <div class="flex flex-col items-end gap-2">
-                  <ui-badge [status]="getHealthBadge(provider)">{{ provider.health }}</ui-badge>
-                  <span class="text-[11px] uppercase tracking-wider text-zinc-500">
-                    {{ describeRole(provider) }}
-                  </span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3">
-                  <div class="text-zinc-500 uppercase tracking-wider mb-1">Base URL</div>
-                  <div class="font-mono text-zinc-300 break-all">{{ provider.baseUrl }}</div>
-                </div>
-                <div class="bg-white/5 border border-white/5 rounded-xl p-3">
-                  <div class="text-zinc-500 uppercase tracking-wider mb-1">Model</div>
-                  <div class="font-mono text-zinc-300">{{ provider.model }}</div>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between text-xs text-zinc-500">
-                <span>Failover priority {{ provider.priority }}</span>
-                <span *ngIf="provider.role === 'backup'">Eligible backup</span>
-                <span *ngIf="provider.role === 'primary'">Current default route</span>
-                <span *ngIf="provider.role === 'disabled'">Not used by runtime</span>
+          <div class="rounded-2xl border border-white/5 bg-white/[0.03] p-4 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div class="text-xs uppercase tracking-[0.18em] text-zinc-500">View</div>
+              <div class="inline-flex rounded-xl border border-white/10 bg-black/20 p-1 text-xs">
+                <button
+                  (click)="setViewMode('grid')"
+                  class="px-3 py-1.5 rounded-lg transition-colors"
+                  [ngClass]="viewMode() === 'grid' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
+                  Cards
+                </button>
+                <button
+                  (click)="setViewMode('list')"
+                  class="px-3 py-1.5 rounded-lg transition-colors"
+                  [ngClass]="viewMode() === 'list' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
+                  List
+                </button>
               </div>
             </div>
+            <div class="text-xs leading-6 text-zinc-500">
+              Configured providers: {{ providers().length }}
+            </div>
+          </div>
+        </aside>
 
-            <div class="grid grid-cols-3 gap-2 md:w-60 md:shrink-0">
+        <div class="space-y-6">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
+              <ui-icon name="layers" [size]="16" cssClass="text-violet-400"></ui-icon>
+              Preset Catalog
+            </div>
+            <div class="mt-4 grid grid-cols-1 gap-3">
               <button
-                (click)="setPrimary(provider.id)"
-                class="py-2 rounded-lg text-xs font-medium border transition-colors"
-                [ngClass]="provider.role === 'primary'
-                  ? 'bg-cyan-500 text-slate-900 border-cyan-400'
-                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
-                Primary
+                *ngFor="let preset of presets()"
+                (click)="addPreset(preset.kind)"
+                class="rounded-xl border border-white/5 bg-white/[0.03] px-4 py-3 text-left hover:border-cyan-500/20 hover:bg-white/[0.05] transition-colors">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="text-sm text-zinc-100">{{ preset.label }}</div>
+                    <div class="text-xs text-zinc-500 mt-1">{{ preset.description }}</div>
+                  </div>
+                  <span
+                    class="shrink-0 px-2 py-1 rounded-full text-[11px] border"
+                    [ngClass]="hasConfiguredProvider(preset.kind)
+                      ? 'border-amber-500/20 bg-amber-500/10 text-amber-100'
+                      : 'border-cyan-500/20 bg-cyan-500/10 text-cyan-100'">
+                    {{ hasConfiguredProvider(preset.kind) ? 'Add another' : 'Add' }}
+                  </span>
+                </div>
               </button>
-              <button
-                (click)="setBackup(provider.id)"
-                class="py-2 rounded-lg text-xs font-medium border transition-colors"
-                [ngClass]="provider.role === 'backup'
-                  ? 'bg-amber-400 text-amber-950 border-amber-300'
-                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
-                Backup
-              </button>
-              <button
-                (click)="disable(provider.id)"
-                class="py-2 rounded-lg text-xs font-medium border transition-colors"
-                [ngClass]="provider.role === 'disabled'
-                  ? 'bg-zinc-700 text-zinc-100 border-zinc-600'
-                  : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
-                Disable
-              </button>
+            </div>
+          </div>
+
+          <div
+          [ngClass]="viewMode() === 'grid' ? 'grid grid-cols-1 xl:grid-cols-2 gap-4' : 'space-y-3'">
+            <div
+              *ngFor="let provider of providers()"
+              (click)="selectProvider(provider.id)"
+              class="bg-[#0f0f13] border rounded-2xl p-5 shadow-xl cursor-pointer transition-colors"
+              [ngClass]="[
+                viewMode() === 'grid' ? 'flex flex-col gap-4' : 'flex flex-col md:flex-row md:items-start md:justify-between gap-4',
+                selectedProvider()?.id === provider.id ? 'border-cyan-500/30' : 'border-white/5 hover:border-white/10'
+              ]">
+              <div class="flex-1 space-y-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
+                      <ui-icon name="server" [size]="20"></ui-icon>
+                    </div>
+                    <div>
+                      <div class="text-base font-medium text-zinc-100">{{ provider.name }}</div>
+                      <div class="text-xs text-zinc-500 mt-1">{{ provider.kind }} · {{ provider.apiStyle }}</div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-2">
+                    <ui-badge [status]="getHealthBadge(provider)">{{ provider.health }}</ui-badge>
+                    <span class="text-[11px] uppercase tracking-wider text-zinc-500">
+                      {{ describeRole(provider) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider mb-1">Base URL</div>
+                    <div class="font-mono text-zinc-300 break-all">{{ provider.baseUrl }}</div>
+                  </div>
+                  <div class="bg-white/5 border border-white/5 rounded-xl p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider mb-1">Model</div>
+                    <div class="font-mono text-zinc-300">{{ provider.model }}</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-zinc-500">
+                  <span>Failover priority {{ provider.priority }}</span>
+                  <span *ngIf="provider.role === 'backup'">Eligible backup</span>
+                  <span *ngIf="provider.role === 'primary'">Current default route</span>
+                  <span *ngIf="provider.role === 'disabled'">Not used by runtime</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 md:w-60 md:shrink-0">
+                <button
+                  (click)="setPrimary(provider.id)"
+                  class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                  [ngClass]="provider.role === 'primary'
+                    ? 'bg-cyan-500 text-slate-900 border-cyan-400'
+                    : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                  Primary
+                </button>
+                <button
+                  (click)="setBackup(provider.id)"
+                  class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                  [ngClass]="provider.role === 'backup'
+                    ? 'bg-amber-400 text-amber-950 border-amber-300'
+                    : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                  Backup
+                </button>
+                <button
+                  (click)="disable(provider.id)"
+                  class="py-2 rounded-lg text-xs font-medium border transition-colors"
+                  [ngClass]="provider.role === 'disabled'
+                    ? 'bg-zinc-700 text-zinc-100 border-zinc-600'
+                    : 'bg-white/5 border-white/10 text-zinc-200 hover:bg-white/10'">
+                  Disable
+                </button>
+              </div>
             </div>
           </div>
         </div>
