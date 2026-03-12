@@ -4,7 +4,7 @@
   "description": "Root workspace scripts for running the MagnetarEidolon UI and CLI from the repository root.",
   "scripts": {
     "setup": "npm --prefix packages/magnetar-sdk install && npm --prefix apps/magnetar-api install && npm --prefix apps/magnetar-ui install",
-    "dev": "bash -lc 'trap \"kill 0\" EXIT; npm --prefix apps/magnetar-api run start:dev & npm --prefix apps/magnetar-ui run start -- --host 0.0.0.0'",
+    "dev": "./dev.sh",
     "dev:open": "bash -lc 'trap \"kill 0\" EXIT; npm --prefix apps/magnetar-api run start:dev & npm --prefix apps/magnetar-ui run web:open -- --host 0.0.0.0'",
     "dev:api": "npm --prefix apps/magnetar-api run start:dev",
     "cli:dev": "npm --prefix apps/magnetar-ui run cli:dev --",
