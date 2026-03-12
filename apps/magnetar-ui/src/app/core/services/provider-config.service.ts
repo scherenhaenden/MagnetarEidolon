@@ -1,4 +1,4 @@
-import { computed, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 
 import {
   ProviderConfig,
@@ -54,6 +54,9 @@ const INITIAL_PROVIDERS: ProviderConfig[] = [
   },
 ];
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ProviderConfigService {
   private readonly providerState = signal<ProviderConfig[]>(INITIAL_PROVIDERS);
 

@@ -1,4 +1,4 @@
-import { computed, signal } from '@angular/core';
+import { Inject, Injectable, InjectionToken, inject, computed, signal } from '@angular/core';
 
 import {
   ChatCanvasDocument,
@@ -25,6 +25,10 @@ interface ActiveLiveStream {
 interface FetchLike {
   (input: string, init?: RequestInit): Promise<Response>;
 }
+
+export const CHAT_FETCH_FN = new InjectionToken<FetchLike>('CHAT_FETCH_FN', {
+  factory: () => globalThis.fetch.bind(globalThis) as FetchLike,
+});
 
 interface LMStudioChatCompletionResponse {
   type?: string;
@@ -59,6 +63,9 @@ const WELCOME_MESSAGE = buildAssistantMessage(
   'complete',
 );
 
+@Injectable({
+  providedIn: 'root',
+})
 export class ChatSessionService {
   private readonly messageState = signal<ChatMessage[]>([WELCOME_MESSAGE]);
   private readonly draftState = signal('');
@@ -68,6 +75,7 @@ export class ChatSessionService {
   private pendingStream: PendingStream | null = null;
   private activeStreamPromise: Promise<void> | null = null;
   private nextId = 1;
+  private readonly fetchFn: FetchLike;
 
   public readonly messages = computed(() => this.messageState());
   public readonly draft = computed(() => this.draftState());
@@ -86,9 +94,11 @@ export class ChatSessionService {
   public readonly canvasDocument = computed(() => this.canvasState());
 
   public constructor(
-    private readonly providerConfigService: ProviderConfigService,
-    private readonly fetchFn: FetchLike = globalThis.fetch.bind(globalThis),
-  ) {}
+    private readonly providerConfigService: ProviderConfigService = inject(ProviderConfigService),
+    @Inject(CHAT_FETCH_FN) fetchFn?: FetchLike,
+  ) {
+    this.fetchFn = fetchFn ?? globalThis.fetch.bind(globalThis);
+  }
 
   public setDraft(value: string): void {
     this.draftState.set(value);
