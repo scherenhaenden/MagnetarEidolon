@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { describeProviderRole, sortProvidersByPriority } from '../src/app/core/models/provider-config.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
@@ -23,6 +23,13 @@ describe('provider-config model helpers', () => {
         priority: 2,
         health: 'unknown',
         apiStyle: 'openai-compatible',
+        apiKey: '',
+        description: 'Backup preset',
+        template: { requestTemplate: '{}', placeholders: [] },
+        supportsApiKey: true,
+        ownership: 'backend',
+        presetKind: 'openai',
+        modelSuggestions: ['gpt'],
       },
       {
         id: 'a',
@@ -34,6 +41,13 @@ describe('provider-config model helpers', () => {
         priority: 1,
         health: 'healthy',
         apiStyle: 'openai-compatible',
+        apiKey: '',
+        description: 'Primary preset',
+        template: { requestTemplate: '{}', placeholders: [] },
+        supportsApiKey: false,
+        ownership: 'backend',
+        presetKind: 'lm_studio',
+        modelSuggestions: ['llama'],
       },
     ]);
 
@@ -42,6 +56,11 @@ describe('provider-config model helpers', () => {
 });
 
 describe('ProviderConfigService', () => {
+  beforeEach(() => {
+    globalThis.localStorage?.removeItem('magnetar.provider-config.v1');
+    ProviderConfigService.resetTestStorage();
+  });
+
   it('exposes one primary provider and at least one backup by default', () => {
     const service = new ProviderConfigService();
 
@@ -57,6 +76,10 @@ describe('ProviderConfigService', () => {
     expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.kind).toBe(
       'openrouter',
     );
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.template.placeholders).toContain(
+      '$model',
+    );
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.modelSuggestions.length).toBeGreaterThan(0);
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {
@@ -155,5 +178,67 @@ describe('ProviderConfigService', () => {
     expect(service.getHealthTone('degraded')).toBe('pending_approval');
     expect(service.getHealthTone('offline')).toBe('failed');
     expect(service.getHealthTone('unknown')).toBe('idle');
+  });
+
+  it('can add a configurable provider from a preset', () => {
+    const service = new ProviderConfigService();
+
+    const providerId = service.addProviderFromPreset('openrouter');
+
+    expect(service.providers().some((provider) => provider.id === providerId)).toBe(true);
+    expect(service.providers().find((provider) => provider.id === providerId)?.presetKind).toBe('openrouter');
+  });
+
+  it('can update editable provider fields', () => {
+    const service = new ProviderConfigService();
+
+    service.updateProvider('provider-openrouter', {
+      name: 'OpenRouter Custom',
+      baseUrl: 'https://openrouter.example/api/v1',
+      model: 'anthropic/claude-3.7-sonnet',
+      apiKey: 'secret',
+    });
+
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')).toMatchObject({
+      name: 'OpenRouter Custom',
+      baseUrl: 'https://openrouter.example/api/v1',
+      model: 'anthropic/claude-3.7-sonnet',
+      apiKey: 'secret',
+    });
+  });
+
+  it('can add a fully custom provider shell', () => {
+    const service = new ProviderConfigService();
+
+    const providerId = service.addCustomProvider();
+    const provider = service.providers().find((candidate) => candidate.id === providerId);
+
+    expect(provider?.kind).toBe('custom');
+    expect(provider?.presetKind).toBe('custom');
+    expect(provider?.template.placeholders).toContain('$model');
+  });
+
+  it('can remove a provider entry', () => {
+    const service = new ProviderConfigService();
+    const providerId = service.addProviderFromPreset('anthropic');
+
+    expect(service.removeProvider(providerId)).toBe(true);
+    expect(service.providers().some((provider) => provider.id === providerId)).toBe(false);
+  });
+
+  it('persists provider configuration locally', () => {
+    const firstService = new ProviderConfigService();
+    firstService.updateProvider('provider-openrouter', {
+      name: 'Persisted Router',
+      model: 'google/gemini-2.5-flash',
+    });
+
+    const secondService = new ProviderConfigService();
+    expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.name).toBe(
+      'Persisted Router',
+    );
+    expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.model).toBe(
+      'google/gemini-2.5-flash',
+    );
   });
 });

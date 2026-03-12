@@ -1,6 +1,27 @@
-export type ProviderKind = 'lm_studio' | 'openai' | 'anthropic' | 'ollama' | 'openrouter';
+export type ProviderKind = 'lm_studio' | 'openai' | 'anthropic' | 'ollama' | 'openrouter' | 'custom';
 export type ProviderRole = 'primary' | 'backup' | 'disabled';
 export type ProviderHealth = 'healthy' | 'degraded' | 'offline' | 'unknown';
+export type ProviderOwnership = 'backend' | 'ui';
+export type ProviderApiStyle = 'openai-compatible' | 'native';
+
+export interface ProviderTemplateDefinition {
+  requestTemplate: string;
+  placeholders: string[];
+}
+
+export interface ProviderPreset {
+  kind: ProviderKind;
+  label: string;
+  description: string;
+  baseUrl: string;
+  defaultModel: string;
+  apiStyle: ProviderApiStyle;
+  template: ProviderTemplateDefinition;
+  supportsApiKey: boolean;
+  ownership: ProviderOwnership;
+  modelSuggestions?: string[];
+  suggestedHeaders?: string[];
+}
 
 export interface ProviderConfig {
   id: string;
@@ -11,7 +32,14 @@ export interface ProviderConfig {
   role: ProviderRole;
   priority: number;
   health: ProviderHealth;
-  apiStyle: 'openai-compatible' | 'native';
+  apiStyle: ProviderApiStyle;
+  apiKey: string;
+  description: string;
+  template: ProviderTemplateDefinition;
+  supportsApiKey: boolean;
+  ownership: ProviderOwnership;
+  presetKind: ProviderKind | null;
+  modelSuggestions: string[];
 }
 
 export function describeProviderRole(role: ProviderRole): string {
