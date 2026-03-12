@@ -1,4 +1,13 @@
-import { Component, Input, ViewEncapsulation, computed, signal } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  Input,
+  ViewChild,
+  ViewEncapsulation,
+  computed,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
@@ -368,8 +377,8 @@ class ToolsScreen {
   standalone: true,
   imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 animate-fade-in pb-12">
-      <aside class="xl:col-span-3 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 animate-fade-in pb-12 xl:h-[calc(100vh-8rem)] xl:min-h-0">
+      <aside class="xl:col-span-3 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden flex flex-col min-h-0 xl:max-h-[calc(100vh-8rem)]">
         <div class="px-4 py-4 border-b border-white/5 bg-black/20">
           <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
             <ui-icon name="message-square" [size]="16" cssClass="text-cyan-400"></ui-icon>
@@ -379,7 +388,7 @@ class ToolsScreen {
             Chat is the main UI path for provider validation and execution-oriented prompting.
           </p>
         </div>
-        <div class="p-4 space-y-3">
+        <div class="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           <div class="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-3 py-3">
             <div class="text-xs uppercase tracking-wider text-cyan-300">Active provider</div>
             <div class="text-sm font-medium text-cyan-100 mt-1">{{ providerConfigService.primaryProvider()?.name ?? 'Unassigned' }}</div>
@@ -396,7 +405,7 @@ class ToolsScreen {
         </div>
       </aside>
 
-      <section class="xl:col-span-6 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden flex flex-col min-h-[42rem]">
+      <section class="xl:col-span-6 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden flex flex-col min-h-[36rem] max-h-[calc(100vh-8rem)]">
         <div class="px-5 py-4 border-b border-white/5 bg-black/20 flex items-center justify-between gap-4">
           <div>
             <h2 class="text-xl font-light text-white tracking-tight">Chat</h2>
@@ -409,7 +418,10 @@ class ToolsScreen {
           </ui-badge>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+        <div
+          #messageViewport
+          (scroll)="handleMessageViewportScroll()"
+          class="flex-1 min-h-0 overflow-y-auto p-5 space-y-4 custom-scrollbar">
           <div
             *ngFor="let message of chatSessionService.messages()"
             class="rounded-2xl border p-4"
@@ -503,13 +515,13 @@ class ToolsScreen {
         </div>
       </section>
 
-      <aside class="xl:col-span-3 space-y-4">
-        <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+      <aside class="xl:col-span-3 space-y-4 min-h-0 xl:max-h-[calc(100vh-8rem)]">
+        <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5 flex flex-col min-h-0 xl:max-h-[calc(100vh-8rem-8.5rem)]">
           <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
             <ui-icon name="git-branch" [size]="16" cssClass="text-violet-400"></ui-icon>
             Canvas Panel
           </div>
-          <div *ngIf="chatSessionService.canvasDocument() as canvas; else emptyCanvas" class="mt-4 space-y-3">
+          <div *ngIf="chatSessionService.canvasDocument() as canvas; else emptyCanvas" class="mt-4 space-y-3 min-h-0 overflow-y-auto custom-scrollbar">
             <div>
               <div class="text-sm text-zinc-100">{{ canvas.title }}</div>
               <div class="text-xs uppercase tracking-wider text-zinc-500 mt-1">{{ canvas.language }}</div>
@@ -543,9 +555,13 @@ class ToolsScreen {
     </div>
   `,
 })
-export class ChatScreen {
+export class ChatScreen implements AfterViewChecked {
   @Input({ required: true }) public providerConfigService!: ProviderConfigService;
   @Input({ required: true }) public chatSessionService!: ChatSessionService;
+  @ViewChild('messageViewport') private messageViewport?: ElementRef<HTMLDivElement>;
+
+  private lastScrollSignature = '';
+  private shouldAutoScroll = true;
 
   public updateDraft(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
@@ -557,6 +573,9 @@ export class ChatScreen {
     if (!didStart) {
       return;
     }
+
+    this.shouldAutoScroll = true;
+    this.scrollMessageViewportToBottom();
   }
 
   public handlePromptKeydown(event: KeyboardEvent): void {
@@ -566,6 +585,15 @@ export class ChatScreen {
 
     event.preventDefault();
     void this.submitPrompt();
+  }
+
+  public handleMessageViewportScroll(): void {
+    const viewport = this.messageViewport?.nativeElement;
+    if (!viewport) {
+      return;
+    }
+
+    this.shouldAutoScroll = this.isNearBottom(viewport);
   }
 
   public copyMessage(message: ChatMessage): void {
@@ -600,6 +628,46 @@ export class ChatScreen {
       default:
         return 'idle';
     }
+  }
+
+  public ngAfterViewChecked(): void {
+    const viewport = this.messageViewport?.nativeElement;
+    if (!viewport) {
+      return;
+    }
+
+    const messages = this.chatSessionService.messages();
+    const lastMessage = messages.at(-1);
+    const nextSignature = `${messages.length}:${lastMessage?.id ?? ''}:${lastMessage?.phase ?? ''}:${lastMessage?.rawText.length ?? 0}`;
+    if (nextSignature === this.lastScrollSignature) {
+      return;
+    }
+
+    this.lastScrollSignature = nextSignature;
+    if (!this.shouldAutoScroll) {
+      return;
+    }
+
+    this.scrollMessageViewportToBottom();
+  }
+
+  private scrollMessageViewportToBottom(): void {
+    const viewport = this.messageViewport?.nativeElement;
+    if (!viewport) {
+      return;
+    }
+
+    const scheduleFrame =
+      globalThis.requestAnimationFrame ??
+      ((callback: FrameRequestCallback) => setTimeout(() => callback(0), 0));
+    scheduleFrame(() => {
+      viewport.scrollTop = viewport.scrollHeight;
+    });
+  }
+
+  private isNearBottom(viewport: HTMLDivElement): boolean {
+    const remainingDistance = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    return remainingDistance <= 96;
   }
 }
 

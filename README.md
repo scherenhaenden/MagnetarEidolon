@@ -84,6 +84,9 @@ npm run setup
 # start backend + web UI together from the project root
 npm run dev
 
+# equivalent direct launcher from the project root
+./dev.sh
+
 # start only the backend
 npm run dev:api
 
