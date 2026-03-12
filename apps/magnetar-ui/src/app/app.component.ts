@@ -378,14 +378,23 @@ export class ToolsScreen {
   template: `
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 animate-fade-in pb-12 xl:h-[calc(100vh-8rem)] xl:min-h-0">
       <aside class="xl:col-span-3 bg-[#0a0a0d] border border-white/5 rounded-2xl overflow-hidden flex flex-col min-h-0 xl:max-h-[calc(100vh-8rem)]">
-        <div class="px-4 py-4 border-b border-white/5 bg-black/20">
-          <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
-            <ui-icon name="message-square" [size]="16" cssClass="text-cyan-400"></ui-icon>
-            Conversations
+        <div class="px-4 py-4 border-b border-white/5 bg-black/20 space-y-3">
+          <div class="flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+                <ui-icon name="message-square" [size]="16" cssClass="text-cyan-400"></ui-icon>
+                Conversations
+              </div>
+              <p class="text-xs text-zinc-500 mt-2">
+                Chat is the main UI path for provider validation and execution-oriented prompting.
+              </p>
+            </div>
+            <button
+              (click)="createNewSession()"
+              class="px-3 py-2 rounded-lg border border-cyan-500/20 bg-cyan-500/10 text-xs text-cyan-100 hover:bg-cyan-500/20">
+              New Chat
+            </button>
           </div>
-          <p class="text-xs text-zinc-500 mt-2">
-            Chat is the main UI path for provider validation and execution-oriented prompting.
-          </p>
         </div>
         <div class="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           <div class="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-3 py-3">
@@ -394,9 +403,35 @@ export class ToolsScreen {
           </div>
           <div
             *ngFor="let conversation of chatSessionService.conversationHistory()"
-            class="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-3">
-            <div class="text-sm text-zinc-200">{{ conversation.title }}</div>
-            <div class="text-xs text-zinc-500 mt-1">{{ conversation.preview }}</div>
+            (click)="switchToSession(conversation.id)"
+            class="rounded-xl border px-3 py-3 cursor-pointer transition-colors"
+            [ngClass]="isActiveSession(conversation.id)
+              ? 'border-cyan-500/20 bg-cyan-500/10'
+              : 'border-white/5 bg-white/[0.03] hover:bg-white/[0.05]'">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-sm text-zinc-200 truncate">{{ conversation.title }}</div>
+                <div class="text-xs text-zinc-500 mt-1 line-clamp-2">{{ conversation.preview || 'No messages yet.' }}</div>
+              </div>
+              <div class="flex flex-col items-end gap-2">
+                <div *ngIf="isActiveSession(conversation.id)" class="text-[11px] uppercase tracking-wider text-cyan-300">
+                  Active
+                </div>
+                <div class="flex items-center gap-1">
+                  <button
+                    (click)="renameSession(conversation.id, $event)"
+                    class="px-2 py-1 rounded border border-white/10 bg-white/5 text-[11px] text-zinc-300 hover:bg-white/10">
+                    Rename
+                  </button>
+                  <button
+                    (click)="deleteSession(conversation.id, $event)"
+                    [disabled]="chatSessionService.sessions().length <= 1"
+                    class="px-2 py-1 rounded border border-white/10 bg-white/5 text-[11px] text-zinc-300 enabled:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
           <div *ngIf="chatSessionService.conversationHistory().length === 0" class="rounded-xl border border-dashed border-white/10 px-3 py-4 text-xs text-zinc-500">
             The first prompt you send will appear here as the initial conversation record.
@@ -633,6 +668,43 @@ export class ChatScreen implements AfterViewChecked {
 
   public openCanvas(messageId: string): void {
     this.chatSessionService.openCanvasFromMessage(messageId);
+  }
+
+  public createNewSession(): void {
+    this.chatSessionService.createNewSession();
+    this.shouldAutoScroll = true;
+  }
+
+  public switchToSession(sessionId: string): void {
+    this.chatSessionService.switchToSession(sessionId);
+    this.shouldAutoScroll = true;
+  }
+
+  public renameSession(sessionId: string, event: Event): void {
+    event.stopPropagation();
+    const currentTitle =
+      this.chatSessionService.conversationHistory().find((conversation) => conversation.id === sessionId)?.title ??
+      'New Chat';
+    const nextTitle = globalThis.prompt?.('Rename chat', currentTitle);
+    if (!nextTitle) {
+      return;
+    }
+
+    this.chatSessionService.renameSession(sessionId, nextTitle);
+  }
+
+  public deleteSession(sessionId: string, event: Event): void {
+    event.stopPropagation();
+    const confirmed = globalThis.confirm?.('Delete this chat?') ?? false;
+    if (!confirmed) {
+      return;
+    }
+
+    this.chatSessionService.deleteSession(sessionId);
+  }
+
+  public isActiveSession(sessionId: string): boolean {
+    return this.chatSessionService.currentSession()?.id === sessionId;
   }
 
   public getMessageBadge(message: ChatMessage): BadgeStatus {
