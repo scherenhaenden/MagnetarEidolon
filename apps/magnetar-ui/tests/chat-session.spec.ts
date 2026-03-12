@@ -335,23 +335,58 @@ describe('ChatSessionService', () => {
 
     expect(fetchMock).toHaveBeenCalledOnce();
     expect((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[0]).toBe('/api/chat/stream');
-    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"prompt":"Generate a SQL migration"',
-    );
-    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"baseUrl":"http://127.0.0.1:1234/v1"',
-    );
-    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"model":"local-model"',
-    );
-    expect(((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string)).toContain(
-      '"apiStyle":"openai-compatible"',
-    );
+    const requestBody = JSON.parse(
+      ((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string),
+    ) as {
+      prompt: string;
+      providerId: string;
+      model: string | null;
+    };
+    expect(requestBody).toEqual({
+      prompt: 'Generate a SQL migration',
+      providerId: 'provider-lmstudio',
+      model: 'local-model',
+    });
     expect(service.messages()[2].phase).toBe('complete');
     expect(service.canvasDocument()).not.toBeNull();
     expect(service.canvasDocument()?.language).toBe('sql');
     expect(service.canvasDocument()?.content).toContain('ALTER TABLE users');
     expect(service.openCanvasFromMessage('missing')).toBe(false);
+  });
+
+  it('streams OpenRouter tokens through the backend when OpenRouter is the primary provider', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"type":"content.delta","content":"OpenRouter"}\n\n',
+        'data: {"type":"content.delta","content":" response"}\n\n',
+        'data: [DONE]\n\n',
+      ]),
+    );
+
+    const providerConfigService = new ProviderConfigService();
+    providerConfigService.setPrimary('provider-openrouter');
+    const service = new ChatSessionService(providerConfigService, fetchMock);
+
+    expect(await service.submitPrompt('Test OpenRouter')).toBe(true);
+    await service.waitForIdle();
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[0]).toBe('/api/chat/stream');
+    const requestBody = JSON.parse(
+      ((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string),
+    ) as {
+      prompt: string;
+      providerId: string;
+      model: string | null;
+    };
+    expect(requestBody).toEqual({
+      prompt: 'Test OpenRouter',
+      providerId: 'provider-openrouter',
+      model: 'openai/gpt-4.1-mini',
+    });
+    expect(service.messages()[2].providerLabel).toBe('OpenRouter');
+    expect(service.messages()[2].rawText).toBe('OpenRouter response');
+    expect(service.messages()[2].phase).toBe('complete');
   });
 
   it('exposes live streaming state while LM Studio tokens are still arriving', async () => {
@@ -496,12 +531,8 @@ describe('ChatSessionService', () => {
 
     expect(request).toEqual({
       prompt: 'hello',
-      provider: {
-        baseUrl: 'http://localhost:1234/v1',
-        model: 'qwen/test',
-        apiStyle: 'openai-compatible',
-        apiKey: null,
-      },
+      providerId: 'provider-lmstudio-openai',
+      model: 'qwen/test',
     });
   });
 
@@ -607,7 +638,7 @@ describe('ChatSessionService', () => {
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
 
     expect(await service.submitPrompt('Generate code')).toBe(false);
-    expect(service.messages().at(-1)?.rawText).toContain('LM Studio request failed with status 503.');
+    expect(service.messages().at(-1)?.rawText).toContain('LM Studio Local request failed with status 503.');
   });
 
   it('surfaces missing LM Studio completion content as an assistant error', async () => {
@@ -657,7 +688,7 @@ describe('ChatSessionService', () => {
     expect(await service.submitPrompt('Generate code')).toBe(false);
     expect(service.messages().at(-1)?.phase).toBe('error');
     expect(service.messages().at(-1)?.rawText).toContain(
-      'LM Studio did not provide a readable streaming response body.',
+      'LM Studio Local did not provide a readable streaming response body.',
     );
   });
 

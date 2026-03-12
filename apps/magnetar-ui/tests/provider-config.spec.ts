@@ -53,6 +53,10 @@ describe('ProviderConfigService', () => {
     expect(service.healthyFailoverProviders().map((provider) => provider.name)).toEqual([
       'OpenAI Cloud',
     ]);
+    expect(service.providers().some((provider) => provider.id === 'provider-openrouter')).toBe(true);
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.kind).toBe(
+      'openrouter',
+    );
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {
@@ -67,6 +71,17 @@ describe('ProviderConfigService', () => {
     );
     expect(service.providers().find((provider) => provider.id === 'provider-anthropic')?.priority).toBe(
       99,
+    );
+  });
+
+  it('can promote OpenRouter into the active failover chain', () => {
+    const service = new ProviderConfigService();
+
+    service.setBackup('provider-openrouter');
+
+    expect(service.backupProviders().map((provider) => provider.id)).toContain('provider-openrouter');
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.apiStyle).toBe(
+      'openai-compatible',
     );
   });
 

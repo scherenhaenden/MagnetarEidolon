@@ -1,4 +1,4 @@
-export type ProviderKind = 'lm_studio' | 'openai' | 'anthropic' | 'ollama';
+export type ProviderKind = 'lm_studio' | 'openai' | 'anthropic' | 'ollama' | 'openrouter';
 export type ProviderRole = 'primary' | 'backup' | 'disabled';
 export type ProviderHealth = 'healthy' | 'degraded' | 'offline' | 'unknown';
 

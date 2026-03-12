@@ -4,6 +4,16 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PIDS=()
 
+load_env() {
+  local env_file="$ROOT_DIR/.env"
+  if [[ -f "$env_file" ]]; then
+    set -a
+    # shellcheck disable=SC1090
+    source "$env_file"
+    set +a
+  fi
+}
+
 ensure_dependencies() {
   if [[ -x "$ROOT_DIR/apps/magnetar-api/node_modules/.bin/tsx" ]] && [[ -x "$ROOT_DIR/apps/magnetar-ui/node_modules/.bin/ng" ]]; then
     return
@@ -37,6 +47,7 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
+load_env
 ensure_dependencies
 
 npm --prefix "$ROOT_DIR/apps/magnetar-api" run start:dev &

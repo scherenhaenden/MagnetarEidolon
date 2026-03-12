@@ -7,10 +7,11 @@ import {
   ChatGatewayService,
   type BackendChatRequest,
 } from './chat.gateway.service.js';
+import { ProviderRegistryService } from './provider-registry.service.js';
 
 class TestChatGatewayService extends ChatGatewayService {
   public constructor(private readonly mockedFetchFn: (input: string, init?: RequestInit) => Promise<globalThis.Response>) {
-    super();
+    super(new ProviderRegistryService());
   }
 
   protected override getFetchFn(): (input: string, init?: RequestInit) => Promise<globalThis.Response> {
@@ -40,16 +41,12 @@ function createSseResponse(chunks: string[], status = 200): globalThis.Response 
 }
 
 function createBackendRequest(
-  overrides?: Partial<BackendChatRequest['provider']> & { prompt?: string },
+  overrides?: Partial<BackendChatRequest> & { prompt?: string },
 ): BackendChatRequest {
   return {
     prompt: overrides?.prompt ?? 'Hello from MagnetarEidolon',
-    provider: {
-      baseUrl: overrides?.baseUrl ?? 'http://127.0.0.1:1234/api/v1',
-      model: overrides?.model ?? 'ibm/granite-4-micro',
-      apiStyle: overrides?.apiStyle ?? 'native',
-      apiKey: overrides?.apiKey ?? null,
-    },
+    providerId: overrides?.providerId ?? 'provider-lmstudio',
+    model: overrides?.model ?? 'ibm/granite-4-micro',
   };
 }
 
@@ -136,7 +133,23 @@ test('ChatGatewayService normalizes native LM Studio deltas for the browser', as
   await service.streamChat(createBackendRequest(), recorder.response);
 
   assert.equal(fetchCalls.length, 1);
-  assert.equal(fetchCalls[0]?.input, 'http://127.0.0.1:1234/api/v1/chat');
+  assert.ok(fetchCalls[0]?.input);
+  assert.match(fetchCalls[0].input, /^http:\/\/127\.0\.0\.1:1234(?:\/[^/]+)*\/chat\/completions$/);
+  assert.equal(fetchCalls[0]?.init?.method, 'POST');
+  assert.equal(fetchCalls[0]?.init?.headers?.['Content-Type'], 'application/json');
+  const requestBody = JSON.parse(String(fetchCalls[0]?.init?.body)) as {
+    model: string;
+    stream: boolean;
+    messages: Array<{ role: string; content: string }>;
+  };
+  assert.equal(requestBody.model, 'ibm/granite-4-micro');
+  assert.equal(requestBody.stream, true);
+  assert.deepEqual(requestBody.messages, [
+    {
+      role: 'user',
+      content: 'Hello from MagnetarEidolon',
+    },
+  ]);
   assert.match(recorder.body, /"type":"content\.delta","content":"Hello"/);
   assert.match(recorder.body, /"type":"content\.delta","content":" world"/);
   assert.match(recorder.body, /\[DONE\]/);
@@ -146,30 +159,45 @@ test('ChatGatewayService normalizes native LM Studio deltas for the browser', as
 });
 
 test('ChatGatewayService normalizes OpenAI-compatible deltas for the browser', async (): Promise<void> => {
+  process.env.OPENROUTER_API_KEY = 'secret-openrouter-key';
+  process.env.OPENROUTER_HTTP_REFERER = 'https://magnetar.example/chat';
+  process.env.OPENROUTER_APP_TITLE = 'MagnetarEidolon Dev';
+  const fetchCalls: Array<{ input: string; init?: RequestInit }> = [];
   const fetchMock = async (
-    _input: string,
-    _init?: RequestInit,
-  ): Promise<globalThis.Response> =>
-    createSseResponse([
+    input: string,
+    init?: RequestInit,
+  ): Promise<globalThis.Response> => {
+    fetchCalls.push({ input, init });
+    return createSseResponse([
       'data: {"choices":[{"delta":{"content":"Alpha"}}]}\n\n',
       'data: {"choices":[{"delta":{"content":" Beta"}}]}\n\n',
       'data: [DONE]\n\n',
     ]);
+  };
 
   const service = new TestChatGatewayService(fetchMock);
   const recorder = createResponseRecorder();
 
   await service.streamChat(
     createBackendRequest({
-      apiStyle: 'openai-compatible',
-      baseUrl: 'http://127.0.0.1:1234/v1',
+      providerId: 'provider-openrouter',
+      model: 'openai/gpt-4.1-mini',
     }),
     recorder.response,
   );
 
+  assert.equal(fetchCalls.length, 1);
+  assert.match(fetchCalls[0]?.input ?? '', /^https:\/\/openrouter\.ai\/api\/v1\/chat\/completions$/);
+  assert.equal(fetchCalls[0]?.init?.headers?.Authorization, 'Bearer secret-openrouter-key');
+  assert.equal(fetchCalls[0]?.init?.headers?.['HTTP-Referer'], 'https://magnetar.example/chat');
+  assert.equal(fetchCalls[0]?.init?.headers?.['X-Title'], 'MagnetarEidolon Dev');
   assert.match(recorder.body, /"content":"Alpha"/);
   assert.match(recorder.body, /"content":" Beta"/);
   assert.match(recorder.body, /\[DONE\]/);
+
+  delete process.env.OPENROUTER_API_KEY;
+  delete process.env.OPENROUTER_HTTP_REFERER;
+  delete process.env.OPENROUTER_APP_TITLE;
 });
 
 test('ChatGatewayService returns upstream errors before opening the SSE stream', async (): Promise<void> => {
@@ -193,6 +221,57 @@ test('ChatGatewayService returns upstream errors before opening the SSE stream',
   assert.deepEqual(recorder.jsonPayload, {
     error: {
       message: '{"error":{"message":"messages field is required"}}',
+    },
+  });
+});
+
+test('ChatGatewayService rejects unknown provider ids before opening the SSE stream', async (): Promise<void> => {
+  const fetchMock = async (): Promise<globalThis.Response> => {
+    throw new Error('fetch should not be called');
+  };
+
+  const service = new TestChatGatewayService(fetchMock);
+  const recorder = createResponseRecorder();
+
+  await service.streamChat(
+    {
+      prompt: 'Hello from MagnetarEidolon',
+      providerId: 'provider-missing',
+      model: null,
+    },
+    recorder.response,
+  );
+
+  assert.equal(recorder.statusCode, 400);
+  assert.deepEqual(recorder.jsonPayload, {
+    error: {
+      message: 'Unknown provider id: provider-missing.',
+    },
+  });
+});
+
+test('ChatGatewayService rejects OpenRouter requests when the backend API key is missing', async (): Promise<void> => {
+  delete process.env.OPENROUTER_API_KEY;
+  const fetchMock = async (): Promise<globalThis.Response> => {
+    throw new Error('fetch should not be called');
+  };
+
+  const service = new TestChatGatewayService(fetchMock);
+  const recorder = createResponseRecorder();
+
+  await service.streamChat(
+    {
+      prompt: 'Hello from MagnetarEidolon',
+      providerId: 'provider-openrouter',
+      model: 'openai/gpt-4.1-mini',
+    },
+    recorder.response,
+  );
+
+  assert.equal(recorder.statusCode, 400);
+  assert.deepEqual(recorder.jsonPayload, {
+    error: {
+      message: 'OpenRouter is not configured. Set the required backend API key before using this provider.',
     },
   });
 });
