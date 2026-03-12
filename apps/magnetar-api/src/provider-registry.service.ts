@@ -18,6 +18,7 @@ export interface BackendProviderDefinition {
   requestFormat: BackendProviderRequestFormat;
   responseNormalizer: BackendProviderResponseNormalizer;
   apiKey: string | null;
+  extraHeaders: Record<string, string>;
 }
 
 @Injectable()
@@ -41,6 +42,7 @@ export class ProviderRegistryService {
         requestFormat: 'chat-completions',
         responseNormalizer: 'openai-sse',
         apiKey: null,
+        extraHeaders: {},
       },
       {
         id: 'provider-openrouter',
@@ -55,8 +57,25 @@ export class ProviderRegistryService {
         requestFormat: 'chat-completions',
         responseNormalizer: 'openai-sse',
         apiKey: this.readOptionalEnv('OPENROUTER_API_KEY'),
+        extraHeaders: this.readOpenRouterHeaders(),
       },
     ];
+  }
+
+  private readOpenRouterHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {};
+    const referer = this.readOptionalEnv('OPENROUTER_HTTP_REFERER');
+    const title = this.readOptionalEnv('OPENROUTER_APP_TITLE');
+
+    if (referer) {
+      headers['HTTP-Referer'] = referer;
+    }
+
+    if (title) {
+      headers['X-Title'] = title;
+    }
+
+    return headers;
   }
 
   private readStringEnv(name: string, fallback: string): string {

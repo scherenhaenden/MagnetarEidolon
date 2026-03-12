@@ -354,6 +354,41 @@ describe('ChatSessionService', () => {
     expect(service.openCanvasFromMessage('missing')).toBe(false);
   });
 
+  it('streams OpenRouter tokens through the backend when OpenRouter is the primary provider', async () => {
+    const fetchMock = vi.fn(async () =>
+      createSseResponse([
+        'data: {"type":"content.delta","content":"OpenRouter"}\n\n',
+        'data: {"type":"content.delta","content":" response"}\n\n',
+        'data: [DONE]\n\n',
+      ]),
+    );
+
+    const providerConfigService = new ProviderConfigService();
+    providerConfigService.setPrimary('provider-openrouter');
+    const service = new ChatSessionService(providerConfigService, fetchMock);
+
+    expect(await service.submitPrompt('Test OpenRouter')).toBe(true);
+    await service.waitForIdle();
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[0]).toBe('/api/chat/stream');
+    const requestBody = JSON.parse(
+      ((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].body as string),
+    ) as {
+      prompt: string;
+      providerId: string;
+      model: string | null;
+    };
+    expect(requestBody).toEqual({
+      prompt: 'Test OpenRouter',
+      providerId: 'provider-openrouter',
+      model: 'openai/gpt-4.1-mini',
+    });
+    expect(service.messages()[2].providerLabel).toBe('OpenRouter');
+    expect(service.messages()[2].rawText).toBe('OpenRouter response');
+    expect(service.messages()[2].phase).toBe('complete');
+  });
+
   it('exposes live streaming state while LM Studio tokens are still arriving', async () => {
     const deferred = createDeferredSseResponse();
     const fetchMock = vi.fn(async () => deferred.response);

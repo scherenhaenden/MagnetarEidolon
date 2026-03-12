@@ -99,6 +99,14 @@ npm run typecheck
 npm run build
 ```
 
+To test OpenRouter through the backend:
+
+```bash
+cp .env.example .env
+```
+
+Then set `OPENROUTER_API_KEY` in `.env`, optionally adjust `OPENROUTER_DEFAULT_MODEL`, start the app with `./dev.sh`, switch `OpenRouter` to `Primary` in the `Providers` tab, and send a prompt from `Chat`.
+
 Optional containerized development flow:
 
 ```bash

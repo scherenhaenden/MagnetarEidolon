@@ -35,6 +35,7 @@ test('ProviderRegistryService resolves OpenRouter runtime overrides from env', (
     requestFormat: 'chat-completions',
     responseNormalizer: 'openai-sse',
     apiKey: 'secret-openrouter-key',
+    extraHeaders: {},
   });
 
   delete process.env.OPENROUTER_BASE_URL;
@@ -53,6 +54,23 @@ test('ProviderRegistryService falls back to defaults and null for missing secret
   assert.equal(provider?.baseUrl, 'https://openrouter.ai/api/v1');
   assert.equal(provider?.defaultModel, 'openai/gpt-4.1-mini');
   assert.equal(provider?.apiKey, null);
+  assert.deepEqual(provider?.extraHeaders, {});
+});
+
+test('ProviderRegistryService exposes optional OpenRouter attribution headers from env', (): void => {
+  process.env.OPENROUTER_HTTP_REFERER = 'https://magnetar.example/chat';
+  process.env.OPENROUTER_APP_TITLE = 'MagnetarEidolon Dev';
+
+  const registry = new ProviderRegistryService();
+  const provider = registry.getProvider('provider-openrouter');
+
+  assert.deepEqual(provider?.extraHeaders, {
+    'HTTP-Referer': 'https://magnetar.example/chat',
+    'X-Title': 'MagnetarEidolon Dev',
+  });
+
+  delete process.env.OPENROUTER_HTTP_REFERER;
+  delete process.env.OPENROUTER_APP_TITLE;
 });
 
 test('ProviderRegistryService returns null for unknown providers', (): void => {

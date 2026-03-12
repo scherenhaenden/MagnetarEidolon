@@ -107,6 +107,50 @@ This is a conceptual contract, not a final TypeScript API.
 
 The key point is that execution behavior is described by configuration.
 
+### Provider Request and Response Templates
+For providers that are mostly shape-compatible but not identical, the backend should evolve toward templated request and response extraction instead of handwritten logic per provider.
+
+Illustrative direction:
+
+```ts
+interface ProviderRequestTemplate {
+  bodyTemplate: unknown;
+  placeholderBindings: Record<string, string>;
+}
+
+interface ProviderResponseTemplate {
+  streamContentPath?: string;
+  streamDoneSentinel?: string;
+  errorMessagePath?: string;
+}
+```
+
+Conceptually, the backend would support placeholders such as:
+
+- `$model`
+- `$prompt`
+- `$messages`
+- `$apiKey`
+- `$stream`
+
+Example:
+
+```json
+{
+  "model": "$model",
+  "messages": "$messages",
+  "stream": "$stream"
+}
+```
+
+This should not be treated as arbitrary string substitution everywhere. The safer model is:
+
+- structured JSON templates
+- explicit placeholder binding
+- controlled path extraction for responses
+
+That would allow many future providers to be added ad hoc by configuration plus bounded template rules instead of backend rewrites.
+
 ### Provider Secret Binding
 Secrets should be bound by backend configuration, not UI payloads.
 

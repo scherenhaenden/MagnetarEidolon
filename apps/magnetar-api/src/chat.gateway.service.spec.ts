@@ -159,15 +159,21 @@ test('ChatGatewayService normalizes native LM Studio deltas for the browser', as
 });
 
 test('ChatGatewayService normalizes OpenAI-compatible deltas for the browser', async (): Promise<void> => {
+  process.env.OPENROUTER_API_KEY = 'secret-openrouter-key';
+  process.env.OPENROUTER_HTTP_REFERER = 'https://magnetar.example/chat';
+  process.env.OPENROUTER_APP_TITLE = 'MagnetarEidolon Dev';
+  const fetchCalls: Array<{ input: string; init?: RequestInit }> = [];
   const fetchMock = async (
-    _input: string,
-    _init?: RequestInit,
-  ): Promise<globalThis.Response> =>
-    createSseResponse([
+    input: string,
+    init?: RequestInit,
+  ): Promise<globalThis.Response> => {
+    fetchCalls.push({ input, init });
+    return createSseResponse([
       'data: {"choices":[{"delta":{"content":"Alpha"}}]}\n\n',
       'data: {"choices":[{"delta":{"content":" Beta"}}]}\n\n',
       'data: [DONE]\n\n',
     ]);
+  };
 
   const service = new TestChatGatewayService(fetchMock);
   const recorder = createResponseRecorder();
@@ -180,9 +186,18 @@ test('ChatGatewayService normalizes OpenAI-compatible deltas for the browser', a
     recorder.response,
   );
 
+  assert.equal(fetchCalls.length, 1);
+  assert.match(fetchCalls[0]?.input ?? '', /^https:\/\/openrouter\.ai\/api\/v1\/chat\/completions$/);
+  assert.equal(fetchCalls[0]?.init?.headers?.Authorization, 'Bearer secret-openrouter-key');
+  assert.equal(fetchCalls[0]?.init?.headers?.['HTTP-Referer'], 'https://magnetar.example/chat');
+  assert.equal(fetchCalls[0]?.init?.headers?.['X-Title'], 'MagnetarEidolon Dev');
   assert.match(recorder.body, /"content":"Alpha"/);
   assert.match(recorder.body, /"content":" Beta"/);
   assert.match(recorder.body, /\[DONE\]/);
+
+  delete process.env.OPENROUTER_API_KEY;
+  delete process.env.OPENROUTER_HTTP_REFERER;
+  delete process.env.OPENROUTER_APP_TITLE;
 });
 
 test('ChatGatewayService returns upstream errors before opening the SSE stream', async (): Promise<void> => {
@@ -231,6 +246,32 @@ test('ChatGatewayService rejects unknown provider ids before opening the SSE str
   assert.deepEqual(recorder.jsonPayload, {
     error: {
       message: 'Unknown provider id: provider-missing.',
+    },
+  });
+});
+
+test('ChatGatewayService rejects OpenRouter requests when the backend API key is missing', async (): Promise<void> => {
+  delete process.env.OPENROUTER_API_KEY;
+  const fetchMock = async (): Promise<globalThis.Response> => {
+    throw new Error('fetch should not be called');
+  };
+
+  const service = new TestChatGatewayService(fetchMock);
+  const recorder = createResponseRecorder();
+
+  await service.streamChat(
+    {
+      prompt: 'Hello from MagnetarEidolon',
+      providerId: 'provider-openrouter',
+      model: 'openai/gpt-4.1-mini',
+    },
+    recorder.response,
+  );
+
+  assert.equal(recorder.statusCode, 400);
+  assert.deepEqual(recorder.jsonPayload, {
+    error: {
+      message: 'OpenRouter is not configured. Set the required backend API key before using this provider.',
     },
   });
 });

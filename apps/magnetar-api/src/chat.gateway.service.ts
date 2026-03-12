@@ -104,14 +104,19 @@ export class ChatGatewayService {
       return;
     }
 
+    if (provider.authStrategy === 'bearer' && !provider.apiKey) {
+      response.status(400).json({
+        error: {
+          message: `${provider.displayName} is not configured. Set the required backend API key before using this provider.`,
+        },
+      });
+      return;
+    }
+
     const target = this.buildProviderTarget(request, provider);
     const upstreamResponse = await this.fetchFn(target.url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        ...(target.apiKey ? { Authorization: `Bearer ${target.apiKey}` } : {}),
-      },
+      headers: this.buildRequestHeaders(target, provider),
       body: JSON.stringify(target.body),
     });
 
@@ -208,6 +213,18 @@ export class ChatGatewayService {
         stream: true,
       },
       apiKey: provider.apiKey,
+    };
+  }
+
+  private buildRequestHeaders(
+    target: { apiKey: string | null },
+    provider: BackendProviderDefinition,
+  ): Record<string, string> {
+    return {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      ...(target.apiKey ? { Authorization: `Bearer ${target.apiKey}` } : {}),
+      ...provider.extraHeaders,
     };
   }
 
