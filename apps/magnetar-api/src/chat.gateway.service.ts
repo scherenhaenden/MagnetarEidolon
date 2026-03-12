@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import type { Response as ExpressResponse } from 'express';
 
-export type ProviderApiStyle = 'native' | 'openai-compatible';
+import {
+  ProviderRegistryService,
+  type BackendProviderApiStyle,
+  type BackendProviderDefinition,
+} from './provider-registry.service.js';
 
 export interface BackendChatRequest {
   prompt: string;
-  provider: {
-    baseUrl: string;
-    model: string;
-    apiStyle: ProviderApiStyle;
-    apiKey?: string | null;
-  };
+  providerId: string;
+  model?: string | null;
 }
 
 interface NativeLmStudioRequest {
@@ -76,6 +76,10 @@ interface FetchLike {
 
 @Injectable()
 export class ChatGatewayService {
+  public constructor(
+    private readonly providerRegistryService: ProviderRegistryService,
+  ) {}
+
   public async streamChat(
     request: BackendChatRequest,
     response: ExpressResponse,
@@ -90,7 +94,17 @@ export class ChatGatewayService {
       return;
     }
 
-    const target = this.buildLmStudioTarget(request);
+    const provider = this.providerRegistryService.getProvider(request.providerId);
+    if (!provider) {
+      response.status(400).json({
+        error: {
+          message: `Unknown provider id: ${request.providerId}.`,
+        },
+      });
+      return;
+    }
+
+    const target = this.buildProviderTarget(request, provider);
     const upstreamResponse = await this.fetchFn(target.url, {
       method: 'POST',
       headers: {
@@ -105,7 +119,7 @@ export class ChatGatewayService {
       const errorText: string = await upstreamResponse.text();
       response.status(upstreamResponse.status).json({
         error: {
-          message: errorText || `LM Studio request failed with status ${upstreamResponse.status}.`,
+          message: errorText || `${provider.displayName} request failed with status ${upstreamResponse.status}.`,
         },
       });
       return;
@@ -114,7 +128,7 @@ export class ChatGatewayService {
     if (!upstreamResponse.body) {
       response.status(502).json({
         error: {
-          message: 'LM Studio did not return a readable response body.',
+          message: `${provider.displayName} did not return a readable response body.`,
         },
       });
       return;
@@ -166,34 +180,34 @@ export class ChatGatewayService {
     }
   }
 
-  private buildLmStudioTarget(request: BackendChatRequest): {
+  private buildProviderTarget(request: BackendChatRequest, provider: BackendProviderDefinition): {
     url: string;
     body: NativeLmStudioRequest | OpenAiCompatibleRequest;
     apiKey: string | null;
   } {
-    const baseUrl: string = request.provider.baseUrl.replace(/\/+$/, '');
-    const apiKey: string | null = request.provider.apiKey?.trim() || null;
+    const baseUrl: string = provider.baseUrl.replace(/\/+$/, '');
+    const model: string = request.model?.trim() || provider.defaultModel;
 
-    if (request.provider.apiStyle === 'native') {
+    if (provider.apiStyle === 'native') {
       return {
-        url: `${baseUrl}/chat`,
+        url: `${baseUrl}${provider.chatPath}`,
         body: {
-          model: request.provider.model,
+          model,
           input: request.prompt,
           stream: true,
         },
-        apiKey,
+        apiKey: provider.apiKey,
       };
     }
 
     return {
-      url: `${baseUrl}/chat/completions`,
+      url: `${baseUrl}${provider.chatPath}`,
       body: {
-        model: request.provider.model,
+        model,
         messages: [{ role: 'user', content: request.prompt }],
         stream: true,
       },
-      apiKey,
+      apiKey: provider.apiKey,
     };
   }
 

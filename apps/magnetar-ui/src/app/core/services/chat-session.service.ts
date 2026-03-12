@@ -48,12 +48,8 @@ interface LMStudioChatCompletionResponse {
 
 interface BackendChatStreamRequest {
   prompt: string;
-  provider: {
-    baseUrl: string;
-    model: string;
-    apiStyle: 'native' | 'openai-compatible';
-    apiKey: string | null;
-  };
+  providerId: string;
+  model: string | null;
 }
 
 const WELCOME_MESSAGE = buildAssistantMessage(
@@ -134,9 +130,9 @@ export class ChatSessionService {
       buildAssistantMessage(assistantMessageId, '', provider.name, 'streaming'),
     ]);
 
-    if (provider.kind === 'lm_studio') {
+    if (shouldUseBackendProviderTransport(provider)) {
       try {
-        await this.startLiveLMStudioStream(trimmedPrompt, provider, assistantMessageId);
+        await this.startLiveProviderStream(trimmedPrompt, provider, assistantMessageId);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
@@ -256,7 +252,7 @@ export class ChatSessionService {
     return id;
   }
 
-  private async startLiveLMStudioStream(
+  private async startLiveProviderStream(
     prompt: string,
     provider: ProviderConfig,
     assistantMessageId: string,
@@ -273,11 +269,11 @@ export class ChatSessionService {
 
     if (!response.ok) {
       const json = (await response.json()) as LMStudioChatCompletionResponse;
-      throw new Error(json.error?.message ?? `LM Studio request failed with status ${response.status}.`);
+      throw new Error(json.error?.message ?? `${provider.name} request failed with status ${response.status}.`);
     }
 
     if (!response.body) {
-      throw new Error('LM Studio did not provide a readable streaming response body.');
+      throw new Error(`${provider.name} did not provide a readable streaming response body.`);
     }
 
     const liveStream = {
@@ -449,14 +445,14 @@ export class ChatSessionService {
   ): BackendChatStreamRequest {
     return {
       prompt,
-      provider: {
-        baseUrl: provider.baseUrl,
-        model: provider.model,
-        apiStyle: provider.apiStyle,
-        apiKey: null,
-      },
+      providerId: provider.id,
+      model: provider.model,
     };
   }
+}
+
+function shouldUseBackendProviderTransport(provider: ProviderConfig): boolean {
+  return provider.kind === 'lm_studio' || provider.kind === 'openrouter';
 }
 
 function buildUserMessage(id: string, prompt: string): ChatMessage {
