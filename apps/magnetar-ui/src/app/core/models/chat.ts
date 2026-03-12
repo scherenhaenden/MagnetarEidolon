@@ -29,6 +29,7 @@ export interface ChatCanvasDocument {
   content: string;
   language: string;
   renderKind: 'source' | 'html';
+  renderTitle: string | null;
 }
 
 export function parseChatBlocks(markdown: string): ChatBlock[] {
@@ -208,6 +209,7 @@ export function extractCanvasDocument(message: ChatMessage): ChatCanvasDocument 
     content: firstCodeBlock.code,
     language: firstCodeBlock.language,
     renderKind: detectCanvasRenderKind(firstCodeBlock.language, firstCodeBlock.code),
+    renderTitle: extractCanvasRenderTitle(firstCodeBlock.language, firstCodeBlock.code),
   };
 }
 
@@ -230,4 +232,17 @@ function detectCanvasRenderKind(language: string, code: string): 'source' | 'htm
   }
 
   return 'source';
+}
+
+function extractCanvasRenderTitle(language: string, code: string): string | null {
+  if (detectCanvasRenderKind(language, code) !== 'html') {
+    return null;
+  }
+
+  const titleMatch = code.match(/<title>\s*([^<]+?)\s*<\/title>/i);
+  if (!titleMatch) {
+    return null;
+  }
+
+  return titleMatch[1].trim() || null;
 }

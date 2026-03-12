@@ -531,7 +531,7 @@ class ToolsScreen {
             <div *ngIf="canvas.renderKind === 'html'" class="space-y-3">
               <div class="rounded-xl border border-emerald-500/20 bg-white overflow-hidden">
                 <div class="px-3 py-2 border-b border-black/10 text-xs uppercase tracking-wider text-slate-600 bg-slate-100">
-                  Rendered HTML
+                  {{ canvas.renderTitle || 'Rendered HTML' }}
                 </div>
                 <iframe
                   title="Canvas HTML preview"

@@ -134,6 +134,7 @@ console.log("hi");
       content: 'select 1;',
       language: 'sql',
       renderKind: 'source',
+      renderTitle: null,
     });
 
     expect(
@@ -162,6 +163,7 @@ console.log("hi");
       content: 'artifact',
       language: 'txt',
       renderKind: 'source',
+      renderTitle: null,
     });
 
     expect(
@@ -170,15 +172,18 @@ console.log("hi");
         role: 'assistant',
         phase: 'complete',
         providerLabel: 'LM Studio Local',
-        rawText: '```html\n<div>Hello canvas</div>\n```',
-        blocks: parseChatBlocks('```html\n<div>Hello canvas</div>\n```'),
+        rawText: '```html\n<!DOCTYPE html>\n<html><head><title>Sick Website</title></head><body><div>Hello canvas</div></body></html>\n```',
+        blocks: parseChatBlocks(
+          '```html\n<!DOCTYPE html>\n<html><head><title>Sick Website</title></head><body><div>Hello canvas</div></body></html>\n```',
+        ),
       }),
     ).toEqual({
       messageId: 'msg-assistant-html',
       title: 'Canvas from LM Studio Local response',
-      content: '<div>Hello canvas</div>',
+      content: '<!DOCTYPE html>\n<html><head><title>Sick Website</title></head><body><div>Hello canvas</div></body></html>',
       language: 'html',
       renderKind: 'html',
+      renderTitle: 'Sick Website',
     });
 
     expect(
