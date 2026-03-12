@@ -272,7 +272,8 @@ describe('ChatSessionService', () => {
     expect(service.messages()).toHaveLength(1);
     expect(service.draft()).toBe('');
     expect(service.activeProviderLabel()).toBe('LM Studio Local');
-    expect(service.conversationHistory()).toEqual([]);
+    expect(service.conversationHistory()).toHaveLength(1);
+    expect(service.conversationHistory()[0]?.title).toBe('New Chat');
   });
 
   it('ignores empty prompts', async () => {
@@ -741,8 +742,8 @@ describe('ChatSessionService', () => {
   it('uses the generic provider error text when a non-Error value reaches live-stream failure handling', () => {
     const service = new ChatSessionService(new ProviderConfigService());
 
-    (service as any).messageState.set([
-      ...(service as any).messageState(),
+    (service as any).updateCurrentSessionMessages((messages: any[]) => [
+      ...messages,
       {
         id: 'assistant-999',
         role: 'assistant',
