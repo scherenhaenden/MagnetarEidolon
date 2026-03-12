@@ -1,4 +1,6 @@
 export const ICONS: Record<string, string> = {
+  'chevron-up': 'M18 15l-6-6-6 6',
+  'chevron-down': 'M6 9l6 6 6-6',
   home: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
   activity: 'M22 12h-4l-3 9L9 3l-3 9H2',
   'git-branch':
