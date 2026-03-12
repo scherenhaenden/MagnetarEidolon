@@ -1,4 +1,6 @@
 export const ICONS: Record<string, string> = {
+  'chevron-up': 'M18 15l-6-6-6 6',
+  'chevron-down': 'M6 9l6 6 6-6',
   home: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10',
   activity: 'M22 12h-4l-3 9L9 3l-3 9H2',
   'git-branch':
@@ -25,4 +27,6 @@ export const ICONS: Record<string, string> = {
   x: 'M18 6L6 18 M6 6l12 12',
   alert:
     'M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z M12 9v4 M12 17h.01',
+  'plus-circle':
+    'M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z M12 8v8 M8 12h8',
 };

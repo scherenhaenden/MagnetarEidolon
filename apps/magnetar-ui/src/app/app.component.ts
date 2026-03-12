@@ -896,7 +896,7 @@ export class MemoryScreen {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[18rem,minmax(0,1fr),24rem] gap-6 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_24rem] gap-6 items-start">
         <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-5 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
           <div class="space-y-2">
             <div class="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-cyan-200">
@@ -909,31 +909,82 @@ export class MemoryScreen {
             </p>
           </div>
 
-          <div class="space-y-3">
-            <button
-              (click)="addPreset('openrouter')"
-              class="w-full rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400 to-teal-300 px-4 py-3 text-left text-sm font-semibold text-slate-950 shadow-[0_12px_40px_rgba(34,211,238,0.25)] transition-transform hover:-translate-y-0.5">
-              <div>OpenRouter</div>
-              <div class="mt-1 text-xs font-medium text-slate-800/80">Cloud routing and multi-model access</div>
-            </button>
-            <button
-              (click)="addPreset('openai')"
-              class="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm text-zinc-100 hover:bg-white/[0.07]">
-              <div class="font-medium">OpenAI</div>
-              <div class="mt-1 text-xs text-zinc-500">Hosted OpenAI-compatible endpoint</div>
-            </button>
-            <button
-              (click)="addPreset('lm_studio')"
-              class="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left text-sm text-zinc-100 hover:bg-white/[0.07]">
-              <div class="font-medium">LM Studio</div>
-              <div class="mt-1 text-xs text-zinc-500">Local-first smoke and development path</div>
-            </button>
-            <button
-              (click)="addCustomProvider()"
-              class="w-full rounded-2xl border border-violet-500/20 bg-violet-500/10 px-4 py-3 text-left text-sm text-violet-100 hover:bg-violet-500/15">
-              <div class="font-medium">Custom Provider</div>
-              <div class="mt-1 text-xs text-violet-100/70">Start from a blank configurable shell</div>
-            </button>
+          <div class="space-y-2">
+            <!-- OpenRouter Accordion -->
+            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
+                 [ngClass]="expandedMenuItem() === 'openrouter' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
+              <button
+                (click)="toggleMenuItem('openrouter')"
+                class="w-full px-4 py-3 text-left flex items-center justify-between">
+                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'openrouter' ? 'text-cyan-300' : 'text-zinc-300'">OpenRouter</span>
+                <ui-icon [name]="expandedMenuItem() === 'openrouter' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+              </button>
+              <div *ngIf="expandedMenuItem() === 'openrouter'" class="px-4 pb-4 animate-fade-in">
+                <p class="text-xs text-zinc-400 mb-3">Cloud routing and multi-model access.</p>
+                <button
+                  (click)="addPreset('openrouter')"
+                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
+                  Add OpenRouter
+                </button>
+              </div>
+            </div>
+
+            <!-- OpenAI Accordion -->
+            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
+                 [ngClass]="expandedMenuItem() === 'openai' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
+              <button
+                (click)="toggleMenuItem('openai')"
+                class="w-full px-4 py-3 text-left flex items-center justify-between">
+                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'openai' ? 'text-cyan-300' : 'text-zinc-300'">OpenAI</span>
+                <ui-icon [name]="expandedMenuItem() === 'openai' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+              </button>
+              <div *ngIf="expandedMenuItem() === 'openai'" class="px-4 pb-4 animate-fade-in">
+                <p class="text-xs text-zinc-400 mb-3">Hosted OpenAI-compatible endpoint.</p>
+                <button
+                  (click)="addPreset('openai')"
+                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
+                  Add OpenAI
+                </button>
+              </div>
+            </div>
+
+            <!-- LM Studio Accordion -->
+            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
+                 [ngClass]="expandedMenuItem() === 'lm_studio' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
+              <button
+                (click)="toggleMenuItem('lm_studio')"
+                class="w-full px-4 py-3 text-left flex items-center justify-between">
+                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'lm_studio' ? 'text-cyan-300' : 'text-zinc-300'">LM Studio</span>
+                <ui-icon [name]="expandedMenuItem() === 'lm_studio' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+              </button>
+              <div *ngIf="expandedMenuItem() === 'lm_studio'" class="px-4 pb-4 animate-fade-in">
+                <p class="text-xs text-zinc-400 mb-3">Local-first smoke and development path.</p>
+                <button
+                  (click)="addPreset('lm_studio')"
+                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
+                  Add LM Studio
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Provider Accordion -->
+            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
+                 [ngClass]="expandedMenuItem() === 'custom' ? 'border-violet-500/30 shadow-[0_12px_40px_rgba(139,92,246,0.15)] bg-gradient-to-br from-violet-900/30 to-fuchsia-900/10' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
+              <button
+                (click)="toggleMenuItem('custom')"
+                class="w-full px-4 py-3 text-left flex items-center justify-between">
+                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'custom' ? 'text-violet-300' : 'text-zinc-300'">Custom Provider</span>
+                <ui-icon [name]="expandedMenuItem() === 'custom' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+              </button>
+              <div *ngIf="expandedMenuItem() === 'custom'" class="px-4 pb-4 animate-fade-in">
+                <p class="text-xs text-zinc-400 mb-3">Start from a blank configurable shell.</p>
+                <button
+                  (click)="addCustomProvider()"
+                  class="w-full rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-100 text-xs py-2 font-medium transition-colors">
+                  Add Custom Provider
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="rounded-2xl border border-white/5 bg-white/[0.03] p-4 space-y-3">
@@ -1223,6 +1274,11 @@ export class MemoryScreen {
   `,
 })
 export class ProvidersScreen {
+  public readonly expandedMenuItem = signal<string | null>('openrouter');
+  public toggleMenuItem(item: string): void {
+    this.expandedMenuItem.set(this.expandedMenuItem() === item ? null : item);
+  }
+
   public readonly providerConfigService = inject(ProviderConfigService);
   private readonly selectedProviderId = signal<string | null>(this.providerConfigService.providers()[0]?.id ?? null);
   public readonly viewMode = signal<'grid' | 'list'>('grid');
