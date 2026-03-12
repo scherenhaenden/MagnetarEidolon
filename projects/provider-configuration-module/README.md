@@ -13,6 +13,9 @@ This module defines the planning, architecture, and delivery path for configurin
 - Primary/backup/disabled role semantics.
 - Ordering and failover intent in the UI.
 - Runtime wiring path for future provider consumption.
+- Backend-owned provider registry and config-driven execution metadata.
+- Backend-owned provider secret loading and runtime overrides.
+- OpenRouter as the first concrete external provider to validate the backend model.
 
 ## Module Documents
 | File | Role |
