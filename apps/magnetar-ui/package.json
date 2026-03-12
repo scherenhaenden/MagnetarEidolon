@@ -23,6 +23,7 @@
     "magnetar-cli": "dist/cli/magnetar-cli.js"
   },
   "dependencies": {
+    "@angular/router": "21.2.1",
     "@magnetar/magnetar-sdk": "file:../../packages/magnetar-sdk",
     "rxjs": "^7.8.1",
     "zone.js": "^0.16.1"

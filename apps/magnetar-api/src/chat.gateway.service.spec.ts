@@ -136,7 +136,8 @@ test('ChatGatewayService normalizes native LM Studio deltas for the browser', as
   assert.ok(fetchCalls[0]?.input);
   assert.match(fetchCalls[0].input, /^http:\/\/127\.0\.0\.1:1234(?:\/[^/]+)*\/chat\/completions$/);
   assert.equal(fetchCalls[0]?.init?.method, 'POST');
-  assert.equal(fetchCalls[0]?.init?.headers?.['Content-Type'], 'application/json');
+  const lmStudioHeaders = fetchCalls[0]?.init?.headers as Record<string, string>;
+  assert.equal(lmStudioHeaders['Content-Type'], 'application/json');
   const requestBody = JSON.parse(String(fetchCalls[0]?.init?.body)) as {
     model: string;
     stream: boolean;
@@ -188,9 +189,10 @@ test('ChatGatewayService normalizes OpenAI-compatible deltas for the browser', a
 
   assert.equal(fetchCalls.length, 1);
   assert.match(fetchCalls[0]?.input ?? '', /^https:\/\/openrouter\.ai\/api\/v1\/chat\/completions$/);
-  assert.equal(fetchCalls[0]?.init?.headers?.Authorization, 'Bearer secret-openrouter-key');
-  assert.equal(fetchCalls[0]?.init?.headers?.['HTTP-Referer'], 'https://magnetar.example/chat');
-  assert.equal(fetchCalls[0]?.init?.headers?.['X-Title'], 'MagnetarEidolon Dev');
+  const openRouterHeaders = fetchCalls[0]?.init?.headers as Record<string, string>;
+  assert.equal(openRouterHeaders.Authorization, 'Bearer secret-openrouter-key');
+  assert.equal(openRouterHeaders['HTTP-Referer'], 'https://magnetar.example/chat');
+  assert.equal(openRouterHeaders['X-Title'], 'MagnetarEidolon Dev');
   assert.match(recorder.body, /"content":"Alpha"/);
   assert.match(recorder.body, /"content":" Beta"/);
   assert.match(recorder.body, /\[DONE\]/);

@@ -1,14 +1,16 @@
-import { computed, signal } from '@angular/core';
+import { Inject, Injectable, InjectionToken, inject, computed, signal } from '@angular/core';
 
 import {
   ChatCanvasDocument,
+  ChatConversationSession,
   ChatConversationSummary,
   ChatMessage,
-  buildConversationSummary,
   extractCanvasDocument,
   parseChatBlocks,
 } from '../models/chat.js';
 import type { ProviderConfig } from '../models/provider-config.js';
+import { ChatSessionCollection } from './chat-session-collection.js';
+import { ChatSessionStore } from './chat-session-store.js';
 import { ProviderConfigService } from './provider-config.service.js';
 
 interface PendingStream {
@@ -25,6 +27,10 @@ interface ActiveLiveStream {
 interface FetchLike {
   (input: string, init?: RequestInit): Promise<Response>;
 }
+
+export const CHAT_FETCH_FN = new InjectionToken<FetchLike>('CHAT_FETCH_FN', {
+  factory: () => globalThis.fetch.bind(globalThis) as FetchLike,
+});
 
 interface LMStudioChatCompletionResponse {
   type?: string;
@@ -59,8 +65,18 @@ const WELCOME_MESSAGE = buildAssistantMessage(
   'complete',
 );
 
+const CHAT_STORAGE_KEY = 'magnetar.chat.sessions.v1';
+const ACTIVE_CHAT_STORAGE_KEY = 'magnetar.chat.active-session.v1';
+
+@Injectable({
+  providedIn: 'root',
+})
 export class ChatSessionService {
-  private readonly messageState = signal<ChatMessage[]>([WELCOME_MESSAGE]);
+  private readonly sessionStore = new ChatSessionStore(CHAT_STORAGE_KEY, ACTIVE_CHAT_STORAGE_KEY);
+  private readonly sessionCollection = new ChatSessionCollection();
+  private readonly initialSessions = this.sessionCollection.normalizeSessions(this.sessionStore.loadSessions());
+  private readonly sessionState = signal<ChatConversationSession[]>(this.initialSessions);
+  private readonly activeSessionIdState = signal<string>('');
   private readonly draftState = signal('');
   private readonly canvasState = signal<ChatCanvasDocument | null>(null);
   private readonly pendingStreamState = signal<PendingStream | null>(null);
@@ -68,8 +84,9 @@ export class ChatSessionService {
   private pendingStream: PendingStream | null = null;
   private activeStreamPromise: Promise<void> | null = null;
   private nextId = 1;
+  private readonly fetchFn: FetchLike;
 
-  public readonly messages = computed(() => this.messageState());
+  public readonly messages = computed(() => this.currentSession()?.messages ?? []);
   public readonly draft = computed(() => this.draftState());
   public readonly activeProviderLabel = computed(
     () => this.providerConfigService.primaryProvider()?.name ?? 'No provider configured',
@@ -77,18 +94,37 @@ export class ChatSessionService {
   public readonly isStreaming = computed(
     () => this.pendingStreamState() !== null || this.liveStreamState() !== null,
   );
+  public readonly sessions = computed(() => this.sessionState());
+  public readonly currentSession = computed<ChatConversationSession | null>(
+    () => this.sessionState().find((session) => session.id === this.activeSessionIdState()) ?? null,
+  );
   public readonly conversationHistory = computed<ChatConversationSummary[]>(() =>
-    this.messageState()
-      .filter((message) => message.role === 'user')
-      .map((message) => buildConversationSummary(message))
-      .reverse(),
+    this.sessionState().map((session) => ({
+      id: session.id,
+      title: session.title,
+      preview: session.preview,
+      updatedAt: session.updatedAt,
+    })),
   );
   public readonly canvasDocument = computed(() => this.canvasState());
 
   public constructor(
-    private readonly providerConfigService: ProviderConfigService,
-    private readonly fetchFn: FetchLike = globalThis.fetch.bind(globalThis),
-  ) {}
+    private readonly providerConfigService: ProviderConfigService = inject(ProviderConfigService),
+    @Inject(CHAT_FETCH_FN) fetchFn?: FetchLike,
+  ) {
+    this.fetchFn = fetchFn ?? globalThis.fetch.bind(globalThis);
+
+    if (this.sessionState().length === 0) {
+      const initialSession = this.sessionCollection.createSession(WELCOME_MESSAGE);
+      this.sessionState.set([initialSession]);
+      this.activeSessionIdState.set(initialSession.id);
+      this.persistSessions();
+      this.persistActiveSession();
+      return;
+    }
+
+    this.activeSessionIdState.set(this.resolveStoredActiveSessionId(this.sessionState()));
+  }
 
   public setDraft(value: string): void {
     this.draftState.set(value);
@@ -109,23 +145,21 @@ export class ChatSessionService {
 
     const provider = this.providerConfigService.primaryProvider();
     if (!provider) {
-      this.messageState.update((messages) => [
-        ...messages,
+      this.appendMessageToCurrentSession(
         buildAssistantMessage(
           this.allocateMessageId('assistant-error'),
           'No primary provider is configured. Configure a provider before using chat.',
           'Provider Missing',
           'error',
         ),
-      ]);
+      );
       return false;
     }
 
     const userMessage = buildUserMessage(this.allocateMessageId('user'), trimmedPrompt);
     const assistantMessageId = this.allocateMessageId('assistant');
 
-    this.messageState.update((messages) => [
-      ...messages,
+    this.appendMessagesToCurrentSession([
       userMessage,
       buildAssistantMessage(assistantMessageId, '', provider.name, 'streaming'),
     ]);
@@ -136,7 +170,7 @@ export class ChatSessionService {
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
-        this.messageState.update((messages) =>
+        this.updateCurrentSessionMessages((messages) =>
           messages.map((message) =>
             message.id === assistantMessageId
               ? buildAssistantMessage(assistantMessageId, errorMessage, provider.name, 'error')
@@ -173,7 +207,7 @@ export class ChatSessionService {
       return false;
     }
 
-    this.messageState.update((messages) =>
+    this.updateCurrentSessionMessages((messages) =>
       messages.map((message) => {
         if (message.id !== this.pendingStream?.messageId) {
           return message;
@@ -209,7 +243,7 @@ export class ChatSessionService {
   }
 
   public openCanvasFromMessage(messageId: string): boolean {
-    const message = this.messageState().find((candidate) => candidate.id === messageId);
+    const message = this.messages().find((candidate) => candidate.id === messageId);
     if (!message) {
       return false;
     }
@@ -227,12 +261,85 @@ export class ChatSessionService {
     this.canvasState.set(null);
   }
 
+  public createNewSession(): void {
+    const session = this.sessionCollection.createSession(WELCOME_MESSAGE);
+    this.sessionState.update((sessions) => [session, ...sessions]);
+    this.activeSessionIdState.set(session.id);
+    this.canvasState.set(null);
+    this.persistSessions();
+    this.persistActiveSession();
+  }
+
+  public switchToSession(sessionId: string): boolean {
+    const exists = this.sessionState().some((session) => session.id === sessionId);
+    if (!exists) {
+      return false;
+    }
+
+    this.activeSessionIdState.set(sessionId);
+    this.canvasState.set(null);
+    this.persistActiveSession();
+    return true;
+  }
+
+  public renameSession(sessionId: string, nextTitle: string): boolean {
+    const trimmedTitle = nextTitle.trim();
+    if (!trimmedTitle) {
+      return false;
+    }
+
+    let renamed = false;
+    this.sessionState.update((sessions) =>
+      sessions.map((session) => {
+        if (session.id !== sessionId) {
+          return session;
+        }
+
+        renamed = true;
+        return {
+          ...session,
+          title: trimmedTitle,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    );
+
+    if (!renamed) {
+      return false;
+    }
+
+    this.sessionState.set(this.sessionCollection.sortByUpdatedAt(this.sessionState()));
+    this.persistSessions();
+    return true;
+  }
+
+  public deleteSession(sessionId: string): boolean {
+    const sessions = this.sessionState();
+    if (sessions.length <= 1 || !sessions.some((session) => session.id === sessionId)) {
+      return false;
+    }
+
+    const remainingSessions = this.sessionCollection.sortByUpdatedAt(
+      sessions.filter((session) => session.id !== sessionId),
+    );
+    this.sessionState.set(remainingSessions);
+
+    if (this.activeSessionIdState() === sessionId) {
+      this.activeSessionIdState.set(remainingSessions[0]?.id ?? '');
+      this.canvasState.set(null);
+      this.persistActiveSession();
+    }
+
+    this.persistSessions();
+    return true;
+  }
+
   private finalizePendingStream(): void {
     if (!this.pendingStream) {
       return;
     }
 
-    const completedMessage = this.messageState().find(
+    const completedMessage = this.messages().find(
       (message) => message.id === this.pendingStream?.messageId,
     );
     if (completedMessage) {
@@ -372,7 +479,7 @@ export class ChatSessionService {
   }
 
   private appendAssistantChunk(messageId: string, rawText: string): void {
-    this.messageState.update((messages) =>
+    this.updateCurrentSessionMessages((messages) =>
       messages.map((message) =>
         message.id === messageId
           ? {
@@ -387,10 +494,10 @@ export class ChatSessionService {
   }
 
   private finalizeLiveStream(liveStream: ActiveLiveStream): void {
-    const completedMessage = this.messageState().find((message) => message.id === liveStream.messageId);
+    const completedMessage = this.messages().find((message) => message.id === liveStream.messageId);
 
     if (completedMessage) {
-      this.messageState.update((messages) =>
+      this.updateCurrentSessionMessages((messages) =>
         messages.map((message) =>
           message.id === liveStream.messageId ? { ...message, phase: 'complete' } : message,
         ),
@@ -413,7 +520,7 @@ export class ChatSessionService {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown provider error while generating chat response.';
 
-    this.messageState.update((messages) =>
+    this.updateCurrentSessionMessages((messages) =>
       messages.map((message) => {
         if (message.id !== liveStream.messageId) {
           return message;
@@ -448,6 +555,56 @@ export class ChatSessionService {
       providerId: provider.id,
       model: provider.model,
     };
+  }
+
+  private appendMessageToCurrentSession(message: ChatMessage): void {
+    this.appendMessagesToCurrentSession([message]);
+  }
+
+  private appendMessagesToCurrentSession(messagesToAppend: ChatMessage[]): void {
+    this.updateCurrentSessionMessages((messages) => [...messages, ...messagesToAppend]);
+  }
+
+  private updateCurrentSessionMessages(
+    updater: (messages: ChatMessage[]) => ChatMessage[],
+  ): void {
+    const activeSessionId = this.activeSessionIdState();
+    const nextUpdatedAt = new Date().toISOString();
+    let updated = false;
+
+    this.sessionState.update((sessions) => {
+      const hasActiveSession = sessions.some((session) => session.id === activeSessionId);
+      if (!hasActiveSession) {
+        return sessions;
+      }
+
+      updated = true;
+      return this.sessionCollection.updateSessionMessages(sessions, activeSessionId, updater);
+    });
+
+    if (updated) {
+      this.persistSessions();
+    }
+  }
+
+  private persistSessions(): void {
+    this.sessionStore.saveSessions(this.sessionState());
+  }
+
+  private persistActiveSession(): void {
+    const activeSessionId = this.activeSessionIdState();
+    if (activeSessionId) {
+      this.sessionStore.saveActiveSessionId(activeSessionId);
+    }
+  }
+
+  private resolveStoredActiveSessionId(sessions: ChatConversationSession[]): string {
+    const storedSessionId = this.sessionStore.loadActiveSessionId();
+    if (storedSessionId && sessions.some((session) => session.id === storedSessionId)) {
+      return storedSessionId;
+    }
+
+    return this.sessionCollection.resolveInitialSessionId(sessions);
   }
 }
 
