@@ -899,17 +899,25 @@ export class MemoryScreen {
       <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_24rem] gap-6 items-start">
         <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-5 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
           <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-cyan-200">
-              <ui-icon name="plus-circle" [size]="14"></ui-icon>
-              Quick Add
+            <button
+              (click)="toggleQuickAdd()"
+              class="w-full inline-flex items-center justify-between rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.2em] transition-colors"
+              [ngClass]="isQuickAddExpanded() ? 'border-cyan-500/20 bg-cyan-500/10 text-cyan-200' : 'border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-300'">
+              <span class="inline-flex items-center gap-2">
+                <ui-icon name="plus-circle" [size]="14"></ui-icon>
+                Quick Add
+              </span>
+              <ui-icon [name]="isQuickAddExpanded() ? 'chevron-up' : 'chevron-down'" [size]="14"></ui-icon>
+            </button>
+            <div *ngIf="isQuickAddExpanded()" class="animate-fade-in space-y-2 mt-4">
+              <h3 class="text-lg font-medium text-white">Provider Actions</h3>
+              <p class="text-xs leading-6 text-zinc-400">
+                Add known providers from the left rail first. The editor on the right remains for deeper configuration.
+              </p>
             </div>
-            <h3 class="text-lg font-medium text-white">Provider Actions</h3>
-            <p class="text-xs leading-6 text-zinc-400">
-              Add known providers from the left rail first. The editor on the right remains for deeper configuration.
-            </p>
           </div>
 
-          <div class="space-y-2">
+          <div *ngIf="isQuickAddExpanded()" class="space-y-2 animate-fade-in">
             <!-- OpenRouter Accordion -->
             <div class="rounded-2xl border overflow-hidden transition-all duration-200"
                  [ngClass]="expandedMenuItem() === 'openrouter' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
@@ -1274,6 +1282,11 @@ export class MemoryScreen {
   `,
 })
 export class ProvidersScreen {
+  public readonly isQuickAddExpanded = signal<boolean>(true);
+  public toggleQuickAdd(): void {
+    this.isQuickAddExpanded.set(!this.isQuickAddExpanded());
+  }
+
   public readonly expandedMenuItem = signal<string | null>('openrouter');
   public toggleMenuItem(item: string): void {
     this.expandedMenuItem.set(this.expandedMenuItem() === item ? null : item);

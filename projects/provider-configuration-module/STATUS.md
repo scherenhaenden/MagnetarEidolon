@@ -4,7 +4,7 @@
 **Progress:** 55%
 
 ## Current State
-The provider-configuration UI is now beyond role ordering. The Providers screen supports preset onboarding, custom provider shells, visible endpoint/model editing, template inspection, and local persistence for the current slice.
+The provider-configuration UI is now beyond role ordering. The Providers screen supports preset onboarding, custom provider shells, a left-side quick-add accordion, visible endpoint/model editing, template inspection, and local persistence for the current slice.
 
 ## Immediate Focus
 - Keep provider configuration independent from provider transport code.
@@ -15,6 +15,7 @@ The provider-configuration UI is now beyond role ordering. The Providers screen 
 - Add a provider-configuration UI flow for backend-owned secrets and editable non-secret runtime fields, starting with OpenRouter.
 - Surface provider model and request-template placeholders in the UI so adding providers does not require hidden backend knowledge.
 - Push the current local-only provider editor toward backend-backed persistence and execution so the UI stops being the only source of truth.
+- Keep refining the Providers navigation so quick provider onboarding does not compete visually with the deeper provider editor.
 
 ## Risks
 1. UI-only configuration can drift from runtime behavior if the handoff contract is not defined quickly.
