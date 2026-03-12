@@ -28,6 +28,7 @@ export interface ChatCanvasDocument {
   title: string;
   content: string;
   language: string;
+  renderKind: 'source' | 'html';
 }
 
 export function parseChatBlocks(markdown: string): ChatBlock[] {
@@ -206,5 +207,27 @@ export function extractCanvasDocument(message: ChatMessage): ChatCanvasDocument 
     title: `Canvas from ${message.providerLabel ?? 'assistant'} response`,
     content: firstCodeBlock.code,
     language: firstCodeBlock.language,
+    renderKind: detectCanvasRenderKind(firstCodeBlock.language, firstCodeBlock.code),
   };
+}
+
+function detectCanvasRenderKind(language: string, code: string): 'source' | 'html' {
+  const normalizedLanguage = language.trim().toLowerCase();
+  if (normalizedLanguage === 'html' || normalizedLanguage === 'htm') {
+    return 'html';
+  }
+
+  const normalizedCode = code.trim().toLowerCase();
+  if (
+    normalizedCode.startsWith('<!doctype html') ||
+    normalizedCode.startsWith('<html') ||
+    normalizedCode.includes('<body') ||
+    normalizedCode.includes('<main') ||
+    normalizedCode.includes('<section') ||
+    normalizedCode.includes('<div')
+  ) {
+    return 'html';
+  }
+
+  return 'source';
 }

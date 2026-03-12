@@ -524,9 +524,29 @@ class ToolsScreen {
           <div *ngIf="chatSessionService.canvasDocument() as canvas; else emptyCanvas" class="mt-4 space-y-3 min-h-0 overflow-y-auto custom-scrollbar">
             <div>
               <div class="text-sm text-zinc-100">{{ canvas.title }}</div>
-              <div class="text-xs uppercase tracking-wider text-zinc-500 mt-1">{{ canvas.language }}</div>
+              <div class="text-xs uppercase tracking-wider text-zinc-500 mt-1">
+                {{ canvas.language }} <span *ngIf="canvas.renderKind === 'html'">· rendered preview</span>
+              </div>
             </div>
-            <pre class="rounded-xl border border-white/5 bg-[#050508] p-4 overflow-x-auto text-xs font-mono text-cyan-100 whitespace-pre-wrap">{{ canvas.content }}</pre>
+            <div *ngIf="canvas.renderKind === 'html'" class="space-y-3">
+              <div class="rounded-xl border border-emerald-500/20 bg-white overflow-hidden">
+                <div class="px-3 py-2 border-b border-black/10 text-xs uppercase tracking-wider text-slate-600 bg-slate-100">
+                  Rendered HTML
+                </div>
+                <iframe
+                  title="Canvas HTML preview"
+                  sandbox=""
+                  [attr.srcdoc]="canvas.content"
+                  class="block w-full h-72 bg-white"></iframe>
+              </div>
+              <div class="rounded-xl border border-white/5 bg-[#050508] overflow-hidden">
+                <div class="px-3 py-2 border-b border-white/5 text-xs uppercase tracking-wider text-zinc-500">
+                  Source
+                </div>
+                <pre class="p-4 overflow-x-auto text-xs font-mono text-cyan-100 whitespace-pre-wrap">{{ canvas.content }}</pre>
+              </div>
+            </div>
+            <pre *ngIf="canvas.renderKind !== 'html'" class="rounded-xl border border-white/5 bg-[#050508] p-4 overflow-x-auto text-xs font-mono text-cyan-100 whitespace-pre-wrap">{{ canvas.content }}</pre>
             <button
               (click)="chatSessionService.closeCanvas()"
               class="px-3 py-2 rounded-lg border border-white/10 bg-white/5 text-sm text-zinc-200 hover:bg-white/10">

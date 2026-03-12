@@ -133,6 +133,7 @@ console.log("hi");
       title: 'Canvas from LM Studio Local response',
       content: 'select 1;',
       language: 'sql',
+      renderKind: 'source',
     });
 
     expect(
@@ -160,6 +161,24 @@ console.log("hi");
       title: 'Canvas from assistant response',
       content: 'artifact',
       language: 'txt',
+      renderKind: 'source',
+    });
+
+    expect(
+      extractCanvasDocument({
+        id: 'msg-assistant-html',
+        role: 'assistant',
+        phase: 'complete',
+        providerLabel: 'LM Studio Local',
+        rawText: '```html\n<div>Hello canvas</div>\n```',
+        blocks: parseChatBlocks('```html\n<div>Hello canvas</div>\n```'),
+      }),
+    ).toEqual({
+      messageId: 'msg-assistant-html',
+      title: 'Canvas from LM Studio Local response',
+      content: '<div>Hello canvas</div>',
+      language: 'html',
+      renderKind: 'html',
     });
 
     expect(
