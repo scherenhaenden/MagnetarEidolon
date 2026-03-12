@@ -896,7 +896,7 @@ export class MemoryScreen {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-[18rem,minmax(0,1fr),24rem] gap-6 items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_24rem] gap-6 items-start">
         <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-5 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
           <div class="space-y-2">
             <div class="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-cyan-200">
