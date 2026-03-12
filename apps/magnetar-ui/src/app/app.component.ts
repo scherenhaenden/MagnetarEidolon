@@ -413,8 +413,23 @@ export class ToolsScreen {
                 <div class="text-sm text-zinc-200 truncate">{{ conversation.title }}</div>
                 <div class="text-xs text-zinc-500 mt-1 line-clamp-2">{{ conversation.preview || 'No messages yet.' }}</div>
               </div>
-              <div *ngIf="isActiveSession(conversation.id)" class="text-[11px] uppercase tracking-wider text-cyan-300">
-                Active
+              <div class="flex flex-col items-end gap-2">
+                <div *ngIf="isActiveSession(conversation.id)" class="text-[11px] uppercase tracking-wider text-cyan-300">
+                  Active
+                </div>
+                <div class="flex items-center gap-1">
+                  <button
+                    (click)="renameSession(conversation.id, $event)"
+                    class="px-2 py-1 rounded border border-white/10 bg-white/5 text-[11px] text-zinc-300 hover:bg-white/10">
+                    Rename
+                  </button>
+                  <button
+                    (click)="deleteSession(conversation.id, $event)"
+                    [disabled]="chatSessionService.sessions().length <= 1"
+                    class="px-2 py-1 rounded border border-white/10 bg-white/5 text-[11px] text-zinc-300 enabled:hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -663,6 +678,29 @@ export class ChatScreen implements AfterViewChecked {
   public switchToSession(sessionId: string): void {
     this.chatSessionService.switchToSession(sessionId);
     this.shouldAutoScroll = true;
+  }
+
+  public renameSession(sessionId: string, event: Event): void {
+    event.stopPropagation();
+    const currentTitle =
+      this.chatSessionService.conversationHistory().find((conversation) => conversation.id === sessionId)?.title ??
+      'New Chat';
+    const nextTitle = globalThis.prompt?.('Rename chat', currentTitle);
+    if (!nextTitle) {
+      return;
+    }
+
+    this.chatSessionService.renameSession(sessionId, nextTitle);
+  }
+
+  public deleteSession(sessionId: string, event: Event): void {
+    event.stopPropagation();
+    const confirmed = globalThis.confirm?.('Delete this chat?') ?? false;
+    if (!confirmed) {
+      return;
+    }
+
+    this.chatSessionService.deleteSession(sessionId);
   }
 
   public isActiveSession(sessionId: string): boolean {

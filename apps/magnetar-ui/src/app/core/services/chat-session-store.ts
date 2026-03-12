@@ -1,9 +1,29 @@
 import { ChatConversationSession } from '../models/chat.js';
 
+interface StorageLike {
+  getItem(key: string): string | null;
+  setItem(key: string, value: string): void;
+}
+
+class InMemoryStorageAdapter implements StorageLike {
+  private readonly entries = new Map<string, string>();
+
+  public getItem(key: string): string | null {
+    return this.entries.get(key) ?? null;
+  }
+
+  public setItem(key: string, value: string): void {
+    this.entries.set(key, value);
+  }
+}
+
 export class ChatSessionStore {
+  private static readonly fallbackStorage = new InMemoryStorageAdapter();
+
   public constructor(
-    private readonly storageKey: string,
-    private readonly storage: Storage | null = ChatSessionStore.resolveStorage(),
+    private readonly sessionStorageKey: string,
+    private readonly activeSessionStorageKey: string,
+    private readonly storage: StorageLike = ChatSessionStore.resolveStorage(),
   ) {}
 
   public loadSessions(): ChatConversationSession[] {
@@ -12,7 +32,7 @@ export class ChatSessionStore {
     }
 
     try {
-      const rawValue = this.storage.getItem(this.storageKey);
+      const rawValue = this.storage.getItem(this.sessionStorageKey);
       if (!rawValue) {
         return [];
       }
@@ -29,7 +49,24 @@ export class ChatSessionStore {
       return;
     }
 
-    this.storage.setItem(this.storageKey, JSON.stringify(sessions));
+    this.storage.setItem(this.sessionStorageKey, JSON.stringify(sessions));
+  }
+
+  public loadActiveSessionId(): string | null {
+    if (!this.storage) {
+      return null;
+    }
+
+    const value = this.storage.getItem(this.activeSessionStorageKey);
+    return value && value.length > 0 ? value : null;
+  }
+
+  public saveActiveSessionId(sessionId: string): void {
+    if (!this.storage) {
+      return;
+    }
+
+    this.storage.setItem(this.activeSessionStorageKey, sessionId);
   }
 
   private isValidSession(value: unknown): value is ChatConversationSession {
@@ -46,11 +83,11 @@ export class ChatSessionStore {
     );
   }
 
-  private static resolveStorage(): Storage | null {
+  private static resolveStorage(): StorageLike {
     try {
-      return globalThis.localStorage ?? null;
+      return globalThis.localStorage ?? ChatSessionStore.fallbackStorage;
     } catch {
-      return null;
+      return ChatSessionStore.fallbackStorage;
     }
   }
 }

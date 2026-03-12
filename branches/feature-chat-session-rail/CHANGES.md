@@ -7,3 +7,8 @@
   - `ChatSessionStore` now owns local persistence concerns.
   - `ChatSessionCollection` now owns session ordering and session message-update policy.
 - The goal of this branch is phase 1 only: save chats, show them in the side rail, allow switching between them, and preserve them across reloads before adding rename/delete/editing flows.
+- Extended phase 1 to include direct session administration in the rail:
+  - rename an existing chat
+  - delete a non-last chat
+  - restore the previously active chat on reload through persisted active-session state
+- Recorded the next pending follow-up for this branch family: the `Providers` surface still needs an explicit OpenRouter key/config entry path and a way to display provider request/model templates with placeholders.

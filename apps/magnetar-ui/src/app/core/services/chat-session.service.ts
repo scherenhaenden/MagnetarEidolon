@@ -66,15 +66,17 @@ const WELCOME_MESSAGE = buildAssistantMessage(
 );
 
 const CHAT_STORAGE_KEY = 'magnetar.chat.sessions.v1';
+const ACTIVE_CHAT_STORAGE_KEY = 'magnetar.chat.active-session.v1';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatSessionService {
-  private readonly sessionStore = new ChatSessionStore(CHAT_STORAGE_KEY);
+  private readonly sessionStore = new ChatSessionStore(CHAT_STORAGE_KEY, ACTIVE_CHAT_STORAGE_KEY);
   private readonly sessionCollection = new ChatSessionCollection();
-  private readonly sessionState = signal<ChatConversationSession[]>(loadStoredSessions());
-  private readonly activeSessionIdState = signal<string>(resolveInitialSessionId(loadStoredSessions()));
+  private readonly initialSessions = this.sessionCollection.normalizeSessions(this.sessionStore.loadSessions());
+  private readonly sessionState = signal<ChatConversationSession[]>(this.initialSessions);
+  private readonly activeSessionIdState = signal<string>('');
   private readonly draftState = signal('');
   private readonly canvasState = signal<ChatCanvasDocument | null>(null);
   private readonly pendingStreamState = signal<PendingStream | null>(null);
@@ -117,7 +119,11 @@ export class ChatSessionService {
       this.sessionState.set([initialSession]);
       this.activeSessionIdState.set(initialSession.id);
       this.persistSessions();
+      this.persistActiveSession();
+      return;
     }
+
+    this.activeSessionIdState.set(this.resolveStoredActiveSessionId(this.sessionState()));
   }
 
   public setDraft(value: string): void {
@@ -261,6 +267,7 @@ export class ChatSessionService {
     this.activeSessionIdState.set(session.id);
     this.canvasState.set(null);
     this.persistSessions();
+    this.persistActiveSession();
   }
 
   public switchToSession(sessionId: string): boolean {
@@ -271,6 +278,59 @@ export class ChatSessionService {
 
     this.activeSessionIdState.set(sessionId);
     this.canvasState.set(null);
+    this.persistActiveSession();
+    return true;
+  }
+
+  public renameSession(sessionId: string, nextTitle: string): boolean {
+    const trimmedTitle = nextTitle.trim();
+    if (!trimmedTitle) {
+      return false;
+    }
+
+    let renamed = false;
+    this.sessionState.update((sessions) =>
+      sessions.map((session) => {
+        if (session.id !== sessionId) {
+          return session;
+        }
+
+        renamed = true;
+        return {
+          ...session,
+          title: trimmedTitle,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    );
+
+    if (!renamed) {
+      return false;
+    }
+
+    this.sessionState.set(this.sessionCollection.sortByUpdatedAt(this.sessionState()));
+    this.persistSessions();
+    return true;
+  }
+
+  public deleteSession(sessionId: string): boolean {
+    const sessions = this.sessionState();
+    if (sessions.length <= 1 || !sessions.some((session) => session.id === sessionId)) {
+      return false;
+    }
+
+    const remainingSessions = this.sessionCollection.sortByUpdatedAt(
+      sessions.filter((session) => session.id !== sessionId),
+    );
+    this.sessionState.set(remainingSessions);
+
+    if (this.activeSessionIdState() === sessionId) {
+      this.activeSessionIdState.set(remainingSessions[0]?.id ?? '');
+      this.canvasState.set(null);
+      this.persistActiveSession();
+    }
+
+    this.persistSessions();
     return true;
   }
 
@@ -530,6 +590,22 @@ export class ChatSessionService {
   private persistSessions(): void {
     this.sessionStore.saveSessions(this.sessionState());
   }
+
+  private persistActiveSession(): void {
+    const activeSessionId = this.activeSessionIdState();
+    if (activeSessionId) {
+      this.sessionStore.saveActiveSessionId(activeSessionId);
+    }
+  }
+
+  private resolveStoredActiveSessionId(sessions: ChatConversationSession[]): string {
+    const storedSessionId = this.sessionStore.loadActiveSessionId();
+    if (storedSessionId && sessions.some((session) => session.id === storedSessionId)) {
+      return storedSessionId;
+    }
+
+    return this.sessionCollection.resolveInitialSessionId(sessions);
+  }
 }
 
 function shouldUseBackendProviderTransport(provider: ProviderConfig): boolean {
@@ -656,12 +732,4 @@ I can help turn that request into a tracked execution plan inside MagnetarEidolo
 3. Produce the next artifact or answer.
 
 > Ask for code, a plan, or a provider diagnostic to continue.`;
-}
-
-function loadStoredSessions(): ChatConversationSession[] {
-  return new ChatSessionCollection().normalizeSessions(new ChatSessionStore(CHAT_STORAGE_KEY).loadSessions());
-}
-
-function resolveInitialSessionId(sessions: ChatConversationSession[]): string {
-  return new ChatSessionCollection().resolveInitialSessionId(sessions);
 }
