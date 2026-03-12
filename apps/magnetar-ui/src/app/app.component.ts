@@ -1,7 +1,9 @@
 import {
   AfterViewChecked,
   Component,
+  computed,
   ElementRef,
+  signal,
   ViewChild,
   ViewEncapsulation,
   inject,
@@ -13,7 +15,7 @@ import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
-import { ProviderConfig } from './core/models/provider-config.js';
+import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
 import { ProviderConfigService } from './core/services/provider-config.service.js';
 
@@ -894,7 +896,9 @@ export class MemoryScreen {
         <div class="lg:col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div
             *ngFor="let provider of providers()"
-            class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-xl">
+            (click)="selectProvider(provider.id)"
+            class="bg-[#0f0f13] border rounded-2xl p-5 flex flex-col gap-4 shadow-xl cursor-pointer transition-colors"
+            [ngClass]="selectedProvider()?.id === provider.id ? 'border-cyan-500/30' : 'border-white/5 hover:border-white/10'">
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-start gap-3">
                 <div class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-300">
@@ -963,6 +967,93 @@ export class MemoryScreen {
         <div class="space-y-4">
           <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
             <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
+              <ui-icon name="plus-circle" [size]="16" cssClass="text-cyan-400"></ui-icon>
+              Preset Catalog
+            </div>
+            <div class="mt-4 space-y-3">
+              <div
+                *ngFor="let preset of presets()"
+                class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="text-sm text-zinc-200">{{ preset.label }}</div>
+                    <div class="text-xs text-zinc-500 mt-1">{{ preset.description }}</div>
+                  </div>
+                  <button
+                    (click)="addPreset(preset.kind)"
+                    class="px-2 py-1 rounded border border-cyan-500/20 bg-cyan-500/10 text-[11px] text-cyan-100 hover:bg-cyan-500/20">
+                    Add
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="selectedProvider() as provider" class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5 space-y-4">
+            <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
+              <ui-icon name="wrench" [size]="16" cssClass="text-violet-400"></ui-icon>
+              Provider Editor
+            </div>
+            <div class="grid grid-cols-1 gap-3 text-xs">
+              <label class="space-y-1">
+                <span class="text-zinc-500 uppercase tracking-wider">Name</span>
+                <input
+                  [value]="provider.name"
+                  (input)="updateProviderField(provider.id, 'name', readInputValue($event))"
+                  class="w-full rounded-lg border border-white/10 bg-[#050508] px-3 py-2 text-zinc-100" />
+              </label>
+              <label class="space-y-1">
+                <span class="text-zinc-500 uppercase tracking-wider">Endpoint</span>
+                <input
+                  [value]="provider.baseUrl"
+                  (input)="updateProviderField(provider.id, 'baseUrl', readInputValue($event))"
+                  class="w-full rounded-lg border border-white/10 bg-[#050508] px-3 py-2 text-zinc-100 font-mono" />
+              </label>
+              <label class="space-y-1">
+                <span class="text-zinc-500 uppercase tracking-wider">Model</span>
+                <input
+                  [value]="provider.model"
+                  (input)="updateProviderField(provider.id, 'model', readInputValue($event))"
+                  class="w-full rounded-lg border border-white/10 bg-[#050508] px-3 py-2 text-zinc-100 font-mono" />
+              </label>
+              <label *ngIf="provider.supportsApiKey" class="space-y-1">
+                <span class="text-zinc-500 uppercase tracking-wider">API Key</span>
+                <input
+                  type="password"
+                  [value]="provider.apiKey"
+                  (input)="updateProviderField(provider.id, 'apiKey', readInputValue($event))"
+                  class="w-full rounded-lg border border-white/10 bg-[#050508] px-3 py-2 text-zinc-100 font-mono" />
+              </label>
+              <label class="space-y-1">
+                <span class="text-zinc-500 uppercase tracking-wider">Description</span>
+                <textarea
+                  rows="3"
+                  [value]="provider.description"
+                  (input)="updateProviderField(provider.id, 'description', readInputValue($event))"
+                  class="w-full rounded-lg border border-white/10 bg-[#050508] px-3 py-2 text-zinc-100"></textarea>
+              </label>
+            </div>
+            <div class="rounded-xl border border-white/5 bg-[#050508] p-4">
+              <div class="text-xs uppercase tracking-wider text-zinc-500 mb-2">Request Template</div>
+              <pre class="text-xs font-mono text-cyan-100 whitespace-pre-wrap">{{ provider.template.requestTemplate }}</pre>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span *ngFor="let placeholder of provider.template.placeholders" class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-300">
+                  {{ placeholder }}
+                </span>
+              </div>
+            </div>
+            <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs leading-6 text-amber-100/80">
+              Ownership: {{ provider.ownership }}. Secrets should ultimately live on the backend; this UI slice currently persists provider configuration locally until backend sync is completed.
+            </div>
+            <button
+              (click)="removeProvider(provider.id)"
+              class="w-full px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-100 hover:bg-red-500/20">
+              Remove Provider
+            </button>
+          </div>
+
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center gap-2 text-sm font-medium text-zinc-200">
               <ui-icon name="activity" [size]="16" cssClass="text-cyan-400"></ui-icon>
               Failover Chain
             </div>
@@ -996,9 +1087,17 @@ export class MemoryScreen {
 })
 export class ProvidersScreen {
   public readonly providerConfigService = inject(ProviderConfigService);
+  private readonly selectedProviderId = signal<string | null>(this.providerConfigService.providers()[0]?.id ?? null);
+  public readonly selectedProvider = computed(
+    () => this.providers().find((provider) => provider.id === this.selectedProviderId()) ?? null,
+  );
 
   public providers(): ProviderConfig[] {
     return this.providerConfigService.providers();
+  }
+
+  public presets(): ProviderPreset[] {
+    return this.providerConfigService.presets();
   }
 
   public primaryProvider(): ProviderConfig | null {
@@ -1019,6 +1118,36 @@ export class ProvidersScreen {
 
   public disable(providerId: string): void {
     this.providerConfigService.disable(providerId);
+  }
+
+  public selectProvider(providerId: string): void {
+    this.selectedProviderId.set(providerId);
+  }
+
+  public addPreset(kind: ProviderPreset['kind']): void {
+    const providerId = this.providerConfigService.addProviderFromPreset(kind);
+    this.selectedProviderId.set(providerId);
+  }
+
+  public updateProviderField(
+    providerId: string,
+    field: 'name' | 'baseUrl' | 'model' | 'apiKey' | 'description',
+    value: string,
+  ): void {
+    this.providerConfigService.updateProvider(providerId, { [field]: value } as Partial<ProviderConfig>);
+  }
+
+  public removeProvider(providerId: string): void {
+    const didRemove = this.providerConfigService.removeProvider(providerId);
+    if (!didRemove) {
+      return;
+    }
+
+    this.selectedProviderId.set(this.providers()[0]?.id ?? null);
+  }
+
+  public readInputValue(event: Event): string {
+    return (event.target as HTMLInputElement | HTMLTextAreaElement).value;
   }
 
   public describeRole(provider: ProviderConfig): string {

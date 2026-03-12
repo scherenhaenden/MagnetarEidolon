@@ -47,6 +47,9 @@ The module must define how provider identity moves from the UI into the backend 
 - failover ordering
 - user-visible labels and health summaries
 - optional non-secret user routing choices
+- editable provider entries created from known presets
+- provider template and placeholder inspection state
+- local draft values for configuration forms until backend sync is fully implemented
 
 ### Backend-Owned
 - provider base URLs used for real execution

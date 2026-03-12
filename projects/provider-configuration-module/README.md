@@ -12,6 +12,8 @@ This module defines the planning, architecture, and delivery path for configurin
 - Provider configuration state model.
 - Primary/backup/disabled role semantics.
 - Ordering and failover intent in the UI.
+- Provider CRUD and preset onboarding in the UI.
+- User-visible provider templates and placeholder semantics.
 - Runtime wiring path for future provider consumption.
 - Backend-owned provider registry and config-driven execution metadata.
 - Backend-owned provider secret loading and runtime overrides.

@@ -12,6 +12,8 @@ The first provider-configuration slice is active. The UI now has a dedicated Pro
 - Add persistence/config loading once the contract is stable.
 - Move provider execution metadata and secrets behind a backend-owned registry/configuration path.
 - Use OpenRouter as the first real validation target for the config-driven backend provider model.
+- Add a provider-configuration UI flow for backend-owned secrets and editable non-secret runtime fields, starting with OpenRouter.
+- Surface provider model and request-template placeholders in the UI so adding providers does not require hidden backend knowledge.
 
 ## Risks
 1. UI-only configuration can drift from runtime behavior if the handoff contract is not defined quickly.

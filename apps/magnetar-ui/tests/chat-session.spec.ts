@@ -271,6 +271,7 @@ describe('ChatSessionService', () => {
     const store = new ChatSessionStore('magnetar.chat.sessions.v1', 'magnetar.chat.active-session.v1');
     store.saveSessions([]);
     store.saveActiveSessionId('');
+    ProviderConfigService.resetTestStorage();
   });
 
   it('starts with a welcome message and current provider label', () => {
