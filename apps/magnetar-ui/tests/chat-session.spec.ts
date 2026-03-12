@@ -201,6 +201,68 @@ console.log("hi");
       preview: '',
     });
   });
+
+  it('detects html renderability from code content even when the language is not html', () => {
+    expect(
+      extractCanvasDocument({
+        id: 'msg-assistant-content-html',
+        role: 'assistant',
+        phase: 'complete',
+        providerLabel: 'LM Studio Local',
+        rawText: '```text\n<section><h1>Canvas</h1></section>\n```',
+        blocks: parseChatBlocks('```text\n<section><h1>Canvas</h1></section>\n```'),
+      }),
+    ).toEqual({
+      messageId: 'msg-assistant-content-html',
+      title: 'Canvas from LM Studio Local response',
+      content: '<section><h1>Canvas</h1></section>',
+      language: 'text',
+      renderKind: 'html',
+      renderTitle: null,
+    });
+  });
+
+  it('returns a null render title when html content has no title tag', () => {
+    expect(
+      extractCanvasDocument({
+        id: 'msg-assistant-html-no-title',
+        role: 'assistant',
+        phase: 'complete',
+        providerLabel: 'LM Studio Local',
+        rawText: '```html\n<div>No title here</div>\n```',
+        blocks: parseChatBlocks('```html\n<div>No title here</div>\n```'),
+      }),
+    ).toEqual({
+      messageId: 'msg-assistant-html-no-title',
+      title: 'Canvas from LM Studio Local response',
+      content: '<div>No title here</div>',
+      language: 'html',
+      renderKind: 'html',
+      renderTitle: null,
+    });
+  });
+
+  it('returns a null render title when the html title is blank', () => {
+    expect(
+      extractCanvasDocument({
+        id: 'msg-assistant-html-empty-title',
+        role: 'assistant',
+        phase: 'complete',
+        providerLabel: 'LM Studio Local',
+        rawText: '```html\n<html><head><title>   </title></head><body><div>Blank title</div></body></html>\n```',
+        blocks: parseChatBlocks(
+          '```html\n<html><head><title>   </title></head><body><div>Blank title</div></body></html>\n```',
+        ),
+      }),
+    ).toEqual({
+      messageId: 'msg-assistant-html-empty-title',
+      title: 'Canvas from LM Studio Local response',
+      content: '<html><head><title>   </title></head><body><div>Blank title</div></body></html>',
+      language: 'html',
+      renderKind: 'html',
+      renderTitle: null,
+    });
+  });
 });
 
 describe('ChatSessionService', () => {
