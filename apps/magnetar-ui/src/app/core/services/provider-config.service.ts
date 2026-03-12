@@ -21,6 +21,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     apiStyle: 'openai-compatible',
     supportsApiKey: false,
     ownership: 'backend',
+    modelSuggestions: ['local-model', 'gemma-3-1b-it-qat', 'llama-3.2-3b-instruct'],
     template: {
       requestTemplate: `{
   "model": "$model",
@@ -39,6 +40,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     apiStyle: 'openai-compatible',
     supportsApiKey: true,
     ownership: 'backend',
+    modelSuggestions: ['openai/gpt-4.1-mini', 'anthropic/claude-3.7-sonnet', 'google/gemini-2.5-flash'],
     suggestedHeaders: ['HTTP-Referer', 'X-Title'],
     template: {
       requestTemplate: `{
@@ -58,6 +60,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     apiStyle: 'openai-compatible',
     supportsApiKey: true,
     ownership: 'backend',
+    modelSuggestions: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'],
     template: {
       requestTemplate: `{
   "model": "$model",
@@ -76,6 +79,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     apiStyle: 'native',
     supportsApiKey: true,
     ownership: 'backend',
+    modelSuggestions: ['claude-3-7-sonnet-latest', 'claude-3-5-sonnet-latest', 'claude-3-5-haiku-latest'],
     template: {
       requestTemplate: `{
   "model": "$model",
@@ -83,6 +87,25 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
   "stream": "$stream"
 }`,
       placeholders: ['$model', '$prompt', '$stream'],
+    },
+  },
+  {
+    kind: 'custom',
+    label: 'Custom Provider',
+    description: 'Start from a generic provider definition and adapt endpoint, model, keys, and templates by hand.',
+    baseUrl: 'https://api.example.com/v1',
+    defaultModel: 'example/model-name',
+    apiStyle: 'openai-compatible',
+    supportsApiKey: true,
+    ownership: 'backend',
+    modelSuggestions: ['example/model-name'],
+    template: {
+      requestTemplate: `{
+  "model": "$model",
+  "messages": "$messages",
+  "stream": "$stream"
+}`,
+      placeholders: ['$model', '$messages', '$stream'],
     },
   },
 ];
@@ -179,6 +202,10 @@ export class ProviderConfigService {
     ]);
     this.normalizePriorities();
     return providerId;
+  }
+
+  public addCustomProvider(): string {
+    return this.addProviderFromPreset('custom');
   }
 
   public updateProvider(providerId: string, patch: Partial<ProviderConfig>): void {
@@ -356,5 +383,6 @@ function createProviderFromPreset(
     supportsApiKey: preset.supportsApiKey,
     ownership: preset.ownership,
     presetKind: preset.kind,
+    modelSuggestions: preset.modelSuggestions ?? [],
   };
 }

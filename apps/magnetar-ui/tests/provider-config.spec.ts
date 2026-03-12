@@ -29,6 +29,7 @@ describe('provider-config model helpers', () => {
         supportsApiKey: true,
         ownership: 'backend',
         presetKind: 'openai',
+        modelSuggestions: ['gpt'],
       },
       {
         id: 'a',
@@ -46,6 +47,7 @@ describe('provider-config model helpers', () => {
         supportsApiKey: false,
         ownership: 'backend',
         presetKind: 'lm_studio',
+        modelSuggestions: ['llama'],
       },
     ]);
 
@@ -77,6 +79,7 @@ describe('ProviderConfigService', () => {
     expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.template.placeholders).toContain(
       '$model',
     );
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.modelSuggestions.length).toBeGreaterThan(0);
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {
@@ -202,6 +205,17 @@ describe('ProviderConfigService', () => {
       model: 'anthropic/claude-3.7-sonnet',
       apiKey: 'secret',
     });
+  });
+
+  it('can add a fully custom provider shell', () => {
+    const service = new ProviderConfigService();
+
+    const providerId = service.addCustomProvider();
+    const provider = service.providers().find((candidate) => candidate.id === providerId);
+
+    expect(provider?.kind).toBe('custom');
+    expect(provider?.presetKind).toBe('custom');
+    expect(provider?.template.placeholders).toContain('$model');
   });
 
   it('can remove a provider entry', () => {

@@ -4,7 +4,7 @@
 **Progress:** 55%
 
 ## Current State
-The first provider-configuration slice is active. The UI now has a dedicated Providers screen and a state service that models primary, backup, and disabled providers.
+The provider-configuration UI is now beyond role ordering. The Providers screen supports preset onboarding, custom provider shells, visible endpoint/model editing, template inspection, and local persistence for the current slice.
 
 ## Immediate Focus
 - Keep provider configuration independent from provider transport code.
@@ -14,6 +14,7 @@ The first provider-configuration slice is active. The UI now has a dedicated Pro
 - Use OpenRouter as the first real validation target for the config-driven backend provider model.
 - Add a provider-configuration UI flow for backend-owned secrets and editable non-secret runtime fields, starting with OpenRouter.
 - Surface provider model and request-template placeholders in the UI so adding providers does not require hidden backend knowledge.
+- Push the current local-only provider editor toward backend-backed persistence and execution so the UI stops being the only source of truth.
 
 ## Risks
 1. UI-only configuration can drift from runtime behavior if the handoff contract is not defined quickly.
