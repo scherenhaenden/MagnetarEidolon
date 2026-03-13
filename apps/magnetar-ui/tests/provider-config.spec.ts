@@ -189,6 +189,30 @@ describe('ProviderConfigService', () => {
     expect(service.providers().find((provider) => provider.id === providerId)?.presetKind).toBe('openrouter');
   });
 
+  it('falls back to an empty modelSuggestions list when a preset omits suggestions', () => {
+    const service = new ProviderConfigService();
+    const targetPreset = service.presets().find((preset) => preset.kind === 'custom');
+    const originalSuggestions = targetPreset?.modelSuggestions;
+
+    if (targetPreset) {
+      targetPreset.modelSuggestions = undefined;
+    }
+
+    try {
+      const providerId = service.addProviderFromPreset('custom');
+      expect(service.providers().find((provider) => provider.id === providerId)?.modelSuggestions).toEqual([]);
+    } finally {
+      if (targetPreset) {
+        targetPreset.modelSuggestions = originalSuggestions;
+      }
+    }
+  });
+
+  it('throws for an unknown provider preset id', () => {
+    const service = new ProviderConfigService();
+    expect(() => service.addProviderFromPreset('ollama')).toThrow('Unknown provider preset: ollama');
+  });
+
   it('can update editable provider fields', () => {
     const service = new ProviderConfigService();
 
@@ -218,12 +242,121 @@ describe('ProviderConfigService', () => {
     expect(provider?.template.placeholders).toContain('$model');
   });
 
+  it('returns preset metadata when it exists and null when it does not', () => {
+    const service = new ProviderConfigService();
+
+    expect(service.getPreset('openrouter')?.label).toBe('OpenRouter');
+    expect(service.getPreset('ollama')).toBeNull();
+  });
+
+  it('falls back to defaults when persisted provider state is malformed or empty', () => {
+    globalThis.localStorage?.setItem('magnetar.provider-config.v1', '{"broken":');
+    expect(new ProviderConfigService().providers()).toHaveLength(4);
+
+    globalThis.localStorage?.setItem('magnetar.provider-config.v1', '[]');
+    expect(new ProviderConfigService().providers()).toHaveLength(4);
+
+    globalThis.localStorage?.setItem('magnetar.provider-config.v1', '{}');
+    expect(new ProviderConfigService().providers()).toHaveLength(4);
+
+    globalThis.localStorage?.setItem('magnetar.provider-config.v1', 'null');
+    expect(new ProviderConfigService().providers()).toHaveLength(4);
+  });
+
+  it('falls back to defaults when a real storage read returns an empty provider array', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([['magnetar.provider-config.v1', '[]']]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      expect(new ProviderConfigService().providers()).toHaveLength(4);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('uses fallback storage paths when localStorage access fails', () => {
+    const originalLocalStorage = globalThis.localStorage;
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new Error('localStorage unavailable');
+      },
+    });
+
+    try {
+      const firstService = new ProviderConfigService();
+      firstService.updateProvider('provider-openrouter', { name: 'Fallback Router' });
+
+      const secondService = new ProviderConfigService();
+      expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.name).toBe(
+        'Fallback Router',
+      );
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('falls back to defaults when fallback storage contains malformed provider JSON', () => {
+    const originalLocalStorage = globalThis.localStorage;
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new Error('localStorage unavailable');
+      },
+    });
+
+    try {
+      ProviderConfigService.resetTestStorage();
+      const firstService = new ProviderConfigService();
+      firstService.updateProvider('provider-openrouter', { name: 'Fallback Router' });
+      ProviderConfigService.resetTestStorage();
+      const brokenStorageService = new ProviderConfigService();
+      (brokenStorageService as any).writeStorageValue('magnetar.provider-config.v1', '{broken');
+
+      const secondService = new ProviderConfigService();
+      expect(secondService.providers()).toHaveLength(4);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
   it('can remove a provider entry', () => {
     const service = new ProviderConfigService();
     const providerId = service.addProviderFromPreset('anthropic');
 
     expect(service.removeProvider(providerId)).toBe(true);
     expect(service.providers().some((provider) => provider.id === providerId)).toBe(false);
+  });
+
+  it('returns false when removing a missing provider entry', () => {
+    const service = new ProviderConfigService();
+    expect(service.removeProvider('provider-missing')).toBe(false);
   });
 
   it('persists provider configuration locally', () => {

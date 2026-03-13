@@ -7,7 +7,8 @@ import {
   parseChatBlocks,
 } from '../src/app/core/models/chat.js';
 import { ChatSessionStore } from '../src/app/core/services/chat-session-store.js';
-import { ChatSessionService } from '../src/app/core/services/chat-session.service.js';
+import { ChatSessionCollection } from '../src/app/core/services/chat-session-collection.js';
+import { CHAT_FETCH_FN, ChatSessionService } from '../src/app/core/services/chat-session.service.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
 
 function createSseResponse(chunks: string[], status = 200): Response {
@@ -266,7 +267,198 @@ console.log("hi");
   });
 });
 
+describe('ChatSessionCollection', () => {
+  it('handles empty and non-target session updates safely', () => {
+    const collection = new ChatSessionCollection();
+    expect(collection.resolveInitialSessionId([])).toBe('');
+
+    const sessions = [
+      {
+        id: 'chat-1',
+        title: '',
+        preview: '',
+        messages: [],
+        createdAt: '2026-03-13T10:00:00.000Z',
+        updatedAt: '2026-03-13T10:00:00.000Z',
+      },
+    ];
+
+    const normalized = collection.normalizeSessions(sessions);
+    expect(normalized[0]?.title).toBe('New Chat');
+    expect(normalized[0]?.preview).toBe('');
+
+    const untouched = collection.updateSessionMessages(sessions, 'missing', (messages) => messages);
+    expect(untouched).toEqual(sessions);
+  });
+
+  it('derives fallback titles and previews from assistant-only or blank user content', () => {
+    const collection = new ChatSessionCollection();
+
+    const assistantOnly = collection.normalizeSessions([
+      {
+        id: 'chat-assistant',
+        title: '',
+        preview: '',
+        messages: [
+          {
+            id: 'assistant-1',
+            role: 'assistant',
+            phase: 'complete',
+            providerLabel: 'LM Studio Local',
+            rawText: 'Assistant preview',
+            blocks: [],
+          },
+        ],
+        createdAt: '2026-03-13T10:00:00.000Z',
+        updatedAt: '2026-03-13T10:00:00.000Z',
+      },
+    ]);
+
+    expect(assistantOnly[0]?.title).toBe('New Chat');
+    expect(assistantOnly[0]?.preview).toBe('Assistant preview');
+
+    const blankUser = collection.normalizeSessions([
+      {
+        id: 'chat-blank-user',
+        title: '',
+        preview: '',
+        messages: [
+          {
+            id: 'user-1',
+            role: 'user',
+            phase: 'complete',
+            providerLabel: null,
+            rawText: '   ',
+            blocks: [],
+          },
+        ],
+        createdAt: '2026-03-13T10:00:00.000Z',
+        updatedAt: '2026-03-13T10:00:00.000Z',
+      },
+    ]);
+
+    expect(blankUser[0]?.title).toBe('New Chat');
+  });
+
+  it('returns an empty preview when there is no user or assistant message content to derive from', () => {
+    const collection = new ChatSessionCollection();
+    const normalized = collection.normalizeSessions([
+      {
+        id: 'chat-system-only',
+        title: '',
+        preview: '',
+        messages: [
+          {
+            id: 'system-1',
+            role: 'system' as never,
+            phase: 'complete',
+            providerLabel: null,
+            rawText: 'System note',
+            blocks: [],
+          },
+        ],
+        createdAt: '2026-03-13T10:00:00.000Z',
+        updatedAt: '2026-03-13T10:00:00.000Z',
+      },
+    ]);
+
+    expect(normalized[0]?.preview).toBe('');
+  });
+});
+
+describe('ChatSessionStore', () => {
+  it('returns safe defaults for missing, invalid, and empty active session values', () => {
+    const storage = {
+      getItem(key: string) {
+        if (key === 'sessions') {
+          return JSON.stringify([{ nope: true }, null, 'bad']);
+        }
+        return '';
+      },
+      setItem() {},
+    };
+
+    const store = new ChatSessionStore('sessions', 'active-session', storage);
+    expect(store.loadSessions()).toEqual([]);
+    expect(store.loadActiveSessionId()).toBeNull();
+  });
+
+  it('returns empty sessions for malformed session JSON', () => {
+    const storage = {
+      getItem(key: string) {
+        return key === 'sessions' ? '{not-json' : null;
+      },
+      setItem() {},
+    };
+
+    const store = new ChatSessionStore('sessions', 'active-session', storage);
+    expect(store.loadSessions()).toEqual([]);
+  });
+
+  it('returns empty sessions when stored session data is missing', () => {
+    const storage = {
+      getItem() {
+        return null;
+      },
+      setItem() {},
+    };
+
+    const store = new ChatSessionStore('sessions', 'active-session', storage);
+    expect(store.loadSessions()).toEqual([]);
+  });
+
+  it('returns empty sessions when parsed storage data is not an array', () => {
+    const storage = {
+      getItem() {
+        return '{"id":"not-an-array"}';
+      },
+      setItem() {},
+    };
+
+    const store = new ChatSessionStore('sessions', 'active-session', storage);
+    expect(store.loadSessions()).toEqual([]);
+  });
+
+  it('no-ops safely when storage is unavailable', () => {
+    const store = new ChatSessionStore('sessions', 'active-session', null as never);
+    expect(store.loadSessions()).toEqual([]);
+    expect(store.loadActiveSessionId()).toBeNull();
+    expect(() => store.saveSessions([])).not.toThrow();
+    expect(() => store.saveActiveSessionId('chat-1')).not.toThrow();
+  });
+
+  it('falls back to in-memory storage when localStorage access throws during construction', () => {
+    const originalLocalStorage = globalThis.localStorage;
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      get() {
+        throw new Error('localStorage unavailable');
+      },
+    });
+
+    try {
+      const store = new ChatSessionStore('sessions', 'active-session');
+      expect(store.loadSessions()).toEqual([]);
+      store.saveActiveSessionId('chat-fallback');
+      expect(store.loadActiveSessionId()).toBe('chat-fallback');
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+});
+
 describe('ChatSessionService', () => {
+  it('binds the global fetch function in the injection token factory', () => {
+    const factory = (CHAT_FETCH_FN as any).ɵprov.factory as () => typeof fetch;
+    const boundFetch = factory();
+    expect(typeof boundFetch).toBe('function');
+    expect(boundFetch.name).toContain('bound');
+  });
+
   beforeEach(() => {
     const store = new ChatSessionStore('magnetar.chat.sessions.v1', 'magnetar.chat.active-session.v1');
     store.saveSessions([]);
@@ -790,6 +982,16 @@ describe('ChatSessionService', () => {
     expect(service.conversationHistory()[0]?.title).toBe('Renamed Chat');
   });
 
+  it('returns false when renaming a missing session id', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    expect(service.renameSession('missing-session', 'Renamed Chat')).toBe(false);
+  });
+
+  it('returns false when renaming to a blank title', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    expect(service.renameSession(service.currentSession()?.id ?? '', '   ')).toBe(false);
+  });
+
   it('can delete a non-active session and keep the remaining rail entries', () => {
     const service = new ChatSessionService(new ProviderConfigService());
     const firstSessionId = service.currentSession()?.id ?? '';
@@ -801,6 +1003,68 @@ describe('ChatSessionService', () => {
     expect(service.deleteSession(firstSessionId)).toBe(true);
     expect(service.sessions()).toHaveLength(1);
     expect(service.currentSession()?.id).toBe(secondSessionId);
+  });
+
+  it('refuses to delete a missing or last remaining session', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const onlySessionId = service.currentSession()?.id ?? '';
+
+    expect(service.deleteSession('missing-session')).toBe(false);
+    expect(service.deleteSession(onlySessionId)).toBe(false);
+  });
+
+  it('returns false when switching to a missing session', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    expect(service.switchToSession('missing-session')).toBe(false);
+  });
+
+  it('exposes empty message/current-session state when the active session id is cleared', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    (service as any).activeSessionIdState.set('');
+    expect(service.currentSession()).toBeNull();
+    expect(service.messages()).toEqual([]);
+  });
+
+  it('does not persist an empty active session id', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const saveActiveSessionId = vi.spyOn((service as any).sessionStore, 'saveActiveSessionId');
+    (service as any).activeSessionIdState.set('');
+    (service as any).persistActiveSession();
+    expect(saveActiveSessionId).not.toHaveBeenCalled();
+  });
+
+  it('can delete the active session and promote the next remaining session', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const firstSessionId = service.currentSession()?.id ?? '';
+
+    service.createNewSession();
+    const secondSessionId = service.currentSession()?.id ?? '';
+    expect(secondSessionId).not.toBe(firstSessionId);
+
+    expect(service.deleteSession(secondSessionId)).toBe(true);
+    expect(service.currentSession()?.id).toBe(firstSessionId);
+  });
+
+  it('falls back to an empty active session id when deleting a duplicated active entry leaves no remaining sessions', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const duplicateSessions = [
+      { ...service.sessions()[0]!, id: 'duplicate-session' },
+      { ...service.sessions()[0]!, id: 'duplicate-session' },
+    ];
+
+    (service as any).sessionState.set(duplicateSessions);
+    (service as any).activeSessionIdState.set('duplicate-session');
+
+    expect(service.deleteSession('duplicate-session')).toBe(true);
+    expect((service as any).activeSessionIdState()).toBe('');
+  });
+
+  it('keeps session state unchanged when the active session id is missing during an append update', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+    const baselineSessions = service.sessions();
+    (service as any).activeSessionIdState.set('missing-session');
+    (service as any).updateCurrentSessionMessages((messages: unknown[]) => messages);
+    expect(service.sessions()).toEqual(baselineSessions);
   });
 
   it('restores the previously active session from local storage', () => {
@@ -815,5 +1079,40 @@ describe('ChatSessionService', () => {
 
     const secondInstance = new ChatSessionService(new ProviderConfigService());
     expect(secondInstance.currentSession()?.id).toBe(secondSessionId);
+  });
+
+  it('falls back to the first available session when stored active session id is stale', () => {
+    const firstInstance = new ChatSessionService(new ProviderConfigService());
+    const firstSessionId = firstInstance.currentSession()?.id ?? '';
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      ['magnetar.chat.sessions.v1', JSON.stringify(firstInstance.sessions())],
+      ['magnetar.chat.active-session.v1', 'missing-session'],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const secondInstance = new ChatSessionService(new ProviderConfigService());
+      expect(secondInstance.currentSession()?.id).toBe(firstSessionId);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
   });
 });
