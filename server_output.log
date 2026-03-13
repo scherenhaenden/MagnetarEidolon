@@ -1,0 +1,41 @@
+
+> dev
+> ./dev.sh
+
+
+> @magnetar/magnetar-ui@0.1.0 start
+> ng serve --proxy-config proxy.conf.json --host 0.0.0.0
+
+
+> @magnetar/magnetar-api@0.1.0 start:dev
+> tsx src/main.ts
+
+[32m[Nest] 2109  - [39m03/13/2026, 1:54:53 PM [32m    LOG[39m [38;5;3m[NestFactory] [39m[32mStarting Nest application...[39m
+[32m[Nest] 2109  - [39m03/13/2026, 1:54:53 PM [32m    LOG[39m [38;5;3m[InstanceLoader] [39m[32mAppModule dependencies initialized[39m[38;5;3m +12ms[39m
+[32m[Nest] 2109  - [39m03/13/2026, 1:54:53 PM [32m    LOG[39m [38;5;3m[RoutesResolver] [39m[32mChatController {/api/chat}:[39m[38;5;3m +5ms[39m
+[32m[Nest] 2109  - [39m03/13/2026, 1:54:53 PM [32m    LOG[39m [38;5;3m[RouterExplorer] [39m[32mMapped {/api/chat/stream, POST} route[39m[38;5;3m +3ms[39m
+[32m[Nest] 2109  - [39m03/13/2026, 1:54:53 PM [32m    LOG[39m [38;5;3m[NestApplication] [39m[32mNest application successfully started[39m[38;5;3m +2ms[39m
+
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
+
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues. You might need to use "--disable-host-check" if that's the
+case.
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size
+main.js             | main          | 292.04 kB |
+polyfills.js        | polyfills     |  92.58 kB |
+styles.css          | styles        |  74.81 kB |
+
+                    | Initial total | 459.43 kB
+
+Application bundle generation complete. [4.815 seconds] - 2026-03-13T13:54:59.312Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
+  ➜  Network: http://192.168.0.2:4200/
