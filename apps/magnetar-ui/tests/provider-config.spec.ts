@@ -30,6 +30,7 @@ describe('provider-config model helpers', () => {
         ownership: 'backend',
         presetKind: 'openai',
         modelSuggestions: ['gpt'],
+        apiSurface: { endpointComparison: [], endpoints: [] },
       },
       {
         id: 'a',
@@ -48,6 +49,7 @@ describe('provider-config model helpers', () => {
         ownership: 'backend',
         presetKind: 'lm_studio',
         modelSuggestions: ['llama'],
+        apiSurface: { endpointComparison: [], endpoints: [] },
       },
     ]);
 
@@ -80,6 +82,11 @@ describe('ProviderConfigService', () => {
       '$model',
     );
     expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.modelSuggestions.length).toBeGreaterThan(0);
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual([
+      'models',
+      'chat',
+    ]);
+    expect(service.providers().find((provider) => provider.id === 'provider-lmstudio')?.apiSurface.endpoints.length).toBeGreaterThan(2);
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {
@@ -373,5 +380,117 @@ describe('ProviderConfigService', () => {
     expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.model).toBe(
       'google/gemini-2.5-flash',
     );
+  });
+
+  it('hydrates missing preset-backed template and API metadata from the preset definition', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      [
+        'magnetar.provider-config.v1',
+        JSON.stringify([
+          {
+            id: 'provider-openai-hydrated',
+            name: 'Hydrated OpenAI',
+            kind: 'openai',
+            baseUrl: 'https://api.openai.com/v1',
+            model: 'gpt-4.1-mini',
+            role: 'primary',
+            priority: 1,
+            health: 'healthy',
+            apiStyle: 'openai-compatible',
+            apiKey: '',
+            description: 'Preset-backed provider with stripped metadata',
+            supportsApiKey: true,
+            ownership: 'backend',
+            presetKind: 'openai',
+          },
+        ]),
+      ],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const service = new ProviderConfigService();
+      const provider = service.providers()[0];
+      const openAiPreset = service.getPreset('openai');
+
+      expect(provider.template).toEqual(openAiPreset?.template);
+      expect(provider.apiSurface).toEqual(openAiPreset?.apiSurface);
+      expect(provider.modelSuggestions).toEqual(openAiPreset?.modelSuggestions);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('hydrates missing metadata with generic defaults when no preset kind exists', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      [
+        'magnetar.provider-config.v1',
+        JSON.stringify([
+          {
+            id: 'provider-generic-hydrated',
+            name: 'Hydrated Generic',
+            kind: 'custom',
+            baseUrl: 'https://provider.example/v1',
+            model: 'custom-model',
+            role: 'backup',
+            priority: 2,
+            health: 'unknown',
+            apiStyle: 'openai-compatible',
+            apiKey: '',
+            description: 'Provider without preset metadata',
+            supportsApiKey: true,
+            ownership: 'user',
+          },
+        ]),
+      ],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const service = new ProviderConfigService();
+      const provider = service.providers()[0];
+
+      expect(provider.template).toEqual({ requestTemplate: '', placeholders: [] });
+      expect(provider.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual(['models', 'chat']);
+      expect(provider.modelSuggestions).toEqual([]);
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
   });
 });
