@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-13 16:05 UTC
+  **Author:** Codex
+  **Entry:** State Change: Verified that GitHub issues `#173`, `#174`, and `#190` are implemented in the current `master` branch. The Angular chat surface now exposes a conversation rail with new/rename/delete administration, chat sessions persist and restore through local storage with recency ordering, and the Providers editor now shows request templates, placeholders, API-surface endpoint definitions, and example JSON payloads. `PLAN.md` was updated to reference these delivered issue outcomes explicitly.
+
 - **Timestamp:** 2026-03-11 17:05 UTC
   **Author:** Codex
   **Entry:** State Change: Manually validated the end-to-end LM Studio chat path through the Angular UI and NestJS backend. The working default route now uses the OpenAI-compatible LM Studio endpoint with `local-model`, and copyable code blocks were confirmed in the live UI.
