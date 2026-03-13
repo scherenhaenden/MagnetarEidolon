@@ -1,0 +1,43 @@
+name: Package Windows EXE
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build SDK and CLI
+        run: |
+          npm --prefix packages/magnetar-sdk ci --include=dev
+          npm --prefix packages/magnetar-sdk run build
+          npm --prefix apps/magnetar-ui ci --include=dev
+          npm --prefix apps/magnetar-ui run build:cli
+
+      - name: Build EXE with pkg
+        run: |
+          npm --prefix apps/magnetar-ui exec pkg -- --target node22-win-x64 --output dist/magnetar-cli.exe dist/cli/magnetar-cli.js
+
+      - name: Test EXE
+        run: |
+          ./apps/magnetar-ui/dist/magnetar-cli.exe about
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: magnetar-exe
+          path: apps/magnetar-ui/dist/magnetar-cli.exe
