@@ -30,6 +30,7 @@ describe('provider-config model helpers', () => {
         ownership: 'backend',
         presetKind: 'openai',
         modelSuggestions: ['gpt'],
+        apiSurface: { endpointComparison: [], endpoints: [] },
       },
       {
         id: 'a',
@@ -48,6 +49,7 @@ describe('provider-config model helpers', () => {
         ownership: 'backend',
         presetKind: 'lm_studio',
         modelSuggestions: ['llama'],
+        apiSurface: { endpointComparison: [], endpoints: [] },
       },
     ]);
 
@@ -80,6 +82,11 @@ describe('ProviderConfigService', () => {
       '$model',
     );
     expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.modelSuggestions.length).toBeGreaterThan(0);
+    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual([
+      'models',
+      'chat',
+    ]);
+    expect(service.providers().find((provider) => provider.id === 'provider-lmstudio')?.apiSurface.endpoints.length).toBeGreaterThan(2);
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {

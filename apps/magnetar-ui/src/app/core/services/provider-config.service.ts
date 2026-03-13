@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
+  ProviderApiSurfaceDefinition,
   ProviderConfig,
   ProviderHealth,
   ProviderPreset,
@@ -10,6 +11,276 @@ import {
 } from '../models/provider-config.js';
 
 const STORAGE_KEY = 'magnetar.provider-config.v1';
+
+function createOpenAiCompatibleApiSurface(baseChatPath = '/chat/completions'): ProviderApiSurfaceDefinition {
+  return {
+    endpointComparison: [
+      'Streaming responses are supported.',
+      'Model discovery is available through a models endpoint.',
+      'Chat/message generation uses an OpenAI-style messages payload.',
+    ],
+    endpoints: [
+      {
+        id: 'models',
+        label: 'List Models',
+        method: 'GET',
+        path: '/models',
+        description: 'Fetch the models available for selection from this provider.',
+        requestTemplate: '',
+        requestExample: '',
+        responseExample: '',
+        notes: [],
+        placeholders: [],
+      },
+      {
+        id: 'chat',
+        label: 'Chat Messages',
+        method: 'POST',
+        path: baseChatPath,
+        description: 'Send a structured chat/messages request for generation and streaming.',
+        requestTemplate: `{
+  "model": "$model",
+  "messages": "$messages",
+  "stream": "$stream"
+}`,
+        requestExample: `{
+  "model": "gpt-4.1-mini",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a short haiku about sunrise."
+    }
+  ],
+  "stream": true
+}`,
+        responseExample: `{
+  "id": "chatcmpl_123",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Dawn wakes in soft gold..."
+      }
+    }
+  ]
+}`,
+        notes: [],
+        placeholders: ['$model', '$messages', '$stream'],
+      },
+    ],
+  };
+}
+
+function createAnthropicApiSurface(): ProviderApiSurfaceDefinition {
+  return {
+    endpointComparison: [
+      'Streaming responses are supported.',
+      'Model selection is request-driven rather than fetched from a provider-owned models endpoint.',
+      'Message submission uses a native prompt/message contract rather than OpenAI chat-completions.',
+    ],
+    endpoints: [
+      {
+        id: 'messages',
+        label: 'Create Messages',
+        method: 'POST',
+        path: '/v1/messages',
+        description: 'Send a native Anthropic messages request for completion or streaming.',
+        requestTemplate: `{
+  "model": "$model",
+  "messages": "$messages",
+  "stream": "$stream",
+  "max_tokens": "$maxTokens"
+}`,
+        requestExample: `{
+  "model": "claude-3-7-sonnet-latest",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a short haiku about sunrise."
+    }
+  ],
+  "stream": true,
+  "max_tokens": 256
+}`,
+        responseExample: `{
+  "id": "msg_123",
+  "content": [
+    {
+      "type": "text",
+      "text": "Dawn leans over hills..."
+    }
+  ]
+}`,
+        notes: [],
+        placeholders: ['$model', '$messages', '$stream', '$maxTokens'],
+      },
+    ],
+  };
+}
+
+function createLmStudioApiSurface(): ProviderApiSurfaceDefinition {
+  return {
+    endpointComparison: [
+      'Streaming is supported.',
+      'Stateful chat and LM Studio-specific runtime events are available in the native API family.',
+      'Model discovery and lifecycle operations are richer than typical cloud-hosted OpenAI-compatible paths.',
+    ],
+    endpoints: [
+      {
+        id: 'models',
+        label: 'List Models',
+        method: 'GET',
+        path: '/models',
+        description: 'Fetch the models that LM Studio currently exposes through the OpenAI-compatible path.',
+        requestTemplate: '',
+        requestExample: '',
+        responseExample: `{
+  "data": [
+    {
+      "id": "ibm/granite-4-micro"
+    }
+  ]
+}`,
+        notes: [
+          'Use this endpoint to discover model identifiers that can be used for inference requests.',
+        ],
+        placeholders: [],
+      },
+      {
+        id: 'chat',
+        label: 'Chat Messages',
+        method: 'POST',
+        path: '/chat/completions',
+        description: 'Send OpenAI-compatible chat/messages requests to the currently loaded model.',
+        requestTemplate: `{
+  "model": "$model",
+  "messages": "$messages",
+  "stream": "$stream"
+}`,
+        requestExample: `{
+  "model": "ibm/granite-4-micro",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write a short haiku about sunrise."
+    }
+  ],
+  "stream": true
+}`,
+        responseExample: `{
+  "id": "chatcmpl_lmstudio_123",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Dawn wakes the horizon..."
+      }
+    }
+  ]
+}`,
+        notes: [
+          'This is the OpenAI-compatible LM Studio path and expects full messages payloads.',
+          'Use this when you want compatibility with OpenAI-style chat contracts.',
+        ],
+        placeholders: ['$model', '$messages', '$stream'],
+      },
+      {
+        id: 'chat-native',
+        label: 'Native Chat Input',
+        method: 'POST',
+        path: '/chat',
+        description: 'Send LM Studio native chat input payloads when using the stateful native inference path.',
+        requestTemplate: `{
+  "model": "$model",
+  "input": "$input",
+  "previous_response_id": "$previousResponseId",
+  "store": "$store"
+}`,
+        requestExample: `{
+  "model": "ibm/granite-4-micro",
+  "input": "What color did I just mention?",
+  "previous_response_id": "resp_abc123xyz..."
+}`,
+        responseExample: `{
+  "model_instance_id": "ibm/granite-4-micro",
+  "output": [
+    {
+      "type": "message",
+      "content": "You said your favorite color is blue."
+    }
+  ],
+  "response_id": "resp_def456uvw..."
+}`,
+        notes: [
+          'This endpoint is stateful by default: LM Studio stores the conversation thread automatically.',
+          'Use the returned response_id as previous_response_id to continue a conversation without resending full history.',
+          'Set store to false for one-off stateless requests; LM Studio will not return a response_id in that mode.',
+        ],
+        placeholders: ['$model', '$input', '$previousResponseId', '$store'],
+      },
+      {
+        id: 'models-load',
+        label: 'Load Model',
+        method: 'POST',
+        path: '/models/load',
+        description: 'Request LM Studio to load a model before inference.',
+        requestTemplate: `{
+  "model": "$model"
+}`,
+        requestExample: `{
+  "model": "ibm/granite-4-micro"
+}`,
+        responseExample: '',
+        notes: [],
+        placeholders: ['$model'],
+      },
+      {
+        id: 'models-unload',
+        label: 'Unload Model',
+        method: 'POST',
+        path: '/models/unload',
+        description: 'Unload a model from the LM Studio runtime.',
+        requestTemplate: `{
+  "model": "$model"
+}`,
+        requestExample: `{
+  "model": "ibm/granite-4-micro"
+}`,
+        responseExample: '',
+        notes: [],
+        placeholders: ['$model'],
+      },
+      {
+        id: 'models-download',
+        label: 'Download Model',
+        method: 'POST',
+        path: '/models/download',
+        description: 'Start a model download in LM Studio.',
+        requestTemplate: `{
+  "model": "$model"
+}`,
+        requestExample: `{
+  "model": "ibm/granite-4-micro"
+}`,
+        responseExample: '',
+        notes: [],
+        placeholders: ['$model'],
+      },
+      {
+        id: 'models-download-status',
+        label: 'Download Status',
+        method: 'GET',
+        path: '/models/download/status',
+        description: 'Query the status of an LM Studio model download.',
+        requestTemplate: '',
+        requestExample: '',
+        responseExample: '',
+        notes: [],
+        placeholders: [],
+      },
+    ],
+  };
+}
 
 const PROVIDER_PRESETS: ProviderPreset[] = [
   {
@@ -30,6 +301,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 }`,
       placeholders: ['$model', '$messages', '$stream'],
     },
+    apiSurface: createLmStudioApiSurface(),
   },
   {
     kind: 'openrouter',
@@ -50,6 +322,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 }`,
       placeholders: ['$model', '$messages', '$stream'],
     },
+    apiSurface: createOpenAiCompatibleApiSurface(),
   },
   {
     kind: 'openai',
@@ -69,6 +342,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 }`,
       placeholders: ['$model', '$messages', '$stream'],
     },
+    apiSurface: createOpenAiCompatibleApiSurface(),
   },
   {
     kind: 'anthropic',
@@ -88,6 +362,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 }`,
       placeholders: ['$model', '$prompt', '$stream'],
     },
+    apiSurface: createAnthropicApiSurface(),
   },
   {
     kind: 'custom',
@@ -107,6 +382,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 }`,
       placeholders: ['$model', '$messages', '$stream'],
     },
+    apiSurface: createOpenAiCompatibleApiSurface('/chat/completions'),
   },
 ];
 
@@ -330,7 +606,7 @@ export class ProviderConfigService {
         return DEFAULT_PROVIDERS;
       }
 
-      return parsed;
+      return parsed.map((provider) => this.hydrateProviderConfig(provider));
     } catch {
       return DEFAULT_PROVIDERS;
     }
@@ -358,6 +634,16 @@ export class ProviderConfigService {
 
     ProviderConfigService.fallbackStorage.set(key, value);
   }
+
+  private hydrateProviderConfig(provider: ProviderConfig): ProviderConfig {
+    const preset = provider.presetKind ? this.getPreset(provider.presetKind) : null;
+    return {
+      ...provider,
+      template: provider.template ?? preset?.template ?? { requestTemplate: '', placeholders: [] },
+      apiSurface: provider.apiSurface ?? preset?.apiSurface ?? createOpenAiCompatibleApiSurface(),
+      modelSuggestions: provider.modelSuggestions ?? preset?.modelSuggestions ?? [],
+    };
+  }
 }
 
 function createProviderFromPreset(
@@ -384,5 +670,6 @@ function createProviderFromPreset(
     ownership: preset.ownership,
     presetKind: preset.kind,
     modelSuggestions: preset.modelSuggestions ?? [],
+    apiSurface: preset.apiSurface,
   };
 }
