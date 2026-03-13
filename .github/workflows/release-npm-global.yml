@@ -1,0 +1,75 @@
+name: Release NPM Global Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver version for apps/magnetar-ui (for example 0.2.0)"
+        required: true
+      publish:
+        description: "Publish to npm (false = dry run + artifact only)"
+        required: true
+        default: "false"
+  push:
+    tags:
+      - "npm-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  package-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/magnetar-ui
+    outputs:
+      tgz_name: ${{ steps.pack.outputs.tgz_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install and build shared SDK
+        working-directory: packages/magnetar-sdk
+        run: |
+          npm ci --include=dev
+          npm run build
+
+      - name: Install and build CLI package
+        run: |
+          npm ci --include=dev
+          npm run build:cli
+
+      - name: Optionally set package version
+        if: github.event_name == 'workflow_dispatch'
+        run: npm version "${{ inputs.version }}" --no-git-tag-version
+
+      - name: Pack npm package
+        id: pack
+        run: |
+          PACKAGE_TGZ="$(npm pack --silent)"
+          echo "tgz_name=$PACKAGE_TGZ" >> "$GITHUB_OUTPUT"
+          ls -lh "$PACKAGE_TGZ"
+
+      - name: Test global install from tarball
+        run: |
+          npm install --global "./${{ steps.pack.outputs.tgz_name }}"
+          magnetar-cli about
+
+      - name: Upload npm package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: apps/magnetar-ui/${{ steps.pack.outputs.tgz_name }}
+
+      - name: Publish to npm
+        if: github.event_name == 'workflow_dispatch' && inputs.publish == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public

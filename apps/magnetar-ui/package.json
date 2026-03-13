@@ -1,7 +1,7 @@
 {
   "name": "@magnetar/magnetar-ui",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
+  "private": false,
   "description": "MagnetarEidolon TypeScript UI workspace with a shared CLI/runtime proof of concept.",
   "type": "module",
   "scripts": {
@@ -46,5 +46,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
