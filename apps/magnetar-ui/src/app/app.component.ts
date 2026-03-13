@@ -873,6 +873,19 @@ export class MemoryScreen {
   selector: 'screen-providers',
   standalone: true,
   imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  styles: [`
+    .accordion-grid {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s ease-in-out;
+    }
+    .accordion-grid.is-open {
+        grid-template-rows: 1fr;
+    }
+    .accordion-inner {
+        overflow: hidden;
+    }
+  `],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -897,126 +910,116 @@ export class MemoryScreen {
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)_24rem] gap-6 items-start">
-        <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-5 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
-          <div class="space-y-2">
-            <button
-              (click)="toggleQuickAdd()"
-              class="w-full inline-flex items-center justify-between rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.2em] transition-colors"
-              [ngClass]="isQuickAddExpanded() ? 'border-cyan-500/20 bg-cyan-500/10 text-cyan-200' : 'border-white/10 bg-white/[0.03] text-zinc-400 hover:bg-white/[0.06] hover:text-zinc-300'">
-              <span class="inline-flex items-center gap-2">
-                <ui-icon name="plus-circle" [size]="14"></ui-icon>
-                Quick Add
-              </span>
-              <ui-icon [name]="isQuickAddExpanded() ? 'chevron-up' : 'chevron-down'" [size]="14"></ui-icon>
+        <aside class="bg-[#090a0f] border border-cyan-500/10 rounded-3xl p-5 space-y-4 shadow-[0_20px_80px_rgba(6,182,212,0.08)] lg:sticky lg:top-20">
+
+          <!-- Accordion 1: Quick Add Presets -->
+          <section class="bg-white/[0.02] rounded-2xl border border-white/5 overflow-hidden transition-all duration-300"
+                   [ngClass]="accordions().quickAdd ? 'border-cyan-500/30 shadow-[0_12px_40px_rgba(34,211,238,0.1)]' : 'hover:bg-white/[0.04]'">
+            <button (click)="toggleAccordion('quickAdd')" class="w-full flex items-center justify-between p-4 bg-transparent hover:bg-white/[0.02] transition-colors relative z-10 cursor-pointer group">
+                <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-bold flex items-center gap-2 group-hover:text-zinc-200 transition-colors">
+                    <ui-icon name="plus-circle" [size]="16" cssClass="text-cyan-400"></ui-icon>
+                    Quick Add
+                </h2>
+                <ui-icon [name]="accordions().quickAdd ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
             </button>
-            <div *ngIf="isQuickAddExpanded()" class="animate-fade-in space-y-2 mt-4">
-              <h3 class="text-lg font-medium text-white">Provider Actions</h3>
-              <p class="text-xs leading-6 text-zinc-400">
-                Add known providers from the left rail first. The editor on the right remains for deeper configuration.
-              </p>
-            </div>
-          </div>
 
-          <div *ngIf="isQuickAddExpanded()" class="space-y-2 animate-fade-in">
-            <!-- OpenRouter Accordion -->
-            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
-                 [ngClass]="expandedMenuItem() === 'openrouter' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
-              <button
-                (click)="toggleMenuItem('openrouter')"
-                class="w-full px-4 py-3 text-left flex items-center justify-between">
-                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'openrouter' ? 'text-cyan-300' : 'text-zinc-300'">OpenRouter</span>
-                <ui-icon [name]="expandedMenuItem() === 'openrouter' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
-              </button>
-              <div *ngIf="expandedMenuItem() === 'openrouter'" class="px-4 pb-4 animate-fade-in">
-                <p class="text-xs text-zinc-400 mb-3">Cloud routing and multi-model access.</p>
-                <button
-                  (click)="addPreset('openrouter')"
-                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
-                  Add OpenRouter
-                </button>
-              </div>
+            <div class="accordion-grid" [class.is-open]="accordions().quickAdd">
+                <div class="accordion-inner">
+                    <div class="p-4 pt-0 space-y-2">
+                        <button *ngFor="let preset of presets()"
+                          (click)="addPreset(preset.kind)"
+                          class="w-full flex items-center justify-between p-3 bg-black/20 hover:bg-white/[0.05] border border-white/5 hover:border-cyan-500/30 rounded-xl transition-all group shadow-sm text-left">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded flex items-center justify-center border group-hover:bg-white/5"
+                                     [ngClass]="getPresetColorClasses(preset.kind)">
+                                    <ui-icon name="layers" [size]="14"></ui-icon>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-zinc-200 group-hover:text-white">{{ preset.label }}</div>
+                                    <div class="text-[10px] text-zinc-500 mt-0.5">{{ preset.description }}</div>
+                                </div>
+                            </div>
+                            <ui-icon name="plus" [size]="14" cssClass="text-zinc-600 group-hover:text-cyan-400"></ui-icon>
+                        </button>
+                    </div>
+                </div>
             </div>
+          </section>
 
-            <!-- OpenAI Accordion -->
-            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
-                 [ngClass]="expandedMenuItem() === 'openai' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
-              <button
-                (click)="toggleMenuItem('openai')"
-                class="w-full px-4 py-3 text-left flex items-center justify-between">
-                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'openai' ? 'text-cyan-300' : 'text-zinc-300'">OpenAI</span>
-                <ui-icon [name]="expandedMenuItem() === 'openai' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
-              </button>
-              <div *ngIf="expandedMenuItem() === 'openai'" class="px-4 pb-4 animate-fade-in">
-                <p class="text-xs text-zinc-400 mb-3">Hosted OpenAI-compatible endpoint.</p>
-                <button
-                  (click)="addPreset('openai')"
-                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
-                  Add OpenAI
-                </button>
-              </div>
-            </div>
+          <!-- Accordion 2: Configured Providers -->
+          <section class="bg-white/[0.02] rounded-2xl border border-white/5 overflow-hidden transition-all duration-300"
+                   [ngClass]="accordions().configured ? 'border-cyan-500/30 shadow-[0_12px_40px_rgba(34,211,238,0.1)]' : 'hover:bg-white/[0.04]'">
+            <button (click)="toggleAccordion('configured')" class="w-full flex items-center justify-between p-4 bg-transparent hover:bg-white/[0.02] transition-colors relative z-10 cursor-pointer group">
+                <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-bold flex items-center gap-2 group-hover:text-zinc-200 transition-colors">
+                    <ui-icon name="server" [size]="16" cssClass="text-emerald-400"></ui-icon>
+                    View Current
+                </h2>
+                <div class="flex items-center gap-3">
+                    <span class="px-2 py-0.5 text-[10px] uppercase tracking-wider rounded bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20">{{ providers().length }} Active</span>
+                    <ui-icon [name]="accordions().configured ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+                </div>
+            </button>
 
-            <!-- LM Studio Accordion -->
-            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
-                 [ngClass]="expandedMenuItem() === 'lm_studio' ? 'border-cyan-400/30 shadow-[0_12px_40px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/40 to-teal-900/20' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
-              <button
-                (click)="toggleMenuItem('lm_studio')"
-                class="w-full px-4 py-3 text-left flex items-center justify-between">
-                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'lm_studio' ? 'text-cyan-300' : 'text-zinc-300'">LM Studio</span>
-                <ui-icon [name]="expandedMenuItem() === 'lm_studio' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
-              </button>
-              <div *ngIf="expandedMenuItem() === 'lm_studio'" class="px-4 pb-4 animate-fade-in">
-                <p class="text-xs text-zinc-400 mb-3">Local-first smoke and development path.</p>
-                <button
-                  (click)="addPreset('lm_studio')"
-                  class="w-full rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/30 text-cyan-100 text-xs py-2 font-medium transition-colors">
-                  Add LM Studio
-                </button>
-              </div>
-            </div>
+            <div class="accordion-grid" [class.is-open]="accordions().configured">
+                <div class="accordion-inner">
+                    <div class="p-4 pt-0 space-y-2">
+                        <div *ngFor="let provider of providers()"
+                             (click)="selectProvider(provider.id)"
+                             class="flex items-center justify-between p-2 rounded-xl bg-black/20 border border-white/5 hover:border-white/10 cursor-pointer transition-colors"
+                             [ngClass]="{'border-cyan-500/30 bg-cyan-500/5': selectedProvider()?.id === provider.id}">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="getRoleBgClass(provider.role)"></span>
+                                <span class="text-sm font-medium text-zinc-300 truncate max-w-[120px]">{{ provider.name }}</span>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase" [ngClass]="getRoleTextClass(provider.role)">{{ provider.role }}</span>
+                        </div>
 
-            <!-- Custom Provider Accordion -->
-            <div class="rounded-2xl border overflow-hidden transition-all duration-200"
-                 [ngClass]="expandedMenuItem() === 'custom' ? 'border-violet-500/30 shadow-[0_12px_40px_rgba(139,92,246,0.15)] bg-gradient-to-br from-violet-900/30 to-fuchsia-900/10' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.04]'">
-              <button
-                (click)="toggleMenuItem('custom')"
-                class="w-full px-4 py-3 text-left flex items-center justify-between">
-                <span class="text-sm font-medium" [ngClass]="expandedMenuItem() === 'custom' ? 'text-violet-300' : 'text-zinc-300'">Custom Provider</span>
-                <ui-icon [name]="expandedMenuItem() === 'custom' ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
-              </button>
-              <div *ngIf="expandedMenuItem() === 'custom'" class="px-4 pb-4 animate-fade-in">
-                <p class="text-xs text-zinc-400 mb-3">Start from a blank configurable shell.</p>
-                <button
-                  (click)="addCustomProvider()"
-                  class="w-full rounded-xl bg-violet-500/20 hover:bg-violet-500/30 border border-violet-500/30 text-violet-100 text-xs py-2 font-medium transition-colors">
-                  Add Custom Provider
-                </button>
-              </div>
+                        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+                          <div class="text-xs uppercase tracking-[0.18em] text-zinc-500">Layout</div>
+                          <div class="inline-flex rounded-xl border border-white/10 bg-black/20 p-1 text-xs">
+                            <button
+                              (click)="setViewMode('grid')"
+                              class="px-3 py-1.5 rounded-lg transition-colors"
+                              [ngClass]="viewMode() === 'grid' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
+                              Cards
+                            </button>
+                            <button
+                              (click)="setViewMode('list')"
+                              class="px-3 py-1.5 rounded-lg transition-colors"
+                              [ngClass]="viewMode() === 'list' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
+                              List
+                            </button>
+                          </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
+          </section>
 
-          <div class="rounded-2xl border border-white/5 bg-white/[0.03] p-4 space-y-3">
-            <div class="flex items-center justify-between gap-3">
-              <div class="text-xs uppercase tracking-[0.18em] text-zinc-500">View</div>
-              <div class="inline-flex rounded-xl border border-white/10 bg-black/20 p-1 text-xs">
-                <button
-                  (click)="setViewMode('grid')"
-                  class="px-3 py-1.5 rounded-lg transition-colors"
-                  [ngClass]="viewMode() === 'grid' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
-                  Cards
-                </button>
-                <button
-                  (click)="setViewMode('list')"
-                  class="px-3 py-1.5 rounded-lg transition-colors"
-                  [ngClass]="viewMode() === 'list' ? 'bg-cyan-500 text-slate-900 font-medium' : 'text-zinc-300 hover:bg-white/5'">
-                  List
-                </button>
-              </div>
+          <!-- Accordion 3: Add Custom Configuration -->
+          <section class="bg-white/[0.02] rounded-2xl border border-white/5 overflow-hidden transition-all duration-300"
+                   [ngClass]="accordions().custom ? 'border-violet-500/30 shadow-[0_12px_40px_rgba(139,92,246,0.1)]' : 'hover:bg-white/[0.04]'">
+            <button (click)="toggleAccordion('custom')" class="w-full flex items-center justify-between p-4 bg-transparent hover:bg-white/[0.02] transition-colors relative z-10 cursor-pointer group">
+                <h2 class="text-xs uppercase tracking-widest text-zinc-400 font-bold flex items-center gap-2 group-hover:text-zinc-200 transition-colors">
+                    <ui-icon name="wrench" [size]="16" cssClass="text-violet-400"></ui-icon>
+                    Add Custom Config
+                </h2>
+                <ui-icon [name]="accordions().custom ? 'chevron-up' : 'chevron-down'" [size]="16" cssClass="text-zinc-500"></ui-icon>
+            </button>
+
+            <div class="accordion-grid" [class.is-open]="accordions().custom">
+                <div class="accordion-inner">
+                    <div class="p-4 pt-0 space-y-3">
+                        <p class="text-xs text-zinc-400 mb-3">Start from a generic provider definition and adapt endpoint, model, keys, and templates by hand.</p>
+                        <button (click)="addCustomProvider()" class="w-full py-3 border-2 border-dashed border-white/10 hover:border-violet-500/50 rounded-xl text-zinc-400 hover:text-violet-300 hover:bg-violet-500/10 transition-all flex items-center justify-center gap-2 text-sm font-medium group cursor-pointer">
+                            <ui-icon name="plus" [size]="16" cssClass="group-hover:scale-110 transition-transform"></ui-icon>
+                            Configure Custom Provider
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="text-xs leading-6 text-zinc-500">
-              Configured providers: {{ providers().length }}
-            </div>
-          </div>
+          </section>
+
         </aside>
 
         <div class="space-y-6">
@@ -1282,14 +1285,40 @@ export class MemoryScreen {
   `,
 })
 export class ProvidersScreen {
-  public readonly isQuickAddExpanded = signal<boolean>(true);
-  public toggleQuickAdd(): void {
-    this.isQuickAddExpanded.set(!this.isQuickAddExpanded());
+  public readonly accordions = signal({
+    quickAdd: true,
+    configured: false,
+    custom: false
+  });
+
+  public toggleAccordion(section: 'quickAdd' | 'configured' | 'custom'): void {
+    this.accordions.update(acc => ({ ...acc, [section]: !acc[section] }));
   }
 
-  public readonly expandedMenuItem = signal<string | null>('openrouter');
-  public toggleMenuItem(item: string): void {
-    this.expandedMenuItem.set(this.expandedMenuItem() === item ? null : item);
+  public getPresetColorClasses(kind: string): string {
+    switch (kind) {
+      case 'openai': return 'bg-emerald-900/30 border-emerald-800/50 group-hover:bg-emerald-900/50 text-emerald-400';
+      case 'anthropic': return 'bg-amber-900/30 border-amber-800/50 group-hover:bg-amber-900/50 text-amber-500';
+      case 'openrouter': return 'bg-blue-900/30 border-blue-800/50 group-hover:bg-blue-900/50 text-blue-400';
+      case 'lm_studio': return 'bg-emerald-900/30 border-emerald-800/50 group-hover:bg-emerald-900/50 text-emerald-400';
+      default: return 'bg-white/5 border-white/10 text-zinc-400';
+    }
+  }
+
+  public getRoleBgClass(role: string): string {
+    switch (role) {
+      case 'primary': return 'bg-emerald-500';
+      case 'backup': return 'bg-amber-500';
+      default: return 'bg-zinc-600';
+    }
+  }
+
+  public getRoleTextClass(role: string): string {
+    switch (role) {
+      case 'primary': return 'text-emerald-400';
+      case 'backup': return 'text-amber-500';
+      default: return 'text-zinc-500';
+    }
   }
 
   public readonly providerConfigService = inject(ProviderConfigService);
