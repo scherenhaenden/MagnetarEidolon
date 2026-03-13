@@ -1,0 +1,55 @@
+name: Package AppImage
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-appimage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Build SDK and CLI
+        run: |
+          npm --prefix packages/magnetar-sdk ci --include=dev
+          npm --prefix packages/magnetar-sdk run build
+          npm --prefix apps/magnetar-ui ci --include=dev
+          npm --prefix apps/magnetar-ui run build:cli
+
+      - name: Build AppImage
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y appstream fuse libfuse2
+          curl -L -o appimagetool.AppImage https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool.AppImage
+          mkdir -p AppDir/usr/bin AppDir/usr/lib/magnetar-cli AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/256x256/apps
+          cp -R apps/magnetar-ui/dist AppDir/usr/lib/magnetar-cli/
+          cp -R apps/magnetar-ui/node_modules AppDir/usr/lib/magnetar-cli/
+          printf '#!/usr/bin/env bash\nnode "$APPDIR/usr/lib/magnetar-cli/dist/cli/magnetar-cli.js" "$@"\n' > AppDir/usr/bin/magnetar-cli
+          chmod +x AppDir/usr/bin/magnetar-cli
+          printf '[Desktop Entry]\nType=Application\nName=Magnetar CLI\nExec=magnetar-cli\nIcon=magnetar-cli\nCategories=Utility;\nTerminal=true\n' > AppDir/magnetar-cli.desktop
+          cp AppDir/magnetar-cli.desktop AppDir/usr/share/applications/magnetar-cli.desktop
+          printf '<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="#111827"/><text x="50%%" y="55%%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-size="48">M</text></svg>' > AppDir/usr/share/icons/hicolor/256x256/apps/magnetar-cli.svg
+          ln -sf usr/share/icons/hicolor/256x256/apps/magnetar-cli.svg AppDir/magnetar-cli.svg
+          ln -sf usr/bin/magnetar-cli AppDir/AppRun
+          ARCH=x86_64 ./appimagetool.AppImage AppDir magnetar-cli-x86_64.AppImage
+
+      - name: Test AppImage
+        run: |
+          chmod +x magnetar-cli-x86_64.AppImage
+          APPIMAGE_EXTRACT_AND_RUN=1 ./magnetar-cli-x86_64.AppImage about
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: magnetar-appimage
+          path: magnetar-cli-x86_64.AppImage

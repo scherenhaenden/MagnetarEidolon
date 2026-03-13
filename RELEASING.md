@@ -1,35 +1,28 @@
 # Releasing MagnetarEidolon
 
-This repository uses a single automated GitHub Actions release workflow (`.github/workflows/release.yml`).
+This repository now uses dedicated packaging workflows so each distribution channel can be shipped independently.
 
-## One-time setup
-1. Configure PyPI Trusted Publishing for this repository (recommended).
-2. Ensure `GITHUB_TOKEN` has `contents: write` for workflow runs.
+## Pipelines
+- `.github/workflows/release-npm-global.yml`: Build, pack, test global install, and optionally publish `apps/magnetar-ui` to npm.
+- `.github/workflows/release-deb.yml`: Build and package a Linux `.deb` bundle for `magnetar-cli`.
+- `.github/workflows/release-exe.yml`: Build and package a Windows `.exe` with `pkg`.
+- `.github/workflows/release-appimage.yml`: Build and package a Linux AppImage.
 
-## Cut a release
-1. Open **Actions → Release → Run workflow**.
+## Recommended first path (npm)
+1. Open **Actions → Release NPM Global Package → Run workflow**.
 2. Provide:
-   - `version`: semantic version without `v` (example: `0.2.0`)
-   - `publish_to_pypi`: `true` or `false`
-   - `release_notes`: complete markdown using `RELEASE_NOTES_TEMPLATE.md`
-3. Run the workflow.
+   - `version`: semantic version (example: `0.2.0`)
+   - `publish`: `false` for dry run, `true` to publish
+3. Ensure `NPM_TOKEN` is configured in repository secrets before `publish=true`.
 
-## What the workflow does
-1. Validates release notes are extremely detailed and include all required sections.
-2. Creates/pushes tag `vX.Y.Z` if missing.
-3. Builds artifacts on Linux, macOS, and Windows.
-4. Creates a GitHub Release and uploads all OS artifacts plus Python distributions.
-5. Publishes to PyPI (optional input) via OIDC trusted publishing.
+### What npm workflow validates
+1. Installs and builds `packages/magnetar-sdk`.
+2. Installs and builds CLI output in `apps/magnetar-ui`.
+3. Packs npm tarball with `npm pack`.
+4. Installs tarball globally and runs `magnetar-cli about` as a real smoke test.
+5. Uploads the package artifact and publishes only when requested.
 
-## Produced artifacts
-- `magnetar-linux` (standalone CLI binary)
-- `magnetar-macos` (standalone CLI binary)
-- `magnetar-windows.exe` (standalone CLI binary)
-- Python source distribution (`.tar.gz`)
-- Python wheel (`.whl`)
-
-## Failure handling
-- Release notes validation failures stop the release before tagging.
-- A GitHub release is still published when at least one platform build succeeds; only successful platform artifacts are attached.
-- If all platform builds fail, the release job fails and nothing is published.
-- PyPI publish still requires the Linux build artifacts and can be disabled during dry runs (`publish_to_pypi: false`).
+## Other package workflows
+- Run each workflow manually from the Actions tab.
+- Every workflow builds and executes a smoke test command before uploading artifacts.
+- Start with npm first, then roll out DEB/EXE/AppImage artifacts as needed for your target users.

@@ -873,6 +873,19 @@ export class MemoryScreen {
   selector: 'screen-providers',
   standalone: true,
   imports: [CommonModule, UiIconComponent, UiBadgeComponent],
+  styles: [`
+    .accordion-grid {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s ease-in-out;
+    }
+    .accordion-grid.is-open {
+        grid-template-rows: 1fr;
+    }
+    .accordion-inner {
+        overflow: hidden;
+    }
+  `],
   template: `
     <div class="space-y-6 animate-fade-in pb-12">
       <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -1012,7 +1025,6 @@ export class MemoryScreen {
               </button>
             </div>
           </section>
-
         </aside>
 
         <div class="space-y-6">
@@ -1402,7 +1414,6 @@ export class ProvidersScreen {
     this.selectedEndpointId.set(null);
     this.accordions.update((accordions) => ({ ...accordions, configured: true }));
   }
-
   public getPresetColorClasses(kind: string): string {
     switch (kind) {
       case 'openai': return 'bg-emerald-900/30 border-emerald-800/50 group-hover:bg-emerald-900/50 text-emerald-400';
