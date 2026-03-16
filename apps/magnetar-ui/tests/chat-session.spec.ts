@@ -11,6 +11,17 @@ import { ChatSessionCollection } from '../src/app/core/services/chat-session-col
 import { CHAT_FETCH_FN, ChatSessionService } from '../src/app/core/services/chat-session.service.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
 
+function findProviderIdByPreset(service: ProviderConfigService, presetKind: string): string {
+  const provider = service
+    .providers()
+    .find((candidate) => candidate.presetKind === presetKind && candidate.origin === 'system');
+  if (!provider) {
+    throw new Error(`Missing provider for preset ${presetKind}`);
+  }
+
+  return provider.id;
+}
+
 function createSseResponse(chunks: string[], status = 200): Response {
   const encoder = new TextEncoder();
 
@@ -485,9 +496,10 @@ describe('ChatSessionService', () => {
 
   it('adds an error message when no provider is available', async () => {
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.disable('provider-lmstudio');
-    providerConfigService.disable('provider-openai');
-    providerConfigService.disable('provider-anthropic');
+    providerConfigService.disable(findProviderIdByPreset(providerConfigService, 'lm_studio'));
+    providerConfigService.disable(findProviderIdByPreset(providerConfigService, 'openai'));
+    providerConfigService.disable(findProviderIdByPreset(providerConfigService, 'openrouter'));
+    providerConfigService.disable(findProviderIdByPreset(providerConfigService, 'anthropic'));
 
     const service = new ChatSessionService(providerConfigService);
 
@@ -499,7 +511,7 @@ describe('ChatSessionService', () => {
 
   it('streams a generic response and records conversation history', async () => {
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.setPrimary('provider-openai');
+    providerConfigService.setPrimary(findProviderIdByPreset(providerConfigService, 'openai'));
 
     const service = new ChatSessionService(providerConfigService);
 
@@ -530,6 +542,7 @@ describe('ChatSessionService', () => {
     );
 
     const service = new ChatSessionService(new ProviderConfigService(), fetchMock);
+    const expectedProviderId = findProviderIdByPreset(new ProviderConfigService(), 'lm_studio');
 
     expect(await service.submitPrompt('Generate a SQL migration')).toBe(true);
     await service.waitForIdle();
@@ -545,7 +558,7 @@ describe('ChatSessionService', () => {
     };
     expect(requestBody).toEqual({
       prompt: 'Generate a SQL migration',
-      providerId: 'provider-lmstudio',
+      providerId: expectedProviderId,
       model: 'local-model',
     });
     expect(service.messages()[2].phase).toBe('complete');
@@ -565,7 +578,8 @@ describe('ChatSessionService', () => {
     );
 
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.setPrimary('provider-openrouter');
+    const openRouterId = findProviderIdByPreset(providerConfigService, 'openrouter');
+    providerConfigService.setPrimary(openRouterId);
     const service = new ChatSessionService(providerConfigService, fetchMock);
 
     expect(await service.submitPrompt('Test OpenRouter')).toBe(true);
@@ -582,7 +596,7 @@ describe('ChatSessionService', () => {
     };
     expect(requestBody).toEqual({
       prompt: 'Test OpenRouter',
-      providerId: 'provider-openrouter',
+      providerId: openRouterId,
       model: 'openai/gpt-4.1-mini',
     });
     expect(service.messages()[2].providerLabel).toBe('OpenRouter');
@@ -756,7 +770,7 @@ describe('ChatSessionService', () => {
 
   it('can close the canvas and reopen it from the assistant message', async () => {
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.setPrimary('provider-openai');
+    providerConfigService.setPrimary(findProviderIdByPreset(providerConfigService, 'openai'));
 
     const service = new ChatSessionService(providerConfigService);
 
@@ -785,7 +799,7 @@ describe('ChatSessionService', () => {
 
   it('handles defensive stream-finalization branches', async () => {
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.setPrimary('provider-openai');
+    providerConfigService.setPrimary(findProviderIdByPreset(providerConfigService, 'openai'));
 
     const service = new ChatSessionService(providerConfigService);
 
@@ -971,7 +985,7 @@ describe('ChatSessionService', () => {
 
   it('can rename a persisted session', async () => {
     const providerConfigService = new ProviderConfigService();
-    providerConfigService.setPrimary('provider-openai');
+    providerConfigService.setPrimary(findProviderIdByPreset(providerConfigService, 'openai'));
     const service = new ChatSessionService(providerConfigService);
 
     expect(await service.submitPrompt('Original title source')).toBe(true);

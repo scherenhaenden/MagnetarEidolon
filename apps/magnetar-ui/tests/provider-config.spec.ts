@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { describeProviderRole, sortProvidersByPriority } from '../src/app/core/models/provider-config.js';
 import { ProviderConfigService } from '../src/app/core/services/provider-config.service.js';
 
+function findProviderByPreset(service: ProviderConfigService, presetKind: string) {
+  return service.providers().find((provider) => provider.presetKind === presetKind && provider.origin === 'system');
+}
+
 describe('provider-config model helpers', () => {
   it('describes provider roles for the UI', () => {
     expect(describeProviderRole('primary')).toBe('Primary');
@@ -15,6 +19,7 @@ describe('provider-config model helpers', () => {
     const providers = sortProvidersByPriority([
       {
         id: 'b',
+        origin: 'user',
         name: 'Backup',
         kind: 'openai',
         baseUrl: 'https://example.com',
@@ -34,6 +39,7 @@ describe('provider-config model helpers', () => {
       },
       {
         id: 'a',
+        origin: 'system',
         name: 'Primary',
         kind: 'lm_studio',
         baseUrl: 'http://localhost:1234/v1',
@@ -65,6 +71,8 @@ describe('ProviderConfigService', () => {
 
   it('exposes one primary provider and at least one backup by default', () => {
     const service = new ProviderConfigService();
+    const openRouter = findProviderByPreset(service, 'openrouter');
+    const lmStudio = findProviderByPreset(service, 'lm_studio');
 
     expect(service.primaryProvider()?.name).toBe('LM Studio Local');
     expect(service.primaryProvider()?.baseUrl).toBe('http://127.0.0.1:1234/v1');
@@ -74,90 +82,103 @@ describe('ProviderConfigService', () => {
     expect(service.healthyFailoverProviders().map((provider) => provider.name)).toEqual([
       'OpenAI Cloud',
     ]);
-    expect(service.providers().some((provider) => provider.id === 'provider-openrouter')).toBe(true);
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.kind).toBe(
-      'openrouter',
-    );
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.template.placeholders).toContain(
-      '$model',
-    );
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.modelSuggestions.length).toBeGreaterThan(0);
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual([
+    expect(openRouter?.id.startsWith('provider-config-openrouter-')).toBe(true);
+    expect(openRouter?.kind).toBe('openrouter');
+    expect(openRouter?.template.placeholders).toContain('$model');
+    expect(openRouter?.modelSuggestions.length).toBeGreaterThan(0);
+    expect(openRouter?.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual([
       'models',
       'chat',
     ]);
-    expect(service.providers().find((provider) => provider.id === 'provider-lmstudio')?.apiSurface.endpoints.length).toBeGreaterThan(2);
+    expect(lmStudio?.apiSurface.endpoints.length).toBeGreaterThan(2);
   });
 
   it('promotes a backup provider to primary and normalizes priorities', () => {
     const service = new ProviderConfigService();
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
+    const lmStudioId = findProviderByPreset(service, 'lm_studio')?.id;
+    const anthropicId = findProviderByPreset(service, 'anthropic')?.id;
 
-    service.setPrimary('provider-openai');
+    expect(openAiId).toBeTruthy();
+    service.setPrimary(openAiId!);
 
-    expect(service.primaryProvider()?.id).toBe('provider-openai');
-    expect(service.providers().find((provider) => provider.id === 'provider-openai')?.priority).toBe(1);
-    expect(service.providers().find((provider) => provider.id === 'provider-lmstudio')?.role).toBe(
-      'backup',
-    );
-    expect(service.providers().find((provider) => provider.id === 'provider-anthropic')?.priority).toBe(
-      99,
-    );
+    expect(service.primaryProvider()?.id).toBe(openAiId);
+    expect(service.providers().find((provider) => provider.id === openAiId)?.priority).toBe(1);
+    expect(service.providers().find((provider) => provider.id === lmStudioId)?.role).toBe('backup');
+    expect(service.providers().find((provider) => provider.id === anthropicId)?.priority).toBe(99);
   });
 
   it('can promote OpenRouter into the active failover chain', () => {
     const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
 
-    service.setBackup('provider-openrouter');
+    expect(openRouterId).toBeTruthy();
+    service.setBackup(openRouterId!);
 
-    expect(service.backupProviders().map((provider) => provider.id)).toContain('provider-openrouter');
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')?.apiStyle).toBe(
+    expect(service.backupProviders().map((provider) => provider.id)).toContain(openRouterId);
+    expect(service.providers().find((provider) => provider.id === openRouterId)?.apiStyle).toBe(
       'openai-compatible',
     );
   });
 
   it('restores a primary provider when the current primary is disabled', () => {
     const service = new ProviderConfigService();
+    const lmStudioId = findProviderByPreset(service, 'lm_studio')?.id;
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
 
-    service.disable('provider-lmstudio');
+    expect(lmStudioId).toBeTruthy();
+    service.disable(lmStudioId!);
 
-    expect(service.primaryProvider()?.id).toBe('provider-openai');
-    expect(service.describeRole('provider-lmstudio')).toBe('Disabled');
+    expect(service.primaryProvider()?.id).toBe(openAiId);
+    expect(service.describeRole(lmStudioId!)).toBe('Disabled');
   });
 
   it('can convert a disabled provider into a backup provider', () => {
     const service = new ProviderConfigService();
+    const anthropicId = findProviderByPreset(service, 'anthropic')?.id;
 
-    service.setBackup('provider-anthropic');
+    expect(anthropicId).toBeTruthy();
+    service.setBackup(anthropicId!);
 
-    expect(service.backupProviders().map((provider) => provider.id)).toContain('provider-anthropic');
+    expect(service.backupProviders().map((provider) => provider.id)).toContain(anthropicId);
   });
 
   it('reorders non-target backup providers when a different provider becomes primary', () => {
     const service = new ProviderConfigService();
+    const anthropicId = findProviderByPreset(service, 'anthropic')?.id;
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
 
-    service.setBackup('provider-anthropic');
-    service.setPrimary('provider-openai');
+    expect(anthropicId).toBeTruthy();
+    expect(openAiId).toBeTruthy();
+    service.setBackup(anthropicId!);
+    service.setPrimary(openAiId!);
 
-    expect(service.providers().find((provider) => provider.id === 'provider-anthropic')?.priority).toBe(3);
+    expect(service.providers().find((provider) => provider.id === anthropicId)?.priority).toBe(3);
   });
 
   it('promotes the next backup when the primary is converted into a backup', () => {
     const service = new ProviderConfigService();
+    const lmStudioId = findProviderByPreset(service, 'lm_studio')?.id;
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
 
-    service.setBackup('provider-lmstudio');
+    expect(lmStudioId).toBeTruthy();
+    service.setBackup(lmStudioId!);
 
-    expect(service.primaryProvider()?.id).toBe('provider-openai');
-    expect(service.backupProviders().map((provider) => provider.id)).toContain('provider-lmstudio');
+    expect(service.primaryProvider()?.id).toBe(openAiId);
+    expect(service.backupProviders().map((provider) => provider.id)).toContain(lmStudioId);
   });
 
   it('re-promotes the same provider when no other backup exists', () => {
     const service = new ProviderConfigService();
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
+    const anthropicId = findProviderByPreset(service, 'anthropic')?.id;
+    const lmStudioId = findProviderByPreset(service, 'lm_studio')?.id;
 
-    service.disable('provider-openai');
-    service.disable('provider-anthropic');
-    service.setBackup('provider-lmstudio');
+    service.disable(openAiId!);
+    service.disable(anthropicId!);
+    service.setBackup(lmStudioId!);
 
-    expect(service.primaryProvider()?.id).toBe('provider-lmstudio');
+    expect(service.primaryProvider()?.id).toBe(lmStudioId);
     expect(service.backupProviders()).toEqual([]);
   });
 
@@ -169,10 +190,13 @@ describe('ProviderConfigService', () => {
 
   it('can end with no primary when every provider is disabled', () => {
     const service = new ProviderConfigService();
+    const lmStudioId = findProviderByPreset(service, 'lm_studio')?.id;
+    const openAiId = findProviderByPreset(service, 'openai')?.id;
+    const anthropicId = findProviderByPreset(service, 'anthropic')?.id;
 
-    service.disable('provider-lmstudio');
-    service.disable('provider-openai');
-    service.disable('provider-anthropic');
+    service.disable(lmStudioId!);
+    service.disable(openAiId!);
+    service.disable(anthropicId!);
 
     expect(service.primaryProvider()).toBeNull();
     expect(service.backupProviders()).toEqual([]);
@@ -222,15 +246,16 @@ describe('ProviderConfigService', () => {
 
   it('can update editable provider fields', () => {
     const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
 
-    service.updateProvider('provider-openrouter', {
+    service.updateProvider(openRouterId!, {
       name: 'OpenRouter Custom',
       baseUrl: 'https://openrouter.example/api/v1',
       model: 'anthropic/claude-3.7-sonnet',
       apiKey: 'secret',
     });
 
-    expect(service.providers().find((provider) => provider.id === 'provider-openrouter')).toMatchObject({
+    expect(service.providers().find((provider) => provider.id === openRouterId)).toMatchObject({
       name: 'OpenRouter Custom',
       baseUrl: 'https://openrouter.example/api/v1',
       model: 'anthropic/claude-3.7-sonnet',
@@ -311,10 +336,11 @@ describe('ProviderConfigService', () => {
 
     try {
       const firstService = new ProviderConfigService();
-      firstService.updateProvider('provider-openrouter', { name: 'Fallback Router' });
+      const openRouterId = findProviderByPreset(firstService, 'openrouter')?.id;
+      firstService.updateProvider(openRouterId!, { name: 'Fallback Router' });
 
       const secondService = new ProviderConfigService();
-      expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.name).toBe(
+      expect(findProviderByPreset(secondService, 'openrouter')?.name).toBe(
         'Fallback Router',
       );
     } finally {
@@ -338,7 +364,8 @@ describe('ProviderConfigService', () => {
     try {
       ProviderConfigService.resetTestStorage();
       const firstService = new ProviderConfigService();
-      firstService.updateProvider('provider-openrouter', { name: 'Fallback Router' });
+      const openRouterId = findProviderByPreset(firstService, 'openrouter')?.id;
+      firstService.updateProvider(openRouterId!, { name: 'Fallback Router' });
       ProviderConfigService.resetTestStorage();
       const brokenStorageService = new ProviderConfigService();
       (brokenStorageService as any).writeStorageValue('magnetar.provider-config.v1', '{broken');
@@ -357,8 +384,18 @@ describe('ProviderConfigService', () => {
     const service = new ProviderConfigService();
     const providerId = service.addProviderFromPreset('anthropic');
 
+    expect(service.canRemoveProvider(providerId)).toBe(true);
     expect(service.removeProvider(providerId)).toBe(true);
     expect(service.providers().some((provider) => provider.id === providerId)).toBe(false);
+  });
+
+  it('does not allow removing the built-in provider catalog entries', () => {
+    const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
+
+    expect(service.canRemoveProvider(openRouterId!)).toBe(false);
+    expect(service.removeProvider(openRouterId!)).toBe(false);
+    expect(service.providers().some((provider) => provider.id === openRouterId)).toBe(true);
   });
 
   it('returns false when removing a missing provider entry', () => {
@@ -366,20 +403,38 @@ describe('ProviderConfigService', () => {
     expect(service.removeProvider('provider-missing')).toBe(false);
   });
 
+  it('can reset a built-in provider configuration without deleting the provider entry', () => {
+    const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
+
+    service.updateProvider(openRouterId!, {
+      name: 'Overridden Router',
+      baseUrl: 'https://override.example/api/v1',
+      model: 'override/model',
+      apiKey: 'secret',
+    });
+
+    expect(service.resetProviderConfiguration(openRouterId!)).toBe(true);
+    expect(service.providers().find((provider) => provider.id === openRouterId)).toMatchObject({
+      name: 'OpenRouter',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      model: 'openai/gpt-4.1-mini',
+      apiKey: '',
+      origin: 'system',
+    });
+  });
+
   it('persists provider configuration locally', () => {
     const firstService = new ProviderConfigService();
-    firstService.updateProvider('provider-openrouter', {
+    const openRouterId = findProviderByPreset(firstService, 'openrouter')?.id;
+    firstService.updateProvider(openRouterId!, {
       name: 'Persisted Router',
       model: 'google/gemini-2.5-flash',
     });
 
     const secondService = new ProviderConfigService();
-    expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.name).toBe(
-      'Persisted Router',
-    );
-    expect(secondService.providers().find((provider) => provider.id === 'provider-openrouter')?.model).toBe(
-      'google/gemini-2.5-flash',
-    );
+    expect(findProviderByPreset(secondService, 'openrouter')?.name).toBe('Persisted Router');
+    expect(findProviderByPreset(secondService, 'openrouter')?.model).toBe('google/gemini-2.5-flash');
   });
 
   it('hydrates missing preset-backed template and API metadata from the preset definition', () => {
@@ -390,6 +445,7 @@ describe('ProviderConfigService', () => {
         JSON.stringify([
           {
             id: 'provider-openai-hydrated',
+            origin: 'user',
             name: 'Hydrated OpenAI',
             kind: 'openai',
             baseUrl: 'https://api.openai.com/v1',
@@ -447,6 +503,7 @@ describe('ProviderConfigService', () => {
         JSON.stringify([
           {
             id: 'provider-generic-hydrated',
+            origin: 'user',
             name: 'Hydrated Generic',
             kind: 'custom',
             baseUrl: 'https://provider.example/v1',

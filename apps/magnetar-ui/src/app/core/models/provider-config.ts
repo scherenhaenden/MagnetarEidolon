@@ -4,6 +4,7 @@ export type ProviderHealth = 'healthy' | 'degraded' | 'offline' | 'unknown';
 export type ProviderOwnership = 'backend' | 'ui';
 export type ProviderApiStyle = 'openai-compatible' | 'native';
 export type ProviderHttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type ProviderConfigOrigin = 'system' | 'user';
 
 export interface ProviderApiEndpointDefinition {
   id: string;
@@ -45,6 +46,7 @@ export interface ProviderPreset {
 
 export interface ProviderConfig {
   id: string;
+  origin: ProviderConfigOrigin;
   name: string;
   kind: ProviderKind;
   baseUrl: string;
