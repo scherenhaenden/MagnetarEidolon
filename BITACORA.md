@@ -18,9 +18,29 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-20 20:37 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #241 (feat(governance): enforce required documentation baseline). The repository now has a parallelized validator for required docs, repo-relative test fixtures, and CI enforcement in the TypeScript workflow.
+
+- **Timestamp:** 2026-03-20 20:15 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #240 (feat(governance): add project schema validation pipeline). All `projects/*.project.yml` files are now validated against the required schema as part of the standard test path.
+
 - **Timestamp:** 2026-03-20 19:27 UTC
   **Author:** Copilot
   **Entry:** State Change: Verified and closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). PR #211 had introduced the preset list in two places — the left-rail Quick Add accordion and a middle-column Preset Catalog. The subsequent `feature/provider-config-quick-add-editor-flow` slice removed the middle-column duplicate. The current `app.component.ts` contains a single `*ngFor let preset of presets()` loop inside the Quick Add accordion; no duplicate preset-item markup remains. Planning documents were updated to record this task as done.
+
+- **Timestamp:** 2026-03-20 19:11 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #235 (feature/provider-config-json-runtime). Completed the runtime provider handoff by resolving configured provider instances through a JSON-backed backend registry.
+
+- **Timestamp:** 2026-03-20 19:04 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #236 (feature/provider-config-json-inspector). Added a raw JSON inspector to the Providers UI for inspecting resolved configuration shapes.
+
+- **Timestamp:** 2026-03-20 19:03 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #233 (feature/provider-config-instance-management). Refined provider instance management with opaque IDs and separated the preset catalog from user-created config instances.
 
 - **Timestamp:** 2026-03-20 19:22 UTC
   **Author:** Codex
