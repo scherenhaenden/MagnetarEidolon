@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-20 18:22 UTC
+  **Author:** Codex
+  **Entry:** Blocker: Resolved `blocker-001` / issue `#79` by adding a repository-level validator for `projects/*.project.yml`, adding validator regression tests, wiring the validator into root `npm test`, and enforcing the same path in the `CI TypeScript` workflow. Verified closure evidence with successful runs of `npm run validate:project-schema`, `npm run test:project-schema`, root `npm test`, and root `npm run typecheck`.
+
 - **Timestamp:** 2026-03-16 14:00 UTC
   **Author:** Codex
   **Entry:** State Change: Began a follow-up Providers UX slice on `feature/provider-config-json-inspector`. Added a configured-provider JSON inspector path so existing provider instances can expose their final resolved stored shape directly from the editor, and updated planning to track that UI inspection separately from the later JSON file-persistence task.

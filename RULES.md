@@ -77,6 +77,7 @@ Tasks must be in one of the following states:
 - Parse the project YAML file before acting.
 - Do not open PRs without confirming the task state is `in_review`.
 - Document assumptions in `BITACORA.md` when uncertain.
+- Do not hardcode machine-specific absolute filesystem paths in application code, tests, scripts, or documentation examples. Use repository-relative resolution, configuration, or environment variables so the project remains portable across developers and CI environments.
 
 ## Compliance and Enforcement
 - Continuous Integration (CI) should validate the presence and structure of required files.

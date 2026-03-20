@@ -14,6 +14,12 @@ Ensure governance artifacts are complete, consistent, and operationally enforcea
 - **Workflow consistency tests:** verify task states in `PLAN.md` and YAML conform to `RULES.md`.
 - **Process tests (manual/audit):** verify `BITACORA.md` chronology and blocker lifecycle compliance.
 
+### Current Governance Validation Path
+- Run `npm run validate:project-schema` from the repository root to validate every `projects/*.project.yml` file.
+- Run `npm run test:project-schema` to validate the schema validator logic itself.
+- Root `npm test` now includes both commands before the API and UI test suites, so malformed project YAML fails the standard repository test path.
+- The `CI TypeScript` GitHub Actions workflow also runs the project-schema validator and its tests before the UI build job.
+
 ### Code Coverage Targets
 - **Automated checks coverage target:** 90% of governance rules represented by machine-checkable assertions.
 - **Minimum accepted threshold:** 80% before release tagging.
@@ -94,6 +100,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - verify failure reporting through artifacts/logs when a test job fails
   - add negative-path cases for filesystem/tool safety rules so the suite proves it catches regressions, not only happy paths
   - periodically validate coverage thresholds and test command wiring after workspace moves or package-script changes
+  - resolve fixtures and support files from the repository root or the current module location; tests must not depend on developer-specific absolute paths such as `/home/...`
 
 ## Bug Reporting Process
 1.  **Identify & Document**: Identify the issue. Create a bug entry with ID, summary, reproduction steps, severity, and owner.

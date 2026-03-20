@@ -12,10 +12,16 @@
     "build:api": "npm --prefix apps/magnetar-api run build",
     "build:web": "npm --prefix apps/magnetar-ui run build:web",
     "build:cli": "npm --prefix apps/magnetar-ui run build:cli",
+    "validate": "npm run validate:project-schema && npm run test:project-schema",
+    "validate:project-schema": "node scripts/validate-project-schema.mjs",
+    "test:project-schema": "node --test scripts/validate-project-schema.spec.mjs",
     "typecheck": "npm --prefix apps/magnetar-api run typecheck && npm --prefix apps/magnetar-ui run typecheck",
     "typecheck:api": "npm --prefix apps/magnetar-api run typecheck",
-    "test": "npm --prefix apps/magnetar-api run test && npm --prefix apps/magnetar-ui run test:ci",
+    "test": "npm run validate:project-schema && npm run test:project-schema && npm --prefix apps/magnetar-api run test && npm --prefix apps/magnetar-ui run test:ci",
     "docker:dev": "docker compose up dev",
     "docker:prod": "docker compose up app"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.1.0"
   }
 }
