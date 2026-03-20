@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
 import test from 'node:test';
 
 import {
@@ -14,6 +15,8 @@ class TestableProviderRegistryService extends ProviderRegistryService {
     return this.configRoots;
   }
 }
+
+const FIXTURE_CONFIG_ROOT = resolve(__dirname, '..', '..', '..', 'tests', 'fixtures', 'provider-config');
 
 test('ProviderRegistryService exposes LM Studio and OpenRouter definitions', (): void => {
   const registry = new ProviderRegistryService();
@@ -90,7 +93,7 @@ test('ProviderRegistryService falls back to defaults and null for missing secret
 
 test('ProviderRegistryService applies local JSON overrides before env overrides', (): void => {
   const registry = new TestableProviderRegistryService([
-    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+    FIXTURE_CONFIG_ROOT,
   ]);
   const provider = registry.getProvider('provider-lmstudio');
 
@@ -100,7 +103,7 @@ test('ProviderRegistryService applies local JSON overrides before env overrides'
 
 test('ProviderRegistryService resolves configured provider instances from local JSON', (): void => {
   const registry = new TestableProviderRegistryService([
-    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+    FIXTURE_CONFIG_ROOT,
   ]);
   const provider = registry.resolveExecutionProvider({
     configuredProviderId: 'provider-config-lm_studio-default',
@@ -126,7 +129,7 @@ test('ProviderRegistryService resolves configured provider instances from local 
 
 test('ProviderRegistryService falls back to provider id when configured provider instance is missing', (): void => {
   const registry = new TestableProviderRegistryService([
-    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+    FIXTURE_CONFIG_ROOT,
   ]);
   const provider = registry.resolveExecutionProvider({
     configuredProviderId: 'provider-config-missing',

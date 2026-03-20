@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
 import test from 'node:test';
 
 import type { Response as ExpressResponse } from 'express';
@@ -8,6 +9,8 @@ import {
   type BackendChatRequest,
 } from './chat.gateway.service.js';
 import { ProviderRegistryService } from './provider-registry.service.js';
+
+const FIXTURE_CONFIG_ROOT = resolve(__dirname, '..', '..', '..', 'tests', 'fixtures', 'provider-config');
 
 class TestChatGatewayService extends ChatGatewayService {
   public constructor(
@@ -24,7 +27,7 @@ class TestChatGatewayService extends ChatGatewayService {
 
 class FixtureProviderRegistryService extends ProviderRegistryService {
   protected override getConfigSearchRoots(): string[] {
-    return ['/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config'];
+    return [FIXTURE_CONFIG_ROOT];
   }
 }
 

@@ -18,3 +18,4 @@
 - Updated the chat contract so requests can carry both `configuredProviderId` and `providerId`, allowing backend-owned configured-instance resolution without breaking the current preset-backed runtime path.
 - Added configured-provider examples to `config/providers.local.example.json` for the built-in LM Studio and OpenRouter default instances.
 - Added backend tests for configured-instance resolution and configured-instance-first chat execution, while keeping the full root validation green.
+- Evaluated the high-priority review feedback on PR `#235` and fixed the backend test portability issue by replacing developer-specific absolute fixture paths with repo-relative `resolve(__dirname, ...)` lookups in the provider registry and chat gateway specs.
