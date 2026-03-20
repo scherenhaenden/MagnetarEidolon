@@ -1169,6 +1169,7 @@ export class MemoryScreen {
               <div class="space-y-3">
                 <div class="text-xs uppercase tracking-wider text-zinc-500">Endpoints</div>
 
+                <ng-container *ngIf="activeEndpoint() as activeEndpoint">
                 <div class="rounded-xl border border-white/5 bg-white/[0.03] overflow-hidden flex flex-col">
                   <!-- Tab Bar -->
                   <div class="flex overflow-x-auto border-b border-white/5 bg-[#0a0a0d] custom-scrollbar">
@@ -1176,7 +1177,7 @@ export class MemoryScreen {
                       *ngFor="let endpoint of provider.apiSurface.endpoints"
                       (click)="selectEndpoint(endpoint.id)"
                       class="px-4 py-3 text-xs font-medium whitespace-nowrap transition-colors border-b-2"
-                      [ngClass]="getActiveEndpoint(provider)?.id === endpoint.id
+                      [ngClass]="activeEndpoint.id === endpoint.id
                         ? 'border-cyan-400 text-cyan-300 bg-white/[0.04]'
                         : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]'">
                       {{ endpoint.label }}
@@ -1184,26 +1185,26 @@ export class MemoryScreen {
                   </div>
 
                   <!-- Active Endpoint Details -->
-                  <div *ngIf="getActiveEndpoint(provider) as endpoint" class="p-4 space-y-4">
+                  <div class="p-4 space-y-4">
                     <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
                       <div>
                         <div class="flex items-center gap-2">
                           <span class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                                [ngClass]="getHttpMethodClasses(endpoint.method)">
-                            {{ endpoint.method }}
+                                [ngClass]="getHttpMethodClasses(activeEndpoint.method)">
+                            {{ activeEndpoint.method }}
                           </span>
-                          <span class="text-sm font-medium text-zinc-100">{{ endpoint.label }}</span>
+                          <span class="text-sm font-medium text-zinc-100">{{ activeEndpoint.label }}</span>
                         </div>
-                        <div class="mt-1 font-mono text-xs text-cyan-300">{{ provider.baseUrl }}{{ endpoint.path }}</div>
-                        <div class="mt-2 text-xs leading-6 text-zinc-400">{{ endpoint.description }}</div>
+                        <div class="mt-1 font-mono text-xs text-cyan-300">{{ provider.baseUrl }}{{ activeEndpoint.path }}</div>
+                        <div class="mt-2 text-xs leading-6 text-zinc-400">{{ activeEndpoint.description }}</div>
                       </div>
                     </div>
-                    <div *ngIf="endpoint.requestTemplate; else noRequestBody" class="space-y-2">
+                    <div *ngIf="activeEndpoint.requestTemplate; else noRequestBody" class="space-y-2">
                       <div class="text-[11px] uppercase tracking-wider text-zinc-500">Request Body</div>
                       <textarea
                         rows="6"
-                        [value]="endpoint.requestTemplate"
-                        (input)="updateProviderApiEndpointTemplate(provider.id, endpoint.id, readInputValue($event))"
+                        [value]="activeEndpoint.requestTemplate"
+                        (input)="updateProviderApiEndpointTemplate(provider.id, activeEndpoint.id, readInputValue($event))"
                         class="w-full rounded-lg border border-white/10 bg-[#020305] px-3 py-3 text-xs font-mono text-cyan-100"></textarea>
                     </div>
                     <ng-template #noRequestBody>
@@ -1214,42 +1215,43 @@ export class MemoryScreen {
                     <div class="space-y-2">
                       <div class="text-[11px] uppercase tracking-wider text-zinc-500">Endpoint Placeholders</div>
                       <input
-                        [value]="endpointPlaceholdersValue(endpoint.placeholders)"
-                        (input)="updateProviderApiEndpointPlaceholders(provider.id, endpoint.id, readInputValue($event))"
+                        [value]="endpointPlaceholdersValue(activeEndpoint.placeholders)"
+                        (input)="updateProviderApiEndpointPlaceholders(provider.id, activeEndpoint.id, readInputValue($event))"
                         class="w-full rounded-lg border border-white/10 bg-[#020305] px-3 py-2 text-zinc-100 font-mono text-xs"
                         placeholder="$model, $messages, $stream" />
                       <div class="flex flex-wrap gap-2">
-                        <span *ngFor="let placeholder of endpoint.placeholders" class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-300">
+                        <span *ngFor="let placeholder of activeEndpoint.placeholders" class="px-2 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-zinc-300">
                           {{ placeholder }}
                         </span>
                       </div>
                     </div>
-                    <div *ngIf="endpoint.requestExample || endpoint.requestTemplate" class="space-y-2">
+                    <div *ngIf="activeEndpoint.requestExample || activeEndpoint.requestTemplate" class="space-y-2">
                       <div class="text-[11px] uppercase tracking-wider text-zinc-500">Full JSON Example</div>
                       <textarea
                         rows="8"
-                        [value]="endpoint.requestExample"
-                        (input)="updateProviderApiEndpointExample(provider.id, endpoint.id, readInputValue($event))"
+                        [value]="activeEndpoint.requestExample"
+                        (input)="updateProviderApiEndpointExample(provider.id, activeEndpoint.id, readInputValue($event))"
                         class="w-full rounded-lg border border-white/10 bg-[#020305] px-3 py-3 text-xs font-mono text-emerald-100"></textarea>
                     </div>
-                    <div *ngIf="endpoint.notes.length" class="space-y-2">
+                    <div *ngIf="activeEndpoint.notes.length" class="space-y-2">
                       <div class="text-[11px] uppercase tracking-wider text-zinc-500">Behavior Notes</div>
                       <ul class="space-y-2 text-xs leading-6 text-zinc-400">
-                        <li *ngFor="let note of endpoint.notes" class="rounded-lg border border-white/5 bg-black/20 px-3 py-2">
+                        <li *ngFor="let note of activeEndpoint.notes" class="rounded-lg border border-white/5 bg-black/20 px-3 py-2">
                           {{ note }}
                         </li>
                       </ul>
                     </div>
-                    <div *ngIf="endpoint.responseExample" class="space-y-2">
+                    <div *ngIf="activeEndpoint.responseExample" class="space-y-2">
                       <div class="text-[11px] uppercase tracking-wider text-zinc-500">Example Response</div>
                       <textarea
                         rows="8"
-                        [value]="endpoint.responseExample"
+                        [value]="activeEndpoint.responseExample"
                         readonly
                         class="w-full rounded-lg border border-white/10 bg-[#020305] px-3 py-3 text-xs font-mono text-violet-100"></textarea>
                     </div>
                   </div>
                 </div>
+                </ng-container>
               </div>
             </div>
             <div class="rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs leading-6 text-amber-100/80">
@@ -1507,6 +1509,17 @@ export class ProvidersScreen {
     () => this.providers().find((provider) => provider.id === this.selectedProviderId()) ?? null,
   );
 
+  public readonly activeEndpoint = computed(() => {
+    const provider = this.selectedProvider();
+    if (!provider || provider.apiSurface.endpoints.length === 0) return null;
+    const id = this.selectedEndpointId();
+    if (id) {
+      const found = provider.apiSurface.endpoints.find(e => e.id === id);
+      if (found) return found;
+    }
+    return provider.apiSurface.endpoints[0];
+  });
+
   public providers(): ProviderConfig[] {
     return this.providerConfigService.providers();
   }
@@ -1714,18 +1727,6 @@ export class ProvidersScreen {
 
   public endpointPlaceholdersValue(placeholders: string[]): string {
     return placeholders.join(', ');
-  }
-
-  public getActiveEndpoint(provider: ProviderConfig) {
-    if (provider.apiSurface.endpoints.length === 0) {
-      return null;
-    }
-    const currentSelectedId = this.selectedEndpointId();
-    if (currentSelectedId) {
-      const found = provider.apiSurface.endpoints.find(e => e.id === currentSelectedId);
-      if (found) return found;
-    }
-    return provider.apiSurface.endpoints[0];
   }
 
   public selectEndpoint(endpointId: string): void {
