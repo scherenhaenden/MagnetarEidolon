@@ -33,19 +33,19 @@ export async function validateRequiredDocs(documents = REQUIRED_DOCS, repoRoot =
 
       try {
         const source = await fs.readFile(absolutePath, 'utf8');
-        const firstNonEmptyLine = source
+        const firstHeaderLine = source
           .split(/\r?\n/u)
           .map((line) => line.trim())
-          .find((line) => line.length > 0);
+          .find((line) => /^#+\s+\S/u.test(line));
 
-        if (!firstNonEmptyLine) {
-          return formatError(document.path, 'file is empty.');
+        if (!firstHeaderLine) {
+          return formatError(document.path, 'no markdown-style header line found.');
         }
 
-        if (!firstNonEmptyLine.startsWith(document.header)) {
+        if (!firstHeaderLine.startsWith(document.header)) {
           return formatError(
             document.path,
-            `expected first non-empty line to start with "${document.header}" but found "${firstNonEmptyLine}".`,
+            `expected first non-empty header line to start with "${document.header}" but found "${firstHeaderLine}".`,
           );
         }
 
