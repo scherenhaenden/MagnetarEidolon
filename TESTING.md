@@ -15,10 +15,12 @@ Ensure governance artifacts are complete, consistent, and operationally enforcea
 - **Process tests (manual/audit):** verify `BITACORA.md` chronology and blocker lifecycle compliance.
 
 ### Current Governance Validation Path
+- Run `npm run validate:required-docs` from the repository root to validate the required governance documentation baseline.
+- Run `npm run test:required-docs` to validate the required-documentation validator logic itself.
 - Run `npm run validate:project-schema` from the repository root to validate every `projects/*.project.yml` file.
 - Run `npm run test:project-schema` to validate the schema validator logic itself.
-- Root `npm test` now includes both commands before the API and UI test suites, so malformed project YAML fails the standard repository test path.
-- The `CI TypeScript` GitHub Actions workflow also runs the project-schema validator and its tests before the UI build job.
+- Root `npm test` now includes the required-documentation validator and the project-schema validator before the API and UI test suites, so governance baseline failures stop the standard repository test path early.
+- The `CI TypeScript` GitHub Actions workflow also runs both governance validators and their tests before the UI build job.
 
 ### Code Coverage Targets
 - **Automated checks coverage target:** 90% of governance rules represented by machine-checkable assertions.

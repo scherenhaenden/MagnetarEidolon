@@ -7,7 +7,7 @@ This document tracks all impediments hindering the project's progress. It serves
 | ID | Description | Creation Date | Owner | Status |
 | --- | --- | --- | --- | --- |
 | `blocker-001` | No automated schema validation pipeline configured yet. | 2026-02-20 | Core Team | Resolved |
-| `blocker-002` | Missing CI enforcement for required documentation files. | 2026-02-20 | Core Team | Active |
+| `blocker-002` | Missing CI enforcement for required documentation files. | 2026-02-20 | Core Team | Resolved |
 
 ## Escalation Process
 

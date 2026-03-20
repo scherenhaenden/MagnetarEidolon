@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-20 19:22 UTC
+  **Author:** Codex
+  **Entry:** Blocker: Resolved `blocker-002` / issue `#80` by adding a repository-level validator for the required documentation baseline defined in `RULES.md`, adding validator regression tests, wiring the validator into root `npm test`, and enforcing the same path in the `CI TypeScript` workflow. Verified closure evidence with successful runs of `npm run validate:required-docs`, `npm run test:required-docs`, root `npm test`, and root `npm run typecheck`.
+
 - **Timestamp:** 2026-03-20 18:22 UTC
   **Author:** Codex
   **Entry:** Blocker: Resolved `blocker-001` / issue `#79` by adding a repository-level validator for `projects/*.project.yml`, adding validator regression tests, wiring the validator into root `npm test`, and enforcing the same path in the `CI TypeScript` workflow. Verified closure evidence with successful runs of `npm run validate:project-schema`, `npm run test:project-schema`, root `npm test`, and root `npm run typecheck`.
