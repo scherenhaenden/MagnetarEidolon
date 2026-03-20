@@ -10,3 +10,7 @@
 - Refactored `apps/magnetar-api/src/provider-registry.service.ts` so the backend provider registry now reads provider execution metadata from JSON, then layers local JSON overrides and environment-variable bindings on top.
 - Extended backend registry tests with coverage for catalog-backed loading and local JSON override behavior.
 - Revalidated the backend slice with `npm test` and `npm run typecheck` in `apps/magnetar-api`.
+- Added a `runtimeProviderId` handoff field to preset-backed provider configs in the Angular UI model so UI-local config ids no longer have to match backend-executable provider ids.
+- Updated the chat request builder so LM Studio and OpenRouter send stable backend runtime ids while preserving the existing UI config-instance ids for editing and persistence.
+- Expanded UI tests to cover runtime-id hydration, legacy-origin inference, reset fallbacks, UUID fallback id generation, and provider-id handoff behavior.
+- Revalidated the completed slice with focused UI tests, root `npm test`, and root `npm run typecheck`.

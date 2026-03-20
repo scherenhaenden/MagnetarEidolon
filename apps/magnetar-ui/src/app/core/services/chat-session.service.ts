@@ -552,7 +552,7 @@ export class ChatSessionService {
   ): BackendChatStreamRequest {
     return {
       prompt,
-      providerId: provider.id,
+      providerId: provider.runtimeProviderId ?? provider.id,
       model: provider.model,
     };
   }

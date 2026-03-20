@@ -33,6 +33,7 @@ export interface ProviderPreset {
   kind: ProviderKind;
   label: string;
   description: string;
+  runtimeProviderId: string | null;
   baseUrl: string;
   defaultModel: string;
   apiStyle: ProviderApiStyle;
@@ -47,6 +48,7 @@ export interface ProviderPreset {
 export interface ProviderConfig {
   id: string;
   origin: ProviderConfigOrigin;
+  runtimeProviderId: string | null;
   name: string;
   kind: ProviderKind;
   baseUrl: string;
