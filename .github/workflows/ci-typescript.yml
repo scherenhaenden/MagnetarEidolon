@@ -17,7 +17,10 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install UI dependencies for YAML validation
+      - name: Install root governance dependencies
+        run: npm ci --include=dev
+
+      - name: Install UI dependencies for TypeScript workspace
         working-directory: apps/magnetar-ui
         run: npm ci --include=dev
 

@@ -5,4 +5,4 @@
 - Added a repository-level project YAML schema validator for `projects/*.project.yml`.
 - Added validator tests so the schema rules themselves have a small automated regression net.
 - Wired project schema validation into root npm scripts and the TypeScript CI workflow.
-- Scoped the implementation to the blocker itself: enforce project YAML shape automatically and fail CI on invalid machine-state files.
+- Scoped the implementation to the blocker itself: enforce `projects/*.project.yml` schema shape automatically and fail CI on invalid project files.

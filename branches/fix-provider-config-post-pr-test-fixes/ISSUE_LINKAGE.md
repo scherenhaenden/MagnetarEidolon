@@ -17,7 +17,7 @@ This note records which existing issues can be linked to the open provider PR st
 - Candidate issue to close: `#191` `[task-provider-110] Add CRUD and preset onboarding to the Providers UI`
   Evidence:
   - PR `#233` summary explicitly covers configured provider instance management, stable opaque instance ids, quick-add preset behavior, and reset/delete flows.
-  - [`/home/edward/Development/MagnetarEidolon/PLAN.md`](/home/edward/Development/MagnetarEidolon/PLAN.md) describes `task-provider-110` as the active slice for opaque instance ids plus reset/delete semantics that preserve the quick-add preset catalog.
+  - `PLAN.md` describes `task-provider-110` as the active slice for opaque instance ids plus reset/delete semantics that preserve the quick-add preset catalog.
   Assessment:
   - Strong closure candidate once the PR merges.
 

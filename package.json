@@ -19,5 +19,8 @@
     "test": "npm run validate:project-schema && npm run test:project-schema && npm --prefix apps/magnetar-api run test && npm --prefix apps/magnetar-ui run test:ci",
     "docker:dev": "docker compose up dev",
     "docker:prod": "docker compose up app"
+  },
+  "devDependencies": {
+    "js-yaml": "^4.1.0"
   }
 }

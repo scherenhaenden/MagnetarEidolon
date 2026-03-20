@@ -22,10 +22,10 @@ const require = createRequire(import.meta.url);
 
 function loadYaml() {
   try {
-    return require(path.join(REPO_ROOT, 'apps', 'magnetar-ui', 'node_modules', 'js-yaml'));
-  } catch {
+    return require('js-yaml');
+  } catch (error) {
     throw new Error(
-      'Unable to load js-yaml from apps/magnetar-ui/node_modules. Run `npm --prefix apps/magnetar-ui install` before validating project schema.',
+      `Unable to load js-yaml. Run \`npm ci --include=dev\` at the repository root before validating project schema. Original error: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }
@@ -255,9 +255,13 @@ export async function validateProjectFiles(projectFiles) {
   const errors = [];
 
   for (const filePath of projectFiles) {
-    const source = await fs.readFile(filePath, 'utf8');
-    const document = yaml.load(source);
-    errors.push(...validateProjectDocument(document, filePath));
+    try {
+      const source = await fs.readFile(filePath, 'utf8');
+      const document = yaml.load(source);
+      errors.push(...validateProjectDocument(document, filePath));
+    } catch (error) {
+      fail(errors, filePath, `YAML parse error: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   return errors;
