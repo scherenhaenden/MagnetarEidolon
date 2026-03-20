@@ -2,6 +2,10 @@
 
 ## Entries
 
+- **Timestamp:** 2026-03-20 19:27 UTC
+  **Author:** Copilot
+  **Entry:** State Change: Closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). Confirmed the `app.component.ts` ProvidersScreen template contains a single `*ngFor let preset of presets()` rendering path inside the Quick Add accordion. The middle-column Preset Catalog introduced by PR #211 was already removed by the `feature/provider-config-quick-add-editor-flow` slice. No code change was required; planning documents were updated to record the task as done.
+
 - **Timestamp:** 2026-03-16 14:00 UTC
   **Author:** Codex
   **Entry:** Implementation: added a read-only JSON inspector affordance for existing configured providers so the editor can show the final resolved stored payload for a selected provider instance. The module plan and status were updated to distinguish this inspection slice from the later JSON artifact persistence work.
