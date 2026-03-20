@@ -94,6 +94,7 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
   - verify failure reporting through artifacts/logs when a test job fails
   - add negative-path cases for filesystem/tool safety rules so the suite proves it catches regressions, not only happy paths
   - periodically validate coverage thresholds and test command wiring after workspace moves or package-script changes
+  - resolve fixtures and support files from the repository root or the current module location; tests must not depend on developer-specific absolute paths such as `/home/...`
 
 ## Bug Reporting Process
 1.  **Identify & Document**: Identify the issue. Create a bug entry with ID, summary, reproduction steps, severity, and owner.
