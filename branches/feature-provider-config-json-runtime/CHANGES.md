@@ -14,3 +14,7 @@
 - Updated the chat request builder so LM Studio and OpenRouter send stable backend runtime ids while preserving the existing UI config-instance ids for editing and persistence.
 - Expanded UI tests to cover runtime-id hydration, legacy-origin inference, reset fallbacks, UUID fallback id generation, and provider-id handoff behavior.
 - Revalidated the completed slice with focused UI tests, root `npm test`, and root `npm run typecheck`.
+- Extended the backend runtime path to resolve configured provider instances from `providers.local.json` before falling back to direct runtime provider ids.
+- Updated the chat contract so requests can carry both `configuredProviderId` and `providerId`, allowing backend-owned configured-instance resolution without breaking the current preset-backed runtime path.
+- Added configured-provider examples to `config/providers.local.example.json` for the built-in LM Studio and OpenRouter default instances.
+- Added backend tests for configured-instance resolution and configured-instance-first chat execution, while keeping the full root validation green.

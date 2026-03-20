@@ -31,3 +31,8 @@ Start the transition from UI-local provider configuration toward a JSON-backed p
 - Planned completion target for this slice: 100%
 - Achieved: 100%
 - Notes: this completes the JSON-backed backend registry foundation plus the LM Studio/OpenRouter runtime handoff fix. It does not yet finish backend-owned persistence and execution for arbitrary custom provider instances.
+
+## Extra Progress Landed After The First Slice
+- Added backend-configured provider instance resolution on top of the JSON-backed provider catalog.
+- Added dual-id chat requests (`configuredProviderId` plus runtime `providerId`) so configured-instance execution can grow without regressing the existing provider path.
+- Kept the branch fully validated after this follow-up work with root `npm test` and root `npm run typecheck`.

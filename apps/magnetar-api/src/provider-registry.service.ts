@@ -48,8 +48,18 @@ interface ProviderLocalOverrideEntry {
   extraHeaders?: Record<string, string>;
 }
 
+interface ConfiguredProviderEntry {
+  id: string;
+  providerId: string;
+  displayName?: string;
+  baseUrl?: string;
+  defaultModel?: string;
+  extraHeaders?: Record<string, string>;
+}
+
 interface ProviderLocalOverrideFile {
   providers: ProviderLocalOverrideEntry[];
+  configuredProviders?: ConfiguredProviderEntry[];
 }
 
 export interface BackendProviderDefinition {
@@ -75,6 +85,22 @@ const PROVIDER_LOCAL_FILE = 'providers.local.json';
 export class ProviderRegistryService {
   public getProvider(providerId: string): BackendProviderDefinition | null {
     return this.getProviders().find((provider) => provider.id === providerId) ?? null;
+  }
+
+  public resolveExecutionProvider(request: {
+    configuredProviderId?: string | null;
+    providerId?: string | null;
+  }): BackendProviderDefinition | null {
+    const configuredProviderId = request.configuredProviderId?.trim();
+    if (configuredProviderId) {
+      const configuredProvider = this.getConfiguredProvider(configuredProviderId);
+      if (configuredProvider) {
+        return configuredProvider;
+      }
+    }
+
+    const providerId = request.providerId?.trim();
+    return providerId ? this.getProvider(providerId) : null;
   }
 
   public getProviders(): BackendProviderDefinition[] {
@@ -182,6 +208,46 @@ export class ProviderRegistryService {
     }
 
     return new Map(parsed.providers.map((provider) => [provider.id, provider]));
+  }
+
+  private getConfiguredProvider(configuredProviderId: string): BackendProviderDefinition | null {
+    const configuredProviders = this.readConfiguredProviders();
+    const configuredProvider = configuredProviders.get(configuredProviderId);
+    if (!configuredProvider) {
+      return null;
+    }
+
+    const baseProvider = this.getProvider(configuredProvider.providerId);
+    if (!baseProvider) {
+      return null;
+    }
+
+    return {
+      ...baseProvider,
+      id: configuredProvider.id,
+      displayName: configuredProvider.displayName ?? baseProvider.displayName,
+      baseUrl: configuredProvider.baseUrl ?? baseProvider.baseUrl,
+      defaultModel: configuredProvider.defaultModel ?? baseProvider.defaultModel,
+      extraHeaders: {
+        ...baseProvider.extraHeaders,
+        ...(configuredProvider.extraHeaders ?? {}),
+      },
+    };
+  }
+
+  private readConfiguredProviders(): Map<string, ConfiguredProviderEntry> {
+    const overridePath = this.resolveConfigFilePath(PROVIDER_LOCAL_FILE);
+    if (!overridePath) {
+      return new Map();
+    }
+
+    const raw = readFileSync(overridePath, 'utf8');
+    const parsed = JSON.parse(raw) as ProviderLocalOverrideFile;
+    if (!Array.isArray(parsed.configuredProviders)) {
+      return new Map();
+    }
+
+    return new Map(parsed.configuredProviders.map((provider) => [provider.id, provider]));
   }
 
   private readStringEnv(name: string | undefined, fallback: string): string {

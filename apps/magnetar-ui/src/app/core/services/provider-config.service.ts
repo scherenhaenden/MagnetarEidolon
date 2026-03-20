@@ -393,10 +393,10 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 ];
 
 const DEFAULT_PROVIDERS: ProviderConfig[] = [
-  createProviderFromPreset(PROVIDER_PRESETS[0], 'primary', 1, 'healthy', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[2], 'backup', 2, 'unknown', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[1], 'disabled', 3, 'unknown', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[3], 'disabled', 4, 'offline', 'system'),
+  createProviderFromPreset(PROVIDER_PRESETS[0], 'primary', 1, 'healthy', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[0].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[2], 'backup', 2, 'unknown', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[2].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[1], 'disabled', 3, 'unknown', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[1].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[3], 'disabled', 4, 'offline', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[3].kind)),
 ];
 
 @Injectable({
@@ -718,6 +718,10 @@ function createProviderConfigId(kind: ProviderPreset['kind']): string {
     globalThis.crypto?.randomUUID?.() ??
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   return `provider-config-${kind}-${randomValue}`;
+}
+
+function createSystemProviderConfigId(kind: ProviderPreset['kind']): string {
+  return `provider-config-${kind}-default`;
 }
 
 function normalizeProviderConfigId(id: string, kind: ProviderPreset['kind']): string {
