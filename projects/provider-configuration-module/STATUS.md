@@ -15,6 +15,7 @@ The provider-configuration UI is now beyond role ordering. The Providers screen 
 - Add a provider-configuration UI flow for backend-owned secrets and editable non-secret runtime fields, starting with OpenRouter.
 - Surface provider model and request-template placeholders in the UI so adding providers does not require hidden backend knowledge.
 - Push the current local-only provider editor toward backend-backed persistence and execution so the UI stops being the only source of truth.
+- Define JSON persistence for the provider preset catalog and configured-provider instances so reset/delete flows can operate on durable artifacts instead of only transient UI state.
 
 ## Risks
 1. UI-only configuration can drift from runtime behavior if the handoff contract is not defined quickly.

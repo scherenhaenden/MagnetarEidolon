@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-16 08:20 UTC
+  **Author:** Codex
+  **Entry:** State Change: Refined the Providers configuration model so configured-provider entries use opaque instance ids, built-in preset-backed entries are resettable but not removable, and delete actions now apply only to user-created configuration instances. The Providers editor UX was adjusted so add actions appear in the creation flow while delete/reset actions remain scoped to existing configurations. Planning was also extended to cover JSON persistence for the preset catalog and configured-provider instances.
+
 - **Timestamp:** 2026-03-13 16:05 UTC
   **Author:** Codex
   **Entry:** State Change: Verified that GitHub issues `#173`, `#174`, and `#190` are implemented in the current `master` branch. The Angular chat surface now exposes a conversation rail with new/rename/delete administration, chat sessions persist and restore through local storage with recency ordering, and the Providers editor now shows request templates, placeholders, API-surface endpoint definitions, and example JSON payloads. `PLAN.md` was updated to reference these delivered issue outcomes explicitly.

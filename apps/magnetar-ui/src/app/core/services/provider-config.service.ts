@@ -3,6 +3,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import {
   ProviderApiSurfaceDefinition,
   ProviderConfig,
+  ProviderConfigOrigin,
   ProviderHealth,
   ProviderPreset,
   ProviderRole,
@@ -387,10 +388,10 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 ];
 
 const DEFAULT_PROVIDERS: ProviderConfig[] = [
-  createProviderFromPreset('provider-lmstudio', PROVIDER_PRESETS[0], 'primary', 1, 'healthy'),
-  createProviderFromPreset('provider-openai', PROVIDER_PRESETS[2], 'backup', 2, 'unknown'),
-  createProviderFromPreset('provider-openrouter', PROVIDER_PRESETS[1], 'disabled', 3, 'unknown'),
-  createProviderFromPreset('provider-anthropic', PROVIDER_PRESETS[3], 'disabled', 4, 'offline'),
+  createProviderFromPreset(PROVIDER_PRESETS[0], 'primary', 1, 'healthy', 'system'),
+  createProviderFromPreset(PROVIDER_PRESETS[2], 'backup', 2, 'unknown', 'system'),
+  createProviderFromPreset(PROVIDER_PRESETS[1], 'disabled', 3, 'unknown', 'system'),
+  createProviderFromPreset(PROVIDER_PRESETS[3], 'disabled', 4, 'offline', 'system'),
 ];
 
 @Injectable({
@@ -469,12 +470,12 @@ export class ProviderConfigService {
       throw new Error(`Unknown provider preset: ${kind}`);
     }
 
-    const providerId = `provider-${kind}-${Date.now()}`;
+    const providerId = createProviderConfigId(kind);
     const nextPriority = this.nextAvailablePriority();
 
     this.providerState.update((providers) => [
       ...providers,
-      createProviderFromPreset(providerId, preset, 'disabled', nextPriority, 'unknown'),
+      createProviderFromPreset(preset, 'disabled', nextPriority, 'unknown', 'user', providerId),
     ]);
     this.normalizePriorities();
     return providerId;
@@ -503,13 +504,31 @@ export class ProviderConfigService {
 
   public removeProvider(providerId: string): boolean {
     const target = this.providerState().find((provider) => provider.id === providerId);
-    if (!target) {
+    if (!target || target.origin !== 'user') {
       return false;
     }
 
     this.providerState.update((providers) => providers.filter((provider) => provider.id !== providerId));
     this.ensurePrimaryExists();
     this.normalizePriorities();
+    return true;
+  }
+
+  public canRemoveProvider(providerId: string): boolean {
+    return this.providerState().some((provider) => provider.id === providerId && provider.origin === 'user');
+  }
+
+  public resetProviderConfiguration(providerId: string): boolean {
+    const target = this.providerState().find((provider) => provider.id === providerId);
+    if (!target) {
+      return false;
+    }
+
+    const resetProvider = createResetProviderConfig(target);
+    this.providerState.update((providers) =>
+      providers.map((provider) => (provider.id === providerId ? resetProvider : provider)),
+    );
+    this.persistProviders();
     return true;
   }
 
@@ -598,7 +617,7 @@ export class ProviderConfigService {
     try {
       const rawValue = this.readStorageValue(STORAGE_KEY);
       if (!rawValue) {
-        return DEFAULT_PROVIDERS;
+        return DEFAULT_PROVIDERS.map((provider) => cloneProviderConfig(provider));
       }
 
       const parsed = JSON.parse(rawValue) as ProviderConfig[];
@@ -608,7 +627,7 @@ export class ProviderConfigService {
 
       return parsed.map((provider) => this.hydrateProviderConfig(provider));
     } catch {
-      return DEFAULT_PROVIDERS;
+      return DEFAULT_PROVIDERS.map((provider) => cloneProviderConfig(provider));
     }
   }
 
@@ -639,22 +658,26 @@ export class ProviderConfigService {
     const preset = provider.presetKind ? this.getPreset(provider.presetKind) : null;
     return {
       ...provider,
-      template: provider.template ?? preset?.template ?? { requestTemplate: '', placeholders: [] },
-      apiSurface: provider.apiSurface ?? preset?.apiSurface ?? createOpenAiCompatibleApiSurface(),
+      id: normalizeProviderConfigId(provider.id, provider.kind),
+      origin: provider.origin ?? inferProviderOrigin(provider),
+      template: cloneTemplateDefinition(provider.template ?? preset?.template ?? { requestTemplate: '', placeholders: [] }),
+      apiSurface: cloneApiSurfaceDefinition(provider.apiSurface ?? preset?.apiSurface ?? createOpenAiCompatibleApiSurface()),
       modelSuggestions: provider.modelSuggestions ?? preset?.modelSuggestions ?? [],
     };
   }
 }
 
 function createProviderFromPreset(
-  id: string,
   preset: ProviderPreset,
   role: ProviderRole,
   priority: number,
   health: ProviderHealth,
+  origin: ProviderConfigOrigin,
+  id = createProviderConfigId(preset.kind),
 ): ProviderConfig {
   return {
     id,
+    origin,
     name: preset.label,
     kind: preset.kind,
     baseUrl: preset.baseUrl,
@@ -665,11 +688,82 @@ function createProviderFromPreset(
     apiStyle: preset.apiStyle,
     apiKey: '',
     description: preset.description,
-    template: preset.template,
+    template: cloneTemplateDefinition(preset.template),
     supportsApiKey: preset.supportsApiKey,
     ownership: preset.ownership,
     presetKind: preset.kind,
     modelSuggestions: preset.modelSuggestions ?? [],
-    apiSurface: preset.apiSurface,
+    apiSurface: cloneApiSurfaceDefinition(preset.apiSurface),
+  };
+}
+
+function createProviderConfigId(kind: ProviderPreset['kind']): string {
+  const randomValue =
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  return `provider-config-${kind}-${randomValue}`;
+}
+
+function normalizeProviderConfigId(id: string, kind: ProviderPreset['kind']): string {
+  return id.startsWith('provider-config-') ? id : createProviderConfigId(kind);
+}
+
+function inferProviderOrigin(provider: Pick<ProviderConfig, 'id' | 'presetKind'>): ProviderConfigOrigin {
+  const legacySystemPresetKinds: ProviderPreset['kind'][] = ['lm_studio', 'openai', 'openrouter', 'anthropic'];
+  return provider.id.startsWith('provider-') && provider.presetKind && legacySystemPresetKinds.includes(provider.presetKind)
+    ? 'system'
+    : 'user';
+}
+
+function cloneTemplateDefinition(template: ProviderConfig['template']): ProviderConfig['template'] {
+  return {
+    requestTemplate: template.requestTemplate,
+    placeholders: [...template.placeholders],
+  };
+}
+
+function cloneApiSurfaceDefinition(apiSurface: ProviderConfig['apiSurface']): ProviderConfig['apiSurface'] {
+  return {
+    endpointComparison: [...apiSurface.endpointComparison],
+    endpoints: apiSurface.endpoints.map((endpoint) => ({
+      ...endpoint,
+      notes: [...endpoint.notes],
+      placeholders: [...endpoint.placeholders],
+    })),
+  };
+}
+
+function cloneProviderConfig(provider: ProviderConfig): ProviderConfig {
+  return {
+    ...provider,
+    template: cloneTemplateDefinition(provider.template),
+    apiSurface: cloneApiSurfaceDefinition(provider.apiSurface),
+    modelSuggestions: [...provider.modelSuggestions],
+  };
+}
+
+function createResetProviderConfig(provider: ProviderConfig): ProviderConfig {
+  const preset = provider.presetKind ? PROVIDER_PRESETS.find((candidate) => candidate.kind === provider.presetKind) : null;
+  const baselinePreset = preset ?? PROVIDER_PRESETS.find((candidate) => candidate.kind === 'custom') ?? null;
+
+  if (!baselinePreset) {
+    return cloneProviderConfig(provider);
+  }
+
+  return {
+    ...provider,
+    name: baselinePreset.label,
+    kind: baselinePreset.kind,
+    baseUrl: baselinePreset.baseUrl,
+    model: baselinePreset.defaultModel,
+    apiStyle: baselinePreset.apiStyle,
+    apiKey: '',
+    description: baselinePreset.description,
+    template: cloneTemplateDefinition(baselinePreset.template),
+    supportsApiKey: baselinePreset.supportsApiKey,
+    ownership: baselinePreset.ownership,
+    presetKind: baselinePreset.kind,
+    modelSuggestions: [...(baselinePreset.modelSuggestions ?? [])],
+    apiSurface: cloneApiSurfaceDefinition(baselinePreset.apiSurface),
   };
 }

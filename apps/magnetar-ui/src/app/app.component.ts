@@ -896,14 +896,14 @@ export class MemoryScreen {
             hiding endpoints, models, keys, or request templates.
           </p>
         </div>
-        <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
-          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-zinc-400">
             Primary: {{ primaryProvider()?.name || 'Unassigned' }}
           </span>
-          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-zinc-400">
             Backups Ready: {{ healthyFailoverCount() }}
           </span>
-          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-zinc-400">
             Configured: {{ providers().length }}
           </span>
         </div>
@@ -924,6 +924,9 @@ export class MemoryScreen {
             </button>
 
             <div *ngIf="accordions().quickAdd" class="p-4 pt-0 space-y-2 animate-fade-in">
+              <div class="pb-2 text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+                Choose a preset to create a new provider configuration
+              </div>
               <button *ngFor="let preset of presets()"
                 (click)="addPreset(preset.kind)"
                 class="w-full flex items-center justify-between p-3 border rounded-xl transition-all group shadow-sm text-left"
@@ -1253,11 +1256,33 @@ export class MemoryScreen {
               Ownership: {{ provider.ownership }}. Secrets should ultimately live on the backend; this UI slice
               currently persists provider configuration locally until backend sync is completed.
             </div>
-            <button
-              (click)="removeProvider(provider.id)"
-              class="w-full px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-100 hover:bg-red-500/20">
-              Remove Provider
-            </button>
+            <div *ngIf="isConfiguringNewProvider(); else existingProviderActions" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button
+                (click)="finishProviderConfiguration()"
+                class="w-full px-3 py-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-sm font-medium text-cyan-100 hover:bg-cyan-500/20">
+                Add {{ provider.name }} Configuration
+              </button>
+              <button
+                (click)="addCustomProvider()"
+                class="w-full px-3 py-2 rounded-lg border border-violet-500/20 bg-violet-500/10 text-sm text-violet-100 hover:bg-violet-500/20">
+                Add Custom Configuration
+              </button>
+            </div>
+            <ng-template #existingProviderActions>
+              <button
+                *ngIf="canRemoveProvider(provider.id); else resetProviderAction"
+                (click)="removeProvider(provider.id)"
+                class="w-full px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/10 text-sm text-red-100 hover:bg-red-500/20">
+                Delete Configuration
+              </button>
+              <ng-template #resetProviderAction>
+                <button
+                  (click)="resetProvider(provider.id)"
+                  class="w-full px-3 py-2 rounded-lg border border-amber-500/20 bg-amber-500/10 text-sm text-amber-100 hover:bg-amber-500/20">
+                  Reset Configuration Values
+                </button>
+              </ng-template>
+            </ng-template>
           </div>
 
           <div
@@ -1617,6 +1642,14 @@ export class ProvidersScreen {
 
   public applyModelSuggestion(providerId: string, model: string): void {
     this.providerConfigService.updateProvider(providerId, { model });
+  }
+
+  public canRemoveProvider(providerId: string): boolean {
+    return this.providerConfigService.canRemoveProvider(providerId);
+  }
+
+  public resetProvider(providerId: string): void {
+    this.providerConfigService.resetProviderConfiguration(providerId);
   }
 
   public removeProvider(providerId: string): void {

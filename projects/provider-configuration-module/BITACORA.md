@@ -2,6 +2,10 @@
 
 ## Entries
 
+- **Timestamp:** 2026-03-16 08:20 UTC
+  **Author:** Codex
+  **Entry:** Implementation: changed provider configuration instances to use opaque ids and explicit `system` vs `user` origin so built-in preset-backed entries cannot be deleted. The Providers editor now shows add actions only during new-configuration flows and reserves delete/reset actions for existing configurations. Planning was updated with a follow-up JSON persistence slice for the preset catalog and configured-provider instances.
+
 - **Timestamp:** 2026-03-12 12:40 UTC
   **Author:** Codex
   **Entry:** Planning: documented the next provider-configuration UI slice. The immediate user-facing gaps are an explicit OpenRouter configuration entry path in the Providers screen and a way to inspect provider model/request templates with placeholders so provider onboarding is understandable from the product itself.
