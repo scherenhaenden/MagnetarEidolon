@@ -558,7 +558,7 @@ describe('ChatSessionService', () => {
     };
     expect(requestBody).toEqual({
       prompt: 'Generate a SQL migration',
-      providerId: expectedProviderId,
+      providerId: 'provider-lmstudio',
       model: 'local-model',
     });
     expect(service.messages()[2].phase).toBe('complete');
@@ -596,7 +596,7 @@ describe('ChatSessionService', () => {
     };
     expect(requestBody).toEqual({
       prompt: 'Test OpenRouter',
-      providerId: openRouterId,
+      providerId: 'provider-openrouter',
       model: 'openai/gpt-4.1-mini',
     });
     expect(service.messages()[2].providerLabel).toBe('OpenRouter');
@@ -734,6 +734,7 @@ describe('ChatSessionService', () => {
 
     const request = (service as any).buildBackendChatRequest('hello', {
       id: 'provider-lmstudio-openai',
+      runtimeProviderId: 'provider-lmstudio',
       name: 'LM Studio Compat',
       kind: 'lm_studio',
       baseUrl: 'http://localhost:1234/v1',
@@ -746,8 +747,31 @@ describe('ChatSessionService', () => {
 
     expect(request).toEqual({
       prompt: 'hello',
-      providerId: 'provider-lmstudio-openai',
+      providerId: 'provider-lmstudio',
       model: 'qwen/test',
+    });
+  });
+
+  it('falls back to the provider config id when no runtime provider id exists', () => {
+    const service = new ChatSessionService(new ProviderConfigService());
+
+    const request = (service as any).buildBackendChatRequest('hello', {
+      id: 'provider-config-custom-1',
+      runtimeProviderId: null,
+      name: 'Custom Provider',
+      kind: 'custom',
+      baseUrl: 'https://example.com/v1',
+      model: 'custom-model',
+      role: 'primary',
+      priority: 1,
+      health: 'healthy',
+      apiStyle: 'openai-compatible',
+    });
+
+    expect(request).toEqual({
+      prompt: 'hello',
+      providerId: 'provider-config-custom-1',
+      model: 'custom-model',
     });
   });
 

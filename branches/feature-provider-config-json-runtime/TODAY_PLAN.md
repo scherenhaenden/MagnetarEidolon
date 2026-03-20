@@ -20,3 +20,14 @@ Start the transition from UI-local provider configuration toward a JSON-backed p
 - Provider execution metadata is no longer hardcoded only in TypeScript.
 - The backend has the first real file-backed provider runtime path.
 - The next slice can focus on configured provider instances and custom-provider execution using the same JSON model.
+
+## Completion Status
+- Completed: backend provider catalog moved into JSON and validated.
+- Completed: UI provider configs now carry a backend-executable runtime provider id for preset-backed LM Studio/OpenRouter paths.
+- Completed: chat now sends the runtime provider id instead of assuming the UI config id is executable by the backend.
+- Completed: backend tests, focused UI tests, root `npm test`, and root `npm run typecheck`.
+
+## Final Percentage For This Slice
+- Planned completion target for this slice: 100%
+- Achieved: 100%
+- Notes: this completes the JSON-backed backend registry foundation plus the LM Studio/OpenRouter runtime handoff fix. It does not yet finish backend-owned persistence and execution for arbitrary custom provider instances.

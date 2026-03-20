@@ -20,6 +20,7 @@ describe('provider-config model helpers', () => {
       {
         id: 'b',
         origin: 'user',
+        runtimeProviderId: null,
         name: 'Backup',
         kind: 'openai',
         baseUrl: 'https://example.com',
@@ -40,6 +41,7 @@ describe('provider-config model helpers', () => {
       {
         id: 'a',
         origin: 'system',
+        runtimeProviderId: 'provider-lmstudio',
         name: 'Primary',
         kind: 'lm_studio',
         baseUrl: 'http://localhost:1234/v1',
@@ -83,6 +85,7 @@ describe('ProviderConfigService', () => {
       'OpenAI Cloud',
     ]);
     expect(openRouter?.id.startsWith('provider-config-openrouter-')).toBe(true);
+    expect(openRouter?.runtimeProviderId).toBe('provider-openrouter');
     expect(openRouter?.kind).toBe('openrouter');
     expect(openRouter?.template.placeholders).toContain('$model');
     expect(openRouter?.modelSuggestions.length).toBeGreaterThan(0);
@@ -220,6 +223,26 @@ describe('ProviderConfigService', () => {
     expect(service.providers().find((provider) => provider.id === providerId)?.presetKind).toBe('openrouter');
   });
 
+  it('falls back to a timestamp-based id when crypto.randomUUID is unavailable', () => {
+    const service = new ProviderConfigService();
+    const originalCrypto = globalThis.crypto;
+
+    Object.defineProperty(globalThis, 'crypto', {
+      configurable: true,
+      value: {},
+    });
+
+    try {
+      const providerId = service.addProviderFromPreset('custom');
+      expect(providerId.startsWith('provider-config-custom-')).toBe(true);
+    } finally {
+      Object.defineProperty(globalThis, 'crypto', {
+        configurable: true,
+        value: originalCrypto,
+      });
+    }
+  });
+
   it('falls back to an empty modelSuggestions list when a preset omits suggestions', () => {
     const service = new ProviderConfigService();
     const targetPreset = service.presets().find((preset) => preset.kind === 'custom');
@@ -260,6 +283,7 @@ describe('ProviderConfigService', () => {
       baseUrl: 'https://openrouter.example/api/v1',
       model: 'anthropic/claude-3.7-sonnet',
       apiKey: 'secret',
+      runtimeProviderId: 'provider-openrouter',
     });
   });
 
@@ -403,6 +427,11 @@ describe('ProviderConfigService', () => {
     expect(service.removeProvider('provider-missing')).toBe(false);
   });
 
+  it('returns false when resetting a missing provider entry', () => {
+    const service = new ProviderConfigService();
+    expect(service.resetProviderConfiguration('provider-missing')).toBe(false);
+  });
+
   it('serializes the final configured provider JSON for an existing provider instance', () => {
     const service = new ProviderConfigService();
     const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
@@ -413,6 +442,7 @@ describe('ProviderConfigService', () => {
     expect(JSON.parse(serialized!)).toMatchObject({
       id: openRouterId,
       origin: 'system',
+      runtimeProviderId: 'provider-openrouter',
       kind: 'openrouter',
       baseUrl: 'https://openrouter.ai/api/v1',
       model: 'openai/gpt-4.1-mini',
@@ -443,6 +473,7 @@ describe('ProviderConfigService', () => {
       model: 'openai/gpt-4.1-mini',
       apiKey: '',
       origin: 'system',
+      runtimeProviderId: 'provider-openrouter',
     });
   });
 
@@ -468,6 +499,7 @@ describe('ProviderConfigService', () => {
           {
             id: 'provider-openai-hydrated',
             origin: 'user',
+            runtimeProviderId: null,
             name: 'Hydrated OpenAI',
             kind: 'openai',
             baseUrl: 'https://api.openai.com/v1',
@@ -509,6 +541,7 @@ describe('ProviderConfigService', () => {
       expect(provider.template).toEqual(openAiPreset?.template);
       expect(provider.apiSurface).toEqual(openAiPreset?.apiSurface);
       expect(provider.modelSuggestions).toEqual(openAiPreset?.modelSuggestions);
+      expect(provider.runtimeProviderId).toBeNull();
     } finally {
       Object.defineProperty(globalThis, 'localStorage', {
         configurable: true,
@@ -526,6 +559,7 @@ describe('ProviderConfigService', () => {
           {
             id: 'provider-generic-hydrated',
             origin: 'user',
+            runtimeProviderId: null,
             name: 'Hydrated Generic',
             kind: 'custom',
             baseUrl: 'https://provider.example/v1',
@@ -565,11 +599,234 @@ describe('ProviderConfigService', () => {
       expect(provider.template).toEqual({ requestTemplate: '', placeholders: [] });
       expect(provider.apiSurface.endpoints.map((endpoint) => endpoint.id)).toEqual(['models', 'chat']);
       expect(provider.modelSuggestions).toEqual([]);
+      expect(provider.runtimeProviderId).toBeNull();
     } finally {
       Object.defineProperty(globalThis, 'localStorage', {
         configurable: true,
         value: originalLocalStorage,
       });
+    }
+  });
+
+  it('infers system origin for legacy preset-backed provider ids without an explicit origin', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      [
+        'magnetar.provider-config.v1',
+        JSON.stringify([
+          {
+            id: 'provider-openrouter-legacy',
+            name: 'Legacy OpenRouter',
+            kind: 'openrouter',
+            baseUrl: 'https://openrouter.ai/api/v1',
+            model: 'openai/gpt-4.1-mini',
+            role: 'primary',
+            priority: 1,
+            health: 'healthy',
+            apiStyle: 'openai-compatible',
+            apiKey: '',
+            description: 'Legacy system provider',
+            supportsApiKey: true,
+            ownership: 'backend',
+            presetKind: 'openrouter',
+            template: { requestTemplate: '{}', placeholders: [] },
+            apiSurface: { endpointComparison: [], endpoints: [] },
+            modelSuggestions: [],
+          },
+        ]),
+      ],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const service = new ProviderConfigService();
+      const provider = service.providers()[0];
+      expect(provider?.origin).toBe('system');
+      expect(provider?.runtimeProviderId).toBe('provider-openrouter');
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('infers user origin when a legacy provider id has no preset kind', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      [
+        'magnetar.provider-config.v1',
+        JSON.stringify([
+          {
+            id: 'provider-custom-legacy',
+            name: 'Legacy Custom',
+            kind: 'custom',
+            baseUrl: 'https://provider.example/v1',
+            model: 'custom-model',
+            role: 'primary',
+            priority: 1,
+            health: 'healthy',
+            apiStyle: 'openai-compatible',
+            apiKey: '',
+            description: 'Legacy user provider without preset kind',
+            supportsApiKey: true,
+            ownership: 'user',
+            template: { requestTemplate: '{}', placeholders: [] },
+            apiSurface: { endpointComparison: [], endpoints: [] },
+            modelSuggestions: [],
+          },
+        ]),
+      ],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const service = new ProviderConfigService();
+      expect(service.providers()[0]?.origin).toBe('user');
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('hydrates missing runtime provider ids from preset-backed metadata', () => {
+    const originalLocalStorage = globalThis.localStorage;
+    const entries = new Map<string, string>([
+      [
+        'magnetar.provider-config.v1',
+        JSON.stringify([
+          {
+            id: 'provider-openrouter-hydrated',
+            origin: 'user',
+            name: 'Hydrated OpenRouter',
+            kind: 'openrouter',
+            baseUrl: 'https://openrouter.ai/api/v1',
+            model: 'openai/gpt-4.1-mini',
+            role: 'primary',
+            priority: 1,
+            health: 'healthy',
+            apiStyle: 'openai-compatible',
+            apiKey: '',
+            description: 'Preset-backed provider with stripped runtime id',
+            supportsApiKey: true,
+            ownership: 'backend',
+            presetKind: 'openrouter',
+            template: { requestTemplate: '{}', placeholders: [] },
+            apiSurface: { endpointComparison: [], endpoints: [] },
+            modelSuggestions: [],
+          },
+        ]),
+      ],
+    ]);
+
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        getItem(key: string) {
+          return entries.get(key) ?? null;
+        },
+        setItem(key: string, value: string) {
+          entries.set(key, value);
+        },
+        removeItem(key: string) {
+          entries.delete(key);
+        },
+      },
+    });
+
+    try {
+      const service = new ProviderConfigService();
+      expect(service.providers()[0]?.runtimeProviderId).toBe('provider-openrouter');
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
+      });
+    }
+  });
+
+  it('keeps the current provider config when reset metadata is unavailable', () => {
+    const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
+    const presets = service.presets();
+    const snapshot = [...presets];
+
+    service.updateProvider(openRouterId!, {
+      name: 'No Preset Reset Available',
+      baseUrl: 'https://override.example/api/v1',
+    });
+    presets.splice(0, presets.length);
+
+    try {
+      expect(service.resetProviderConfiguration(openRouterId!)).toBe(true);
+      expect(service.providers().find((provider) => provider.id === openRouterId)).toMatchObject({
+        name: 'No Preset Reset Available',
+        baseUrl: 'https://override.example/api/v1',
+      });
+    } finally {
+      presets.push(...snapshot);
+    }
+  });
+
+  it('resets through the custom fallback when preset kind is missing', () => {
+    const service = new ProviderConfigService();
+    const providerId = service.addCustomProvider();
+    const customPreset = service.presets().find((preset) => preset.kind === 'custom');
+    const originalSuggestions = customPreset?.modelSuggestions;
+
+    service.updateProvider(providerId, {
+      presetKind: null,
+      name: 'Reset Me',
+      baseUrl: 'https://override.example/v1',
+      model: 'override-model',
+    });
+
+    if (customPreset) {
+      customPreset.modelSuggestions = undefined;
+    }
+
+    try {
+      expect(service.resetProviderConfiguration(providerId)).toBe(true);
+      expect(service.providers().find((provider) => provider.id === providerId)).toMatchObject({
+        name: 'Custom Provider',
+        baseUrl: 'https://api.example.com/v1',
+        model: 'example/model-name',
+        modelSuggestions: [],
+      });
+    } finally {
+      if (customPreset) {
+        customPreset.modelSuggestions = originalSuggestions;
+      }
     }
   });
 });
