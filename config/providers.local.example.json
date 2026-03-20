@@ -1,0 +1,13 @@
+{
+  "providers": [
+    {
+      "id": "provider-lmstudio",
+      "baseUrl": "http://127.0.0.1:1234/v1",
+      "defaultModel": "local-model"
+    },
+    {
+      "id": "provider-openrouter",
+      "defaultModel": "openai/gpt-4.1-mini"
+    }
+  ]
+}
