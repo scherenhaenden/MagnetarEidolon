@@ -10,12 +10,21 @@ import {
 import { ProviderRegistryService } from './provider-registry.service.js';
 
 class TestChatGatewayService extends ChatGatewayService {
-  public constructor(private readonly mockedFetchFn: (input: string, init?: RequestInit) => Promise<globalThis.Response>) {
-    super(new ProviderRegistryService());
+  public constructor(
+    private readonly mockedFetchFn: (input: string, init?: RequestInit) => Promise<globalThis.Response>,
+    providerRegistryService: ProviderRegistryService = new ProviderRegistryService(),
+  ) {
+    super(providerRegistryService);
   }
 
   protected override getFetchFn(): (input: string, init?: RequestInit) => Promise<globalThis.Response> {
     return this.mockedFetchFn;
+  }
+}
+
+class FixtureProviderRegistryService extends ProviderRegistryService {
+  protected override getConfigSearchRoots(): string[] {
+    return ['/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config'];
   }
 }
 
@@ -45,8 +54,9 @@ function createBackendRequest(
 ): BackendChatRequest {
   return {
     prompt: overrides?.prompt ?? 'Hello from MagnetarEidolon',
+    configuredProviderId: overrides?.configuredProviderId ?? 'provider-config-lm_studio-default',
     providerId: overrides?.providerId ?? 'provider-lmstudio',
-    model: overrides?.model ?? 'ibm/granite-4-micro',
+    model: overrides && 'model' in overrides ? (overrides.model ?? null) : 'ibm/granite-4-micro',
   };
 }
 
@@ -232,12 +242,13 @@ test('ChatGatewayService rejects unknown provider ids before opening the SSE str
     throw new Error('fetch should not be called');
   };
 
-  const service = new TestChatGatewayService(fetchMock);
+  const service = new TestChatGatewayService(fetchMock, new FixtureProviderRegistryService());
   const recorder = createResponseRecorder();
 
   await service.streamChat(
     {
       prompt: 'Hello from MagnetarEidolon',
+      configuredProviderId: 'provider-config-missing',
       providerId: 'provider-missing',
       model: null,
     },
@@ -247,9 +258,35 @@ test('ChatGatewayService rejects unknown provider ids before opening the SSE str
   assert.equal(recorder.statusCode, 400);
   assert.deepEqual(recorder.jsonPayload, {
     error: {
-      message: 'Unknown provider id: provider-missing.',
+      message: 'Unknown provider id: provider-config-missing.',
     },
   });
+});
+
+test('ChatGatewayService resolves configured provider instances before runtime provider ids', async (): Promise<void> => {
+  const fetchCalls: Array<{ input: string; init?: RequestInit }> = [];
+  const fetchMock = async (input: string, init?: RequestInit): Promise<globalThis.Response> => {
+    fetchCalls.push({ input, init });
+    return createSseResponse(['data: {"choices":[{"delta":{"content":"ok"}}]}\n\n', 'data: [DONE]\n\n']);
+  };
+
+  const service = new TestChatGatewayService(fetchMock, new FixtureProviderRegistryService());
+  const recorder = createResponseRecorder();
+
+  await service.streamChat(
+    createBackendRequest({
+      configuredProviderId: 'provider-config-lm_studio-default',
+      providerId: 'provider-openrouter',
+      model: null,
+    }),
+    recorder.response,
+  );
+
+  assert.equal(fetchCalls.length, 1);
+  assert.match(fetchCalls[0]?.input ?? '', /^http:\/\/127\.0\.0\.1:2234(?:\/[^/]+)*\/chat\/completions$/);
+  const requestBody = JSON.parse(String(fetchCalls[0]?.init?.body)) as { model: string };
+  assert.equal(requestBody.model, 'fixture-model');
+  assert.equal(recorder.statusCode, 200);
 });
 
 test('ChatGatewayService rejects OpenRouter requests when the backend API key is missing', async (): Promise<void> => {

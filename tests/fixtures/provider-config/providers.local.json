@@ -5,5 +5,13 @@
       "baseUrl": "http://127.0.0.1:2234/v1",
       "defaultModel": "fixture-model"
     }
+  ],
+  "configuredProviders": [
+    {
+      "id": "provider-config-lm_studio-default",
+      "providerId": "provider-lmstudio",
+      "baseUrl": "http://127.0.0.1:2234/v1",
+      "defaultModel": "fixture-model"
+    }
   ]
 }

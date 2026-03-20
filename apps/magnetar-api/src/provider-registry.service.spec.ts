@@ -98,6 +98,44 @@ test('ProviderRegistryService applies local JSON overrides before env overrides'
   assert.equal(provider?.defaultModel, 'fixture-model');
 });
 
+test('ProviderRegistryService resolves configured provider instances from local JSON', (): void => {
+  const registry = new TestableProviderRegistryService([
+    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+  ]);
+  const provider = registry.resolveExecutionProvider({
+    configuredProviderId: 'provider-config-lm_studio-default',
+    providerId: 'provider-openrouter',
+  });
+
+  assert.deepEqual(provider, {
+    id: 'provider-config-lm_studio-default',
+    displayName: 'LM Studio Local',
+    kind: 'lm_studio',
+    baseUrl: 'http://127.0.0.1:2234/v1',
+    chatPath: '/chat/completions',
+    apiStyle: 'openai-compatible',
+    authStrategy: 'none',
+    defaultModel: 'fixture-model',
+    supportsStreaming: true,
+    requestFormat: 'chat-completions',
+    responseNormalizer: 'openai-sse',
+    apiKey: null,
+    extraHeaders: {},
+  });
+});
+
+test('ProviderRegistryService falls back to provider id when configured provider instance is missing', (): void => {
+  const registry = new TestableProviderRegistryService([
+    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+  ]);
+  const provider = registry.resolveExecutionProvider({
+    configuredProviderId: 'provider-config-missing',
+    providerId: 'provider-lmstudio',
+  });
+
+  assert.equal(provider?.id, 'provider-lmstudio');
+});
+
 test('ProviderRegistryService exposes optional OpenRouter attribution headers from env', (): void => {
   process.env.OPENROUTER_HTTP_REFERER = 'https://magnetar.example/chat';
   process.env.OPENROUTER_APP_TITLE = 'MagnetarEidolon Dev';
