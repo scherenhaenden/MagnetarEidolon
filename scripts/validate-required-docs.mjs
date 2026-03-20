@@ -27,40 +27,39 @@ function formatError(relativePath, message) {
 }
 
 export async function validateRequiredDocs(documents = REQUIRED_DOCS, repoRoot = REPO_ROOT) {
-  const errors = [];
+  const results = await Promise.all(
+    documents.map(async (document) => {
+      const absolutePath = path.join(repoRoot, document.path);
 
-  for (const document of documents) {
-    const absolutePath = path.join(repoRoot, document.path);
+      try {
+        const source = await fs.readFile(absolutePath, 'utf8');
+        const firstNonEmptyLine = source
+          .split(/\r?\n/u)
+          .map((line) => line.trim())
+          .find((line) => line.length > 0);
 
-    try {
-      const source = await fs.readFile(absolutePath, 'utf8');
-      const firstNonEmptyLine = source
-        .split(/\r?\n/u)
-        .map((line) => line.trim())
-        .find((line) => line.length > 0);
+        if (!firstNonEmptyLine) {
+          return formatError(document.path, 'file is empty.');
+        }
 
-      if (!firstNonEmptyLine) {
-        errors.push(formatError(document.path, 'file is empty.'));
-        continue;
-      }
-
-      if (!firstNonEmptyLine.startsWith(document.header)) {
-        errors.push(
-          formatError(
+        if (!firstNonEmptyLine.startsWith(document.header)) {
+          return formatError(
             document.path,
             `expected first non-empty line to start with "${document.header}" but found "${firstNonEmptyLine}".`,
-          ),
-        );
-      }
-    } catch (error) {
-      const message = error instanceof Error && 'code' in error && error.code === 'ENOENT'
-        ? 'required file is missing.'
-        : `unable to read file: ${error instanceof Error ? error.message : String(error)}.`;
-      errors.push(formatError(document.path, message));
-    }
-  }
+          );
+        }
 
-  return errors;
+        return null;
+      } catch (error) {
+        const message = error instanceof Error && 'code' in error && error.code === 'ENOENT'
+          ? 'required file is missing.'
+          : `unable to read file: ${error instanceof Error ? error.message : String(error)}.`;
+        return formatError(document.path, message);
+      }
+    }),
+  );
+
+  return results.filter((result) => result !== null);
 }
 
 export async function run() {
