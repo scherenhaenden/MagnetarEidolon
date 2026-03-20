@@ -5,7 +5,30 @@ on:
   pull_request:
 
 jobs:
+  governance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install UI dependencies for YAML validation
+        working-directory: apps/magnetar-ui
+        run: npm ci --include=dev
+
+      - name: Validate project YAML schema
+        run: npm run validate:project-schema
+
+      - name: Test project YAML validator
+        run: npm run test:project-schema
+
   build:
+    needs: governance
     runs-on: ubuntu-latest
     defaults:
       run:

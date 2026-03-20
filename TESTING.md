@@ -14,6 +14,12 @@ Ensure governance artifacts are complete, consistent, and operationally enforcea
 - **Workflow consistency tests:** verify task states in `PLAN.md` and YAML conform to `RULES.md`.
 - **Process tests (manual/audit):** verify `BITACORA.md` chronology and blocker lifecycle compliance.
 
+### Current Governance Validation Path
+- Run `npm run validate:project-schema` from the repository root to validate every `projects/*.project.yml` file.
+- Run `npm run test:project-schema` to validate the schema validator logic itself.
+- Root `npm test` now includes both commands before the API and UI test suites, so malformed project YAML fails the standard repository test path.
+- The `CI TypeScript` GitHub Actions workflow also runs the project-schema validator and its tests before the UI build job.
+
 ### Code Coverage Targets
 - **Automated checks coverage target:** 90% of governance rules represented by machine-checkable assertions.
 - **Minimum accepted threshold:** 80% before release tagging.
