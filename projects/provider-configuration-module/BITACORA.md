@@ -2,6 +2,10 @@
 
 ## Entries
 
+- **Timestamp:** 2026-03-16 14:00 UTC
+  **Author:** Codex
+  **Entry:** Implementation: added a read-only JSON inspector affordance for existing configured providers so the editor can show the final resolved stored payload for a selected provider instance. The module plan and status were updated to distinguish this inspection slice from the later JSON artifact persistence work.
+
 - **Timestamp:** 2026-03-16 08:20 UTC
   **Author:** Codex
   **Entry:** Implementation: changed provider configuration instances to use opaque ids and explicit `system` vs `user` origin so built-in preset-backed entries cannot be deleted. The Providers editor now shows add actions only during new-configuration flows and reserves delete/reset actions for existing configurations. Planning was updated with a follow-up JSON persistence slice for the preset catalog and configured-provider instances.

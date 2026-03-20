@@ -532,6 +532,15 @@ export class ProviderConfigService {
     return true;
   }
 
+  public serializeConfiguredProvider(providerId: string): string | null {
+    const provider = this.providerState().find((candidate) => candidate.id === providerId);
+    if (!provider) {
+      return null;
+    }
+
+    return JSON.stringify(cloneProviderConfig(provider), null, 2);
+  }
+
   public getPreset(kind: ProviderPreset['kind']): ProviderPreset | null {
     return PROVIDER_PRESETS.find((preset) => preset.kind === kind) ?? null;
   }

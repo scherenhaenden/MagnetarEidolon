@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-16 14:00 UTC
+  **Author:** Codex
+  **Entry:** State Change: Began a follow-up Providers UX slice on `feature/provider-config-json-inspector`. Added a configured-provider JSON inspector path so existing provider instances can expose their final resolved stored shape directly from the editor, and updated planning to track that UI inspection separately from the later JSON file-persistence task.
+
 - **Timestamp:** 2026-03-16 08:20 UTC
   **Author:** Codex
   **Entry:** State Change: Refined the Providers configuration model so configured-provider entries use opaque instance ids, built-in preset-backed entries are resettable but not removable, and delete actions now apply only to user-created configuration instances. The Providers editor UX was adjusted so add actions appear in the creation flow while delete/reset actions remain scoped to existing configurations. Planning was also extended to cover JSON persistence for the preset catalog and configured-provider instances.

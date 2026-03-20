@@ -403,6 +403,28 @@ describe('ProviderConfigService', () => {
     expect(service.removeProvider('provider-missing')).toBe(false);
   });
 
+  it('serializes the final configured provider JSON for an existing provider instance', () => {
+    const service = new ProviderConfigService();
+    const openRouterId = findProviderByPreset(service, 'openrouter')?.id;
+
+    const serialized = service.serializeConfiguredProvider(openRouterId!);
+
+    expect(serialized).toBeTruthy();
+    expect(JSON.parse(serialized!)).toMatchObject({
+      id: openRouterId,
+      origin: 'system',
+      kind: 'openrouter',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      model: 'openai/gpt-4.1-mini',
+      presetKind: 'openrouter',
+    });
+  });
+
+  it('returns null when serializing a missing provider instance', () => {
+    const service = new ProviderConfigService();
+    expect(service.serializeConfiguredProvider('provider-missing')).toBeNull();
+  });
+
   it('can reset a built-in provider configuration without deleting the provider entry', () => {
     const service = new ProviderConfigService();
     const openRouterId = findProviderByPreset(service, 'openrouter')?.id;

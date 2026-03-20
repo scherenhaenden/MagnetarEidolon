@@ -1256,6 +1256,27 @@ export class MemoryScreen {
               Ownership: {{ provider.ownership }}. Secrets should ultimately live on the backend; this UI slice
               currently persists provider configuration locally until backend sync is completed.
             </div>
+            <div *ngIf="!isConfiguringNewProvider()" class="rounded-xl border border-white/5 bg-[#050508] p-4 space-y-3">
+              <div class="flex items-center justify-between gap-3">
+                <div class="text-xs uppercase tracking-wider text-zinc-500">Raw Config</div>
+                <button
+                  (click)="toggleConfiguredJson(provider.id)"
+                  class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] uppercase tracking-[0.2em] text-zinc-300 transition-colors hover:bg-white/[0.06] hover:text-white">
+                  <ui-icon [name]="isConfiguredJsonVisible(provider.id) ? 'chevron-up' : 'chevron-down'" [size]="12"></ui-icon>
+                  {{ isConfiguredJsonVisible(provider.id) ? 'Hide Raw Config' : 'View Raw Config' }}
+                </button>
+              </div>
+              <div *ngIf="isConfiguredJsonVisible(provider.id)" class="space-y-2">
+                <p class="text-[11px] leading-5 text-zinc-500">
+                  Final resolved raw configuration for this configured provider instance.
+                </p>
+                <textarea
+                  rows="18"
+                  [value]="configuredProviderJson(provider.id)"
+                  readonly
+                  class="w-full rounded-lg border border-white/10 bg-[#020305] px-3 py-3 text-xs font-mono text-emerald-100"></textarea>
+              </div>
+            </div>
             <div *ngIf="isConfiguringNewProvider(); else existingProviderActions" class="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 (click)="finishProviderConfiguration()"
@@ -1436,6 +1457,7 @@ export class ProvidersScreen {
   public finishProviderConfiguration(): void {
     this.providerWorkflowMode.set('browse');
     this.selectedProviderId.set(null);
+    this.configuredJsonProviderId.set(null);
     this.selectedEndpointId.set(null);
     this.accordions.update((accordions) => ({ ...accordions, configured: true }));
   }
@@ -1478,6 +1500,7 @@ export class ProvidersScreen {
 
   public readonly providerConfigService = inject(ProviderConfigService);
   private readonly selectedProviderId = signal<string | null>(null);
+  private readonly configuredJsonProviderId = signal<string | null>(null);
   public readonly selectedEndpointId = signal<string | null>(null);
   public readonly viewMode = signal<'grid' | 'list'>('grid');
   public readonly selectedProvider = computed(
@@ -1519,6 +1542,7 @@ export class ProvidersScreen {
   public selectProvider(providerId: string): void {
     this.providerWorkflowMode.set('browse');
     this.selectedProviderId.set(providerId);
+    this.configuredJsonProviderId.set(null);
     this.selectedEndpointId.set(null);
   }
 
@@ -1531,6 +1555,7 @@ export class ProvidersScreen {
       custom: false,
     });
     this.selectedProviderId.set(providerId);
+    this.configuredJsonProviderId.set(null);
     this.selectedEndpointId.set(null);
   }
 
@@ -1543,7 +1568,20 @@ export class ProvidersScreen {
       custom: true,
     });
     this.selectedProviderId.set(providerId);
+    this.configuredJsonProviderId.set(null);
     this.selectedEndpointId.set(null);
+  }
+
+  public toggleConfiguredJson(providerId: string): void {
+    this.configuredJsonProviderId.update((current) => (current === providerId ? null : providerId));
+  }
+
+  public isConfiguredJsonVisible(providerId: string): boolean {
+    return this.configuredJsonProviderId() === providerId;
+  }
+
+  public configuredProviderJson(providerId: string): string {
+    return this.providerConfigService.serializeConfiguredProvider(providerId) ?? '{}';
   }
 
   public updateProviderField(
@@ -1658,6 +1696,9 @@ export class ProvidersScreen {
       return;
     }
 
+    if (this.configuredJsonProviderId() === providerId) {
+      this.configuredJsonProviderId.set(null);
+    }
     this.selectedProviderId.set(this.providers()[0]?.id ?? null);
     this.selectedEndpointId.set(null);
     this.providerWorkflowMode.set('browse');
