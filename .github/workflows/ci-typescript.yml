@@ -30,6 +30,12 @@ jobs:
       - name: Test project YAML validator
         run: npm run test:project-schema
 
+      - name: Validate required documentation files
+        run: npm run validate:required-docs
+
+      - name: Test required documentation validator
+        run: npm run test:required-docs
+
   build:
     needs: governance
     runs-on: ubuntu-latest
