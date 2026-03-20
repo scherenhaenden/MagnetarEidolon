@@ -1,0 +1,9 @@
+{
+  "providers": [
+    {
+      "id": "provider-lmstudio",
+      "baseUrl": "http://127.0.0.1:2234/v1",
+      "defaultModel": "fixture-model"
+    }
+  ]
+}

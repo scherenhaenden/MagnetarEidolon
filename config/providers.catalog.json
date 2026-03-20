@@ -1,0 +1,65 @@
+{
+  "providers": [
+    {
+      "id": "provider-lmstudio",
+      "displayName": "LM Studio Local",
+      "kind": "lm_studio",
+      "apiStyle": "openai-compatible",
+      "authStrategy": "none",
+      "requestFormat": "chat-completions",
+      "responseNormalizer": "openai-sse",
+      "baseUrl": "http://127.0.0.1:1234/v1",
+      "chatPath": "/chat/completions",
+      "defaultModel": "local-model",
+      "supportsStreaming": true,
+      "extraHeaders": {},
+      "requestTemplate": {
+        "bodyTemplate": {
+          "model": "$model",
+          "messages": "$messages",
+          "stream": "$stream"
+        },
+        "placeholders": [
+          "$model",
+          "$messages",
+          "$stream"
+        ]
+      },
+      "runtimeBindings": {
+        "baseUrlEnvVar": "LM_STUDIO_BASE_URL",
+        "defaultModelEnvVar": "LM_STUDIO_DEFAULT_MODEL"
+      }
+    },
+    {
+      "id": "provider-openrouter",
+      "displayName": "OpenRouter",
+      "kind": "openrouter",
+      "apiStyle": "openai-compatible",
+      "authStrategy": "bearer",
+      "requestFormat": "chat-completions",
+      "responseNormalizer": "openai-sse",
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "chatPath": "/chat/completions",
+      "defaultModel": "openai/gpt-4.1-mini",
+      "supportsStreaming": true,
+      "extraHeaders": {},
+      "requestTemplate": {
+        "bodyTemplate": {
+          "model": "$model",
+          "messages": "$messages",
+          "stream": "$stream"
+        },
+        "placeholders": [
+          "$model",
+          "$messages",
+          "$stream"
+        ]
+      },
+      "runtimeBindings": {
+        "apiKeyEnvVar": "OPENROUTER_API_KEY",
+        "baseUrlEnvVar": "OPENROUTER_BASE_URL",
+        "defaultModelEnvVar": "OPENROUTER_DEFAULT_MODEL"
+      }
+    }
+  ]
+}

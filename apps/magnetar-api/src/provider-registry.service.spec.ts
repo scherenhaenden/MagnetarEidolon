@@ -5,6 +5,16 @@ import {
   ProviderRegistryService,
 } from './provider-registry.service.js';
 
+class TestableProviderRegistryService extends ProviderRegistryService {
+  public constructor(private readonly configRoots: string[]) {
+    super();
+  }
+
+  protected override getConfigSearchRoots(): string[] {
+    return this.configRoots;
+  }
+}
+
 test('ProviderRegistryService exposes LM Studio and OpenRouter definitions', (): void => {
   const registry = new ProviderRegistryService();
   const providers = registry.getProviders();
@@ -12,6 +22,27 @@ test('ProviderRegistryService exposes LM Studio and OpenRouter definitions', ():
   assert.equal(providers.length, 2);
   assert.equal(providers[0]?.id, 'provider-lmstudio');
   assert.equal(providers[1]?.id, 'provider-openrouter');
+});
+
+test('ProviderRegistryService loads provider definitions from the committed catalog JSON', (): void => {
+  const registry = new ProviderRegistryService();
+  const lmStudio = registry.getProvider('provider-lmstudio');
+
+  assert.deepEqual(lmStudio, {
+    id: 'provider-lmstudio',
+    displayName: 'LM Studio Local',
+    kind: 'lm_studio',
+    baseUrl: 'http://127.0.0.1:1234/v1',
+    chatPath: '/chat/completions',
+    apiStyle: 'openai-compatible',
+    authStrategy: 'none',
+    defaultModel: 'local-model',
+    supportsStreaming: true,
+    requestFormat: 'chat-completions',
+    responseNormalizer: 'openai-sse',
+    apiKey: null,
+    extraHeaders: {},
+  });
 });
 
 test('ProviderRegistryService resolves OpenRouter runtime overrides from env', (): void => {
@@ -55,6 +86,16 @@ test('ProviderRegistryService falls back to defaults and null for missing secret
   assert.equal(provider?.defaultModel, 'openai/gpt-4.1-mini');
   assert.equal(provider?.apiKey, null);
   assert.deepEqual(provider?.extraHeaders, {});
+});
+
+test('ProviderRegistryService applies local JSON overrides before env overrides', (): void => {
+  const registry = new TestableProviderRegistryService([
+    '/home/edward/Development/MagnetarEidolon/tests/fixtures/provider-config',
+  ]);
+  const provider = registry.getProvider('provider-lmstudio');
+
+  assert.equal(provider?.baseUrl, 'http://127.0.0.1:2234/v1');
+  assert.equal(provider?.defaultModel, 'fixture-model');
 });
 
 test('ProviderRegistryService exposes optional OpenRouter attribution headers from env', (): void => {
