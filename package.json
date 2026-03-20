@@ -12,6 +12,7 @@
     "build:api": "npm --prefix apps/magnetar-api run build",
     "build:web": "npm --prefix apps/magnetar-ui run build:web",
     "build:cli": "npm --prefix apps/magnetar-ui run build:cli",
+    "validate": "npm run validate:project-schema && npm run test:project-schema",
     "validate:project-schema": "node scripts/validate-project-schema.mjs",
     "test:project-schema": "node --test scripts/validate-project-schema.spec.mjs",
     "typecheck": "npm --prefix apps/magnetar-api run typecheck && npm --prefix apps/magnetar-ui run typecheck",
