@@ -9,7 +9,8 @@ import {
 
 export interface BackendChatRequest {
   prompt: string;
-  providerId: string;
+  configuredProviderId?: string | null;
+  providerId?: string | null;
   model?: string | null;
 }
 
@@ -95,11 +96,15 @@ export class ChatGatewayService {
       return;
     }
 
-    const provider = this.providerRegistryService.getProvider(request.providerId);
+    const provider = this.providerRegistryService.resolveExecutionProvider({
+      configuredProviderId: request.configuredProviderId,
+      providerId: request.providerId,
+    });
     if (!provider) {
+      const requestedProviderId = request.configuredProviderId ?? request.providerId ?? 'unknown-provider';
       response.status(400).json({
         error: {
-          message: `Unknown provider id: ${request.providerId}.`,
+          message: `Unknown provider id: ${requestedProviderId}.`,
         },
       });
       return;

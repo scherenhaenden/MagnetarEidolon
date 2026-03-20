@@ -288,6 +288,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     kind: 'lm_studio',
     label: 'LM Studio Local',
     description: 'Local OpenAI-compatible provider for development and smoke validation.',
+    runtimeProviderId: 'provider-lmstudio',
     baseUrl: 'http://127.0.0.1:1234/v1',
     defaultModel: 'local-model',
     apiStyle: 'openai-compatible',
@@ -308,6 +309,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     kind: 'openrouter',
     label: 'OpenRouter',
     description: 'Cloud router with backend-owned key handling and OpenAI-compatible streaming.',
+    runtimeProviderId: 'provider-openrouter',
     baseUrl: 'https://openrouter.ai/api/v1',
     defaultModel: 'openai/gpt-4.1-mini',
     apiStyle: 'openai-compatible',
@@ -329,6 +331,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     kind: 'openai',
     label: 'OpenAI Cloud',
     description: 'Known hosted provider preset with OpenAI-compatible request semantics.',
+    runtimeProviderId: null,
     baseUrl: 'https://api.openai.com/v1',
     defaultModel: 'gpt-4.1-mini',
     apiStyle: 'openai-compatible',
@@ -349,6 +352,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     kind: 'anthropic',
     label: 'Anthropic',
     description: 'Known hosted provider preset for future native request support.',
+    runtimeProviderId: null,
     baseUrl: 'https://api.anthropic.com',
     defaultModel: 'claude-3-7-sonnet-latest',
     apiStyle: 'native',
@@ -369,6 +373,7 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
     kind: 'custom',
     label: 'Custom Provider',
     description: 'Start from a generic provider definition and adapt endpoint, model, keys, and templates by hand.',
+    runtimeProviderId: null,
     baseUrl: 'https://api.example.com/v1',
     defaultModel: 'example/model-name',
     apiStyle: 'openai-compatible',
@@ -388,10 +393,10 @@ const PROVIDER_PRESETS: ProviderPreset[] = [
 ];
 
 const DEFAULT_PROVIDERS: ProviderConfig[] = [
-  createProviderFromPreset(PROVIDER_PRESETS[0], 'primary', 1, 'healthy', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[2], 'backup', 2, 'unknown', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[1], 'disabled', 3, 'unknown', 'system'),
-  createProviderFromPreset(PROVIDER_PRESETS[3], 'disabled', 4, 'offline', 'system'),
+  createProviderFromPreset(PROVIDER_PRESETS[0], 'primary', 1, 'healthy', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[0].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[2], 'backup', 2, 'unknown', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[2].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[1], 'disabled', 3, 'unknown', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[1].kind)),
+  createProviderFromPreset(PROVIDER_PRESETS[3], 'disabled', 4, 'offline', 'system', createSystemProviderConfigId(PROVIDER_PRESETS[3].kind)),
 ];
 
 @Injectable({
@@ -669,6 +674,7 @@ export class ProviderConfigService {
       ...provider,
       id: normalizeProviderConfigId(provider.id, provider.kind),
       origin: provider.origin ?? inferProviderOrigin(provider),
+      runtimeProviderId: provider.runtimeProviderId ?? preset?.runtimeProviderId ?? null,
       template: cloneTemplateDefinition(provider.template ?? preset?.template ?? { requestTemplate: '', placeholders: [] }),
       apiSurface: cloneApiSurfaceDefinition(provider.apiSurface ?? preset?.apiSurface ?? createOpenAiCompatibleApiSurface()),
       modelSuggestions: provider.modelSuggestions ?? preset?.modelSuggestions ?? [],
@@ -687,6 +693,7 @@ function createProviderFromPreset(
   return {
     id,
     origin,
+    runtimeProviderId: preset.runtimeProviderId,
     name: preset.label,
     kind: preset.kind,
     baseUrl: preset.baseUrl,
@@ -711,6 +718,10 @@ function createProviderConfigId(kind: ProviderPreset['kind']): string {
     globalThis.crypto?.randomUUID?.() ??
     `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
   return `provider-config-${kind}-${randomValue}`;
+}
+
+function createSystemProviderConfigId(kind: ProviderPreset['kind']): string {
+  return `provider-config-${kind}-default`;
 }
 
 function normalizeProviderConfigId(id: string, kind: ProviderPreset['kind']): string {
@@ -763,6 +774,7 @@ function createResetProviderConfig(provider: ProviderConfig): ProviderConfig {
     ...provider,
     name: baselinePreset.label,
     kind: baselinePreset.kind,
+    runtimeProviderId: baselinePreset.runtimeProviderId,
     baseUrl: baselinePreset.baseUrl,
     model: baselinePreset.defaultModel,
     apiStyle: baselinePreset.apiStyle,

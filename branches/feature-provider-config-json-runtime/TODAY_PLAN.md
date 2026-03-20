@@ -1,0 +1,38 @@
+# Today Plan — 2026-03-20
+
+## Goal
+Start the transition from UI-local provider configuration toward a JSON-backed provider runtime, with LM Studio as the first provider to harden today.
+
+## Decisions For Today
+- Use a new branch because the existing `feature/provider-config-json-inspector` branch is too narrow for backend/runtime work.
+- Treat JSON files as the long-term source of truth for provider runtime metadata.
+- Keep provider secrets backend-only through environment-variable bindings.
+- Start with the backend registry/config path first, then follow with UI/backend configured-instance handoff.
+
+## Execution Steps
+1. Add committed provider catalog JSON with backend execution metadata for LM Studio and OpenRouter.
+2. Add a local provider override JSON example plus ignored local runtime config path.
+3. Refactor the NestJS provider registry to load provider definitions from JSON instead of a hardcoded array.
+4. Keep env-based overrides for secrets and runtime defaults working on top of the JSON layer.
+5. Validate the backend provider/chat tests.
+
+## Expected Outcome
+- Provider execution metadata is no longer hardcoded only in TypeScript.
+- The backend has the first real file-backed provider runtime path.
+- The next slice can focus on configured provider instances and custom-provider execution using the same JSON model.
+
+## Completion Status
+- Completed: backend provider catalog moved into JSON and validated.
+- Completed: UI provider configs now carry a backend-executable runtime provider id for preset-backed LM Studio/OpenRouter paths.
+- Completed: chat now sends the runtime provider id instead of assuming the UI config id is executable by the backend.
+- Completed: backend tests, focused UI tests, root `npm test`, and root `npm run typecheck`.
+
+## Final Percentage For This Slice
+- Planned completion target for this slice: 100%
+- Achieved: 100%
+- Notes: this completes the JSON-backed backend registry foundation plus the LM Studio/OpenRouter runtime handoff fix. It does not yet finish backend-owned persistence and execution for arbitrary custom provider instances.
+
+## Extra Progress Landed After The First Slice
+- Added backend-configured provider instance resolution on top of the JSON-backed provider catalog.
+- Added dual-id chat requests (`configuredProviderId` plus runtime `providerId`) so configured-instance execution can grow without regressing the existing provider path.
+- Kept the branch fully validated after this follow-up work with root `npm test` and root `npm run typecheck`.
