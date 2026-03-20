@@ -19,10 +19,11 @@
 | `task-provider-110` | `ms-provider-01` | Add CRUD and preset onboarding to the Providers UI | Core Team | 4 | 24 | in_progress | Introduce preset-based provider creation, editable provider runtime fields, local persistence, and removal flows in the Providers screen. Current focus: opaque instance ids for configured entries plus reset/delete semantics that preserve the quick-add preset catalog. |
 | `task-provider-112` | `ms-provider-01` | Expose resolved JSON inspection for configured providers | Core Team | 2 | 16 | in_progress | Add a read-only JSON inspector in the provider editor for existing configured instances so users can verify the final stored shape directly from the UI. |
 | `task-provider-111` | `ms-provider-01` | Persist provider presets and configuration instances as JSON artifacts | Core Team | 4 | 24 | planned | Define the JSON shape for preset catalog data, configured-provider instances, and resettable runtime values so the UI can stop treating local signal state as the only source of truth. |
+| `task-ui-117` | `ms-provider-01` | Remove duplicated preset rendering in ProvidersScreen | Core Team | 1 | 4 | done | PR #211 rendered the preset list in two template blocks. The middle-column Preset Catalog was removed; the single surviving path is the Quick Add accordion in the left rail. |
 
 ## Effort Summary
-- **Total effort:** 23 pts
-- **Completed (`done`):** 0 pts
+- **Total effort:** 24 pts
+- **Completed (`done`):** 1 pt
 - **In review:** 10 pts
 - **In progress:** 4 pts
-- **Remaining to do:** 13 pts
+- **Remaining to do:** 9 pts

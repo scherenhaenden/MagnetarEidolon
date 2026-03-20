@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-20 19:27 UTC
+  **Author:** Copilot
+  **Entry:** State Change: Verified and closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). PR #211 had introduced the preset list in two places — the left-rail Quick Add accordion and a middle-column Preset Catalog. The subsequent `feature/provider-config-quick-add-editor-flow` slice removed the middle-column duplicate. The current `app.component.ts` contains a single `*ngFor let preset of presets()` loop inside the Quick Add accordion; no duplicate preset-item markup remains. Planning documents were updated to record this task as done.
+
 - **Timestamp:** 2026-03-20 19:22 UTC
   **Author:** Codex
   **Entry:** Blocker: Resolved `blocker-002` / issue `#80` by adding a repository-level validator for the required documentation baseline defined in `RULES.md`, adding validator regression tests, wiring the validator into root `npm test`, and enforcing the same path in the `CI TypeScript` workflow. Verified closure evidence with successful runs of `npm run validate:required-docs`, `npm run test:required-docs`, root `npm test`, and root `npm run typecheck`.
