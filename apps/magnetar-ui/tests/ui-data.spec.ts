@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { ICONS } from '../src/app/ui/icons.js';
-import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS } from '../src/app/ui/mock-data.js';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES } from '../src/app/ui/mock-data.js';
 
 describe('UI mock data', () => {
   it('exposes representative agents, runs, and tools for the shell screens', () => {
@@ -30,6 +30,35 @@ describe('UI mock data', () => {
       expect(ICONS[tool.icon].length).toBeGreaterThan(0);
     }
   });
+
+  it('exposes policies covering all risk levels, actions, and statuses', () => {
+    expect(MOCK_POLICIES).toHaveLength(6);
+    expect(new Set(MOCK_POLICIES.map((p) => p.riskLevel))).toEqual(
+      new Set(['Low', 'High', 'Critical']),
+    );
+    expect(new Set(MOCK_POLICIES.map((p) => p.action))).toEqual(
+      new Set(['Auto-Approve', 'Require Review', 'Block', 'Simulate']),
+    );
+    expect(new Set(MOCK_POLICIES.map((p) => p.status))).toEqual(
+      new Set(['active', 'disabled']),
+    );
+  });
+
+  it('ensures every policy has a unique id, a non-empty name, and at least one tag', () => {
+    const ids = MOCK_POLICIES.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const policy of MOCK_POLICIES) {
+      expect(policy.name.length).toBeGreaterThan(0);
+      expect(policy.tags.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('maps every mock policy icon to a registered icon glyph', () => {
+    for (const policy of MOCK_POLICIES) {
+      expect(ICONS[policy.icon]).toBeTypeOf('string');
+      expect(ICONS[policy.icon].length).toBeGreaterThan(0);
+    }
+  });
 });
 
 describe('ICONS registry', () => {
@@ -43,5 +72,7 @@ describe('ICONS registry', () => {
     expect(ICONS['file-text']).toBeTypeOf('string');
     expect(ICONS.zap).toBeTypeOf('string');
     expect(ICONS.bell).toBeTypeOf('string');
+    expect(ICONS['file-minus']).toBeTypeOf('string');
+    expect(ICONS.layers).toBeTypeOf('string');
   });
 });

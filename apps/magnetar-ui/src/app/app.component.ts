@@ -13,11 +13,15 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
-import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Policy } from './ui/mock-data.js';
+import { PolicyPresentation } from './ui/policy-helpers.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
+import { PolicyScreenState } from './core/models/policy-screen-state.js';
+import { MEMORY_FILTER_OPTIONS, MemoryVisibilityFilter } from './core/models/memory-inspector.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
 import { ProviderConfigService } from './core/services/provider-config.service.js';
+import { MemoryInspectorService } from './core/services/memory-inspector.service.js';
 
 @Component({
   selector: 'screen-dashboard',
@@ -779,47 +783,148 @@ export class ChatScreen implements AfterViewChecked {
         </div>
         <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
           <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-            Session Items: {{ sessionMemory.length }}
+            Session Items: {{ memoryInspector.sessionRecords().length }}
           </span>
           <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-            Durable Notes: {{ durableMemory.length }}
+            Durable Notes: {{ memoryInspector.durableRecords().length }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Pinned: {{ memoryInspector.pinnedCount() }}
           </span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
-          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
-            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
-              <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
-              Active Context Stack
-            </div>
-            <ui-badge status="active">Inspectable</ui-badge>
-          </div>
-          <div class="divide-y divide-white/5">
-            <div *ngFor="let item of sessionMemory" class="px-5 py-4 flex items-start justify-between gap-4">
-              <div>
-                <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
-                <div class="text-xs text-zinc-500 mt-1">{{ item.scope }}</div>
-                <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
-              </div>
-              <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
-            </div>
-          </div>
-        </div>
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let filter of filters"
+          type="button"
+          (click)="setFilter(filter.id)"
+          class="px-3 py-2 rounded-full border text-xs font-medium transition-colors"
+          [class.bg-cyan-500/20]="memoryInspector.filter() === filter.id"
+          [class.border-cyan-400/30]="memoryInspector.filter() === filter.id"
+          [class.text-cyan-200]="memoryInspector.filter() === filter.id"
+          [class.bg-white/5]="memoryInspector.filter() !== filter.id"
+          [class.border-white/10]="memoryInspector.filter() !== filter.id"
+          [class.text-zinc-400]="memoryInspector.filter() !== filter.id">
+          {{ filter.label }}
+        </button>
+        <button
+          type="button"
+          (click)="restoreDefaults()"
+          class="ml-auto px-3 py-2 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10">
+          Restore defaults
+        </button>
+      </div>
 
-        <div class="space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)] gap-6">
+        <div class="space-y-6">
+          <div class="bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+              <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+                <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
+                Active Context Stack
+              </div>
+              <ui-badge status="active">Inspectable</ui-badge>
+            </div>
+            <div class="divide-y divide-white/5">
+              <button
+                *ngFor="let item of memoryInspector.visibleSessionRecords()"
+                type="button"
+                (click)="selectRecord(item.id)"
+                class="w-full px-5 py-4 flex items-start justify-between gap-4 text-left transition-colors hover:bg-white/[0.03]"
+                [class.bg-cyan-500/10]="memoryInspector.selectedRecord()?.id === item.id">
+                <div>
+                  <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
+                  <div class="text-xs text-zinc-500 mt-1">{{ item.scope }} · {{ item.lastUpdated }}</div>
+                  <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
+                </div>
+                <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
+              </button>
+              <div *ngIf="memoryInspector.visibleSessionRecords().length === 0" class="px-5 py-6 text-sm text-zinc-500">
+                No session memory matches the current filter.
+              </div>
+            </div>
+          </div>
+
           <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
             <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
               <ui-icon name="book-open" [size]="16" cssClass="text-violet-400"></ui-icon>
               Durable Notes
             </div>
             <div class="mt-4 space-y-3">
-              <div *ngFor="let note of durableMemory" class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                <div class="text-sm text-zinc-200">{{ note.title }}</div>
-                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-1">{{ note.tag }}</div>
+              <button
+                *ngFor="let note of memoryInspector.visibleDurableRecords()"
+                type="button"
+                (click)="selectRecord(note.id)"
+                class="w-full rounded-xl border border-white/5 bg-white/[0.03] p-3 text-left transition-colors hover:border-violet-400/30"
+                [class.border-violet-400/30]="memoryInspector.selectedRecord()?.id === note.id">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-sm text-zinc-200">{{ note.title }}</div>
+                  <ui-badge [status]="note.status">{{ note.badge }}</ui-badge>
+                </div>
+                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-2">{{ note.tag }} · {{ note.lastUpdated }}</div>
+              </button>
+              <div *ngIf="memoryInspector.visibleDurableRecords().length === 0" class="text-sm text-zinc-500">
+                No durable notes match the current filter.
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-sm font-medium text-zinc-200">Selected Memory Detail</div>
+                <div class="text-xs text-zinc-500 mt-1">What is shaping the runtime right now.</div>
+              </div>
+              <ui-badge [status]="memoryInspector.selectedRecord()?.status ?? 'idle'">{{ memoryInspector.selectedRecord()?.kind ?? 'none' }}</ui-badge>
+            </div>
+
+            <ng-container *ngIf="memoryInspector.selectedRecord() as selected; else noSelection">
+              <div class="mt-5 space-y-4">
+                <div>
+                  <div class="text-lg font-medium text-white">{{ selected.title }}</div>
+                  <div class="text-xs uppercase tracking-[0.24em] text-zinc-500 mt-2">{{ selected.scope }}</div>
+                </div>
+                <p class="text-sm leading-relaxed text-zinc-300">{{ selected.summary }}</p>
+                <div class="grid grid-cols-2 gap-3 text-xs text-zinc-400">
+                  <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider">Tag</div>
+                    <div class="mt-2 text-zinc-200">{{ selected.tag }}</div>
+                  </div>
+                  <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider">Updated</div>
+                    <div class="mt-2 text-zinc-200">{{ selected.lastUpdated }}</div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    (click)="togglePinned(selected.id)"
+                    class="px-3 py-2 rounded-xl border border-cyan-400/20 bg-cyan-500/10 text-xs font-medium text-cyan-100 transition-colors hover:bg-cyan-500/20">
+                    {{ selected.pinned ? 'Unpin memory' : 'Pin memory' }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="removeRecord(selected.id)"
+                    [disabled]="!selected.removable"
+                    class="px-3 py-2 rounded-xl border text-xs font-medium transition-colors"
+                    [class.border-rose-400/20]="selected.removable"
+                    [class.bg-rose-500/10]="selected.removable"
+                    [class.text-rose-100]="selected.removable"
+                    [class.border-white/10]="!selected.removable"
+                    [class.bg-white/5]="!selected.removable"
+                    [class.text-zinc-500]="!selected.removable">
+                    {{ selected.removable ? 'Delete memory' : 'Protected entry' }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-template #noSelection>
+              <div class="mt-5 text-sm text-zinc-500">Select a memory item to inspect its details.</div>
+            </ng-template>
           </div>
 
           <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
@@ -838,35 +943,28 @@ export class ChatScreen implements AfterViewChecked {
   `,
 })
 export class MemoryScreen {
-  public readonly sessionMemory = [
-    {
-      title: 'Current execution objective',
-      scope: 'session / goal',
-      summary: 'Prepare a migration script with explicit approval before any write-capable execution path is enabled.',
-      badge: 'Pinned',
-      status: 'active' as BadgeStatus,
-    },
-    {
-      title: 'Recent schema evidence',
-      scope: 'session / tool output',
-      summary: 'Users table inspected successfully. Runtime should preserve the evidence trail before proposing changes.',
-      badge: 'Fresh',
-      status: 'pending_approval' as BadgeStatus,
-    },
-    {
-      title: 'Policy reminder',
-      scope: 'session / governance',
-      summary: 'Write operations remain approval-gated by default, even when a provider returns a valid migration plan.',
-      badge: 'Guarded',
-      status: 'idle' as BadgeStatus,
-    },
-  ];
+  protected readonly memoryInspector = inject(MemoryInspectorService);
+  protected readonly filters: ReadonlyArray<{ id: MemoryVisibilityFilter; label: string }> = MEMORY_FILTER_OPTIONS;
 
-  public readonly durableMemory = [
-    { title: 'Default provider path starts local-first with LM Studio', tag: 'provider' },
-    { title: 'Traceability required for every sensitive action', tag: 'policy' },
-    { title: 'SDK contract remains shared between UI and CLI', tag: 'architecture' },
-  ];
+  public setFilter(filter: MemoryVisibilityFilter): void {
+    this.memoryInspector.setFilter(filter);
+  }
+
+  public selectRecord(recordId: string): void {
+    this.memoryInspector.selectRecord(recordId);
+  }
+
+  public togglePinned(recordId: string): void {
+    this.memoryInspector.togglePinned(recordId);
+  }
+
+  public removeRecord(recordId: string): void {
+    this.memoryInspector.removeRecord(recordId);
+  }
+
+  public restoreDefaults(): void {
+    this.memoryInspector.restoreDefaults();
+  }
 }
 
 @Component({
@@ -1745,20 +1843,232 @@ export class ProvidersScreen {
 @Component({
   selector: 'screen-policy',
   standalone: true,
-  imports: [CommonModule, UiIconComponent],
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
-    <div class="space-y-6 animate-fade-in max-w-5xl mx-auto pb-12">
-      <div class="flex justify-between items-center bg-gradient-to-r from-violet-500/10 to-transparent p-6 rounded-2xl border border-violet-500/20">
+    <div class="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h2 class="text-2xl font-light text-white tracking-tight flex items-center gap-3">
             <ui-icon name="shield" cssClass="text-violet-400" [size]="28"></ui-icon> Governance & Policy
           </h2>
+          <p class="text-sm text-zinc-400 mt-1 pl-10">
+            Define execution boundaries, approval requirements, and risk mitigation strategies for AI agents.
+          </p>
         </div>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            aria-disabled="true"
+            title="Planned follow-up: audit-log navigation is not implemented in this PoC."
+            class="px-4 py-2 rounded-lg border border-white/5 bg-white/[0.03] text-sm font-medium text-zinc-500 cursor-not-allowed opacity-70">
+            Audit Logs (Planned)
+          </button>
+          <button
+            type="button"
+            aria-disabled="true"
+            title="Planned follow-up: policy creation flow is not implemented in this PoC."
+            class="px-4 py-2 rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-200/70 text-sm font-medium cursor-not-allowed opacity-70 flex items-center gap-2">
+            <ui-icon name="plus" [size]="16"></ui-icon> Create Policy (Planned)
+          </button>
+        </div>
+      </div>
+
+      <div role="status" class="rounded-2xl border border-violet-500/15 bg-violet-500/5 px-4 py-3 text-sm text-violet-100/80 flex items-start gap-3">
+        <ui-icon name="shield" [size]="16" cssClass="text-violet-300 mt-0.5"></ui-icon>
+        <div class="leading-6">
+          This Policy Center slice is a local governance PoC. Policy inspection and local policy editing are active here;
+          audit-log navigation and policy creation remain planned follow-up flows.
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start mt-6">
+        <div class="space-y-4">
+          <div class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 shadow-lg">
+            <h3 class="text-lg font-medium text-white mb-4">Active Policies</h3>
+            <div class="space-y-3">
+              <div *ngFor="let policy of policies()" class="group bg-[#0a0a0d] border border-white/5 hover:border-violet-500/30 rounded-xl p-4 transition-all cursor-pointer shadow-sm relative overflow-hidden" (click)="selectPolicy(policy.id)" [ngClass]="{'border-violet-500/50 bg-violet-500/5': selectedPolicyId() === policy.id}">
+                <div *ngIf="selectedPolicyId() === policy.id" class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mt-1 group-hover:bg-white/10 transition-colors" [ngClass]="{'text-red-400': policy.riskLevel === 'Critical', 'text-amber-400': policy.riskLevel === 'High', 'text-blue-400': policy.riskLevel === 'Medium', 'text-emerald-400': policy.riskLevel === 'Low'}">
+                      <ui-icon [name]="policy.icon" [size]="20"></ui-icon>
+                    </div>
+                    <div>
+                      <h4 class="text-base font-medium text-zinc-100 group-hover:text-white transition-colors">{{ policy.name }}</h4>
+                      <p class="text-sm text-zinc-400 mt-1 line-clamp-2 leading-relaxed">{{ policy.description }}</p>
+                      <div class="flex flex-wrap items-center gap-2 mt-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-zinc-300">
+                          {{ policy.action }}
+                        </span>
+                        <span *ngFor="let tag of policy.tags" class="text-xs text-zinc-500 flex items-center gap-1 before:content-['#'] before:text-zinc-600">
+                          {{ tag }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-2 shrink-0">
+                    <ui-badge [status]="getPolicyStatusBadge(policy.status)">{{ policy.status }}</ui-badge>
+                    <div class="text-[10px] uppercase tracking-wider font-bold mt-2" [ngClass]="getRiskColor(policy.riskLevel)">
+                      {{ policy.riskLevel }} Risk
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sticky top-24 space-y-6">
+          <div *ngIf="draftPolicy() as draft; else emptySelection" class="bg-[#0a0a0d] border border-violet-500/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+             <div class="absolute -right-10 -top-10 w-40 h-40 bg-violet-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+             <div class="flex items-center justify-between mb-6 relative z-10">
+               <h3 class="text-lg font-medium text-white flex items-center gap-2">
+                 <ui-icon name="settings" [size]="18" cssClass="text-violet-400"></ui-icon> Policy Details
+               </h3>
+               <button class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white" (click)="closeDetails()" aria-label="Close details">
+                 <ui-icon name="x" [size]="16"></ui-icon>
+               </button>
+             </div>
+
+             <div class="space-y-6 relative z-10">
+               <div>
+                 <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Policy Name</label>
+                 <input type="text" [value]="draft.name" (input)="handleNameInput($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors">
+               </div>
+
+               <div>
+                 <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Description</label>
+                 <textarea rows="3" [value]="draft.description" (input)="handleDescriptionInput($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors"></textarea>
+               </div>
+
+               <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Risk Level</label>
+                    <select [value]="draft.riskLevel" (change)="handleRiskLevelChange($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Action</label>
+                    <select [value]="draft.action" (change)="handleActionChange($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option value="Auto-Approve">Auto-Approve</option>
+                      <option value="Require Review">Require Review</option>
+                      <option value="Simulate">Simulate</option>
+                      <option value="Block">Block</option>
+                    </select>
+                  </div>
+               </div>
+
+               <div class="pt-4 border-t border-white/5 flex gap-3">
+                 <button
+                   (click)="saveChanges()"
+                   [disabled]="!hasUnsavedChanges()"
+                   class="flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                   [ngClass]="hasUnsavedChanges() ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'bg-violet-600/40 text-white/70'">
+                   Save Changes
+                 </button>
+                 <button
+                   (click)="cancelChanges()"
+                   [disabled]="!hasUnsavedChanges()"
+                   class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                   [ngClass]="hasUnsavedChanges() ? 'border-white/10 hover:bg-white/5 text-zinc-300' : 'border-white/5 text-zinc-500'">
+                   Cancel
+                 </button>
+               </div>
+             </div>
+          </div>
+
+          <ng-template #emptySelection>
+            <div class="bg-violet-500/5 border border-violet-500/10 rounded-2xl p-6 text-center shadow-inner">
+              <div class="w-12 h-12 bg-violet-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-400">
+                <ui-icon name="shield" [size]="24"></ui-icon>
+              </div>
+              <h3 class="text-zinc-200 font-medium mb-2">No Policy Selected</h3>
+              <p class="text-sm text-zinc-400 leading-relaxed">Select a policy from the list to view or edit its rules, risk level, and required actions.</p>
+            </div>
+          </ng-template>
+        </aside>
       </div>
     </div>
   `,
 })
-export class PolicyScreen {}
+export class PolicyScreen {
+  private readonly state = new PolicyScreenState(MOCK_POLICIES);
+  private readonly presentation = new PolicyPresentation();
+  public readonly policies = this.state.policies;
+  public readonly selectedPolicyId = this.state.selectedPolicyId;
+  public readonly draftPolicy = this.state.draftPolicy;
+  public readonly selectedPolicy = this.state.selectedPolicy;
+  public readonly hasUnsavedChanges = this.state.hasUnsavedChanges;
+
+  public selectPolicy(policyId: string): void {
+    this.state.selectPolicy(policyId);
+  }
+
+  public closeDetails(): void {
+    this.state.closeDetails();
+  }
+
+  public updateDraftName(name: string): void {
+    this.state.updateDraftName(name);
+  }
+
+  public handleNameInput(event: Event): void {
+    this.updateDraftName(this.readInputValue(event));
+  }
+
+  public updateDraftDescription(description: string): void {
+    this.state.updateDraftDescription(description);
+  }
+
+  public handleDescriptionInput(event: Event): void {
+    this.updateDraftDescription(this.readInputValue(event));
+  }
+
+  public updateDraftRiskLevel(riskLevel: Policy['riskLevel']): void {
+    this.state.updateDraftRiskLevel(riskLevel);
+  }
+
+  public handleRiskLevelChange(event: Event): void {
+    this.updateDraftRiskLevel(this.readSelectValue(event) as Policy['riskLevel']);
+  }
+
+  public updateDraftAction(action: Policy['action']): void {
+    this.state.updateDraftAction(action);
+  }
+
+  public handleActionChange(event: Event): void {
+    this.updateDraftAction(this.readSelectValue(event) as Policy['action']);
+  }
+
+  public saveChanges(): void {
+    this.state.saveChanges();
+  }
+
+  public cancelChanges(): void {
+    this.state.cancelChanges();
+  }
+
+  public getPolicyStatusBadge(status: Policy['status']): BadgeStatus {
+    return this.presentation.getPolicyStatusBadge(status);
+  }
+
+  public getRiskColor(riskLevel: Policy['riskLevel']): string {
+    return this.presentation.getRiskColor(riskLevel);
+  }
+
+  private readInputValue(event: Event): string {
+    return (event.target as HTMLInputElement | HTMLTextAreaElement).value;
+  }
+
+  private readSelectValue(event: Event): string {
+    return (event.target as HTMLSelectElement).value;
+  }
+}
 
 @Component({
   selector: 'app-root',

@@ -9,6 +9,7 @@
     "build": "npm run build:web && npm run build:cli",
     "build:web": "ng build",
     "build:cli": "tsc -p tsconfig.cli.json",
+    "lint": "node scripts/check-no-magic-strings.mjs",
     "typecheck": "npm run typecheck:web && npm run typecheck:cli && npm run typecheck:test",
     "typecheck:web": "ngc -p tsconfig.app.json --noEmit",
     "typecheck:cli": "tsc -p tsconfig.cli.json --noEmit",
