@@ -12,7 +12,7 @@ This module tracks the work required to move the chat experience from "implement
 - Browser -> backend -> provider routing for chat.
 - NestJS backend-for-frontend behavior for chat streaming.
 - LM Studio native request/response compatibility.
-- Error handling, diagnostics, health checks, and restart/debug workflows.
+- Error handling, diagnostics, heartbeat/health checks, and restart/debug workflows.
 - Root development commands that reliably start the required services.
 - Regression coverage for real chat/runtime failures.
 

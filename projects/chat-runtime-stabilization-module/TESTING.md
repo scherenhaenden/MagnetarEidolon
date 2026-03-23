@@ -20,6 +20,6 @@
 6. Verify errors are understandable when LM Studio is unavailable or misconfigured.
 
 ## Diagnostics Validation
-- Backend health endpoint responds.
-- LM Studio health endpoint responds or fails with a clear message.
+- Backend heartbeat endpoint responds with process metadata plus a provider-registry check.
+- Deeper provider-health checks can fail independently from the lightweight heartbeat path.
 - Browser network requests terminate at the backend, not the provider.
