@@ -1,6 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
+  MEMORY_RECORD_KIND,
+  MEMORY_VISIBILITY_FILTER,
   MemoryRecord,
   MemoryVisibilityFilter,
   createMemoryRecords,
@@ -12,14 +14,18 @@ import {
 })
 export class MemoryInspectorService {
   private readonly recordsState = signal<MemoryRecord[]>(createMemoryRecords());
-  private readonly filterState = signal<MemoryVisibilityFilter>('all');
+  private readonly filterState = signal<MemoryVisibilityFilter>(MEMORY_VISIBILITY_FILTER.ALL);
   /* c8 ignore next 1 -- createMemoryRecords always provides a seeded selection in production */
   private readonly selectedRecordIdState = signal<string>(this.recordsState()[0]?.id ?? '');
 
   public readonly filter = computed(() => this.filterState());
   public readonly records = computed(() => this.recordsState());
-  public readonly sessionRecords = computed(() => this.recordsState().filter((record) => record.kind === 'session'));
-  public readonly durableRecords = computed(() => this.recordsState().filter((record) => record.kind === 'durable'));
+  public readonly sessionRecords = computed(() =>
+    this.recordsState().filter((record) => record.kind === MEMORY_RECORD_KIND.SESSION),
+  );
+  public readonly durableRecords = computed(() =>
+    this.recordsState().filter((record) => record.kind === MEMORY_RECORD_KIND.DURABLE),
+  );
   public readonly visibleRecords = computed(() =>
     this.recordsState().filter((record) => matchesMemoryFilter(record, this.filterState())),
   );
@@ -36,8 +42,9 @@ export class MemoryInspectorService {
 
   public setFilter(filter: MemoryVisibilityFilter): void {
     this.filterState.set(filter);
+    const selectedRecord = this.selectedRecord();
 
-    if (this.selectedRecord() && matchesMemoryFilter(this.selectedRecord()!, filter)) {
+    if (selectedRecord && matchesMemoryFilter(selectedRecord, filter)) {
       return;
     }
 
@@ -68,7 +75,7 @@ export class MemoryInspectorService {
         return {
           ...record,
           pinned: !record.pinned,
-          badge: !record.pinned ? 'Pinned' : record.kind === 'durable' ? 'Shared' : 'Fresh',
+          badge: !record.pinned ? 'Pinned' : record.unpinnedBadge,
         };
       }),
     );
@@ -87,7 +94,6 @@ export class MemoryInspectorService {
 
     if (this.selectedRecordIdState() === recordId) {
       const nextVisibleRecord = nextRecords.find((record) => matchesMemoryFilter(record, this.filterState()));
-      /* c8 ignore next 1 -- fallback only matters for synthetic empty-state tests */
       this.selectedRecordIdState.set(nextVisibleRecord?.id ?? nextRecords[0]?.id ?? '');
     }
 
@@ -97,8 +103,7 @@ export class MemoryInspectorService {
   public restoreDefaults(): void {
     const defaults = createMemoryRecords();
     this.recordsState.set(defaults);
-    this.filterState.set('all');
-    /* c8 ignore next 1 -- restoreDefaults always reseeds the default dataset */
+    this.filterState.set(MEMORY_VISIBILITY_FILTER.ALL);
     this.selectedRecordIdState.set(defaults[0]?.id ?? '');
   }
 }

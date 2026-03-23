@@ -49,6 +49,9 @@ jobs:
       - name: Run TypeScript tests
         run: npm run test:ci
 
+      - name: Run UI lint checks
+        run: npm run lint
+
       - name: Run web build
         run: npm run build:web
 

@@ -17,7 +17,7 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Po
 import { PolicyPresentation } from './ui/policy-helpers.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
 import { PolicyScreenState } from './core/models/policy-screen-state.js';
-import { MemoryVisibilityFilter } from './core/models/memory-inspector.js';
+import { MEMORY_FILTER_OPTIONS, MemoryVisibilityFilter } from './core/models/memory-inspector.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
 import { ProviderConfigService } from './core/services/provider-config.service.js';
@@ -944,12 +944,7 @@ export class ChatScreen implements AfterViewChecked {
 })
 export class MemoryScreen {
   protected readonly memoryInspector = inject(MemoryInspectorService);
-  protected readonly filters: Array<{ id: MemoryVisibilityFilter; label: string }> = [
-    { id: 'all', label: 'All memory' },
-    { id: 'session', label: 'Session' },
-    { id: 'durable', label: 'Durable' },
-    { id: 'pinned', label: 'Pinned' },
-  ];
+  protected readonly filters: ReadonlyArray<{ id: MemoryVisibilityFilter; label: string }> = MEMORY_FILTER_OPTIONS;
 
   public setFilter(filter: MemoryVisibilityFilter): void {
     this.memoryInspector.setFilter(filter);
