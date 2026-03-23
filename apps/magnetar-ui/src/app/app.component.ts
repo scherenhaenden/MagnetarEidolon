@@ -15,6 +15,7 @@ import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Policy } from './ui/mock-data.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
+import { PolicyScreenState } from './core/models/policy-screen-state.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
 import { ProviderConfigService } from './core/services/provider-config.service.js';
@@ -1772,8 +1773,8 @@ export class ProvidersScreen {
           <div class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 shadow-lg">
             <h3 class="text-lg font-medium text-white mb-4">Active Policies</h3>
             <div class="space-y-3">
-              <div *ngFor="let policy of policies" class="group bg-[#0a0a0d] border border-white/5 hover:border-violet-500/30 rounded-xl p-4 transition-all cursor-pointer shadow-sm relative overflow-hidden" (click)="selectedPolicy = policy" [ngClass]="{'border-violet-500/50 bg-violet-500/5': selectedPolicy?.id === policy.id}">
-                <div *ngIf="selectedPolicy?.id === policy.id" class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
+              <div *ngFor="let policy of policies()" class="group bg-[#0a0a0d] border border-white/5 hover:border-violet-500/30 rounded-xl p-4 transition-all cursor-pointer shadow-sm relative overflow-hidden" (click)="selectPolicy(policy.id)" [ngClass]="{'border-violet-500/50 bg-violet-500/5': selectedPolicyId() === policy.id}">
+                <div *ngIf="selectedPolicyId() === policy.id" class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
                 <div class="flex items-start justify-between gap-4">
                   <div class="flex items-start gap-4">
                     <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mt-1 group-hover:bg-white/10 transition-colors" [ngClass]="{'text-red-400': policy.riskLevel === 'Critical', 'text-amber-400': policy.riskLevel === 'High', 'text-blue-400': policy.riskLevel === 'Medium', 'text-emerald-400': policy.riskLevel === 'Low'}">
@@ -1805,14 +1806,14 @@ export class ProvidersScreen {
         </div>
 
         <aside class="sticky top-24 space-y-6">
-          <div *ngIf="selectedPolicy; else emptySelection" class="bg-[#0a0a0d] border border-violet-500/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+          <div *ngIf="draftPolicy() as draft; else emptySelection" class="bg-[#0a0a0d] border border-violet-500/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
              <div class="absolute -right-10 -top-10 w-40 h-40 bg-violet-500/10 blur-3xl rounded-full pointer-events-none"></div>
 
              <div class="flex items-center justify-between mb-6 relative z-10">
                <h3 class="text-lg font-medium text-white flex items-center gap-2">
                  <ui-icon name="settings" [size]="18" cssClass="text-violet-400"></ui-icon> Policy Details
                </h3>
-               <button class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white" (click)="selectedPolicy = null" aria-label="Close details">
+               <button class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white" (click)="closeDetails()" aria-label="Close details">
                  <ui-icon name="x" [size]="16"></ui-icon>
                </button>
              </div>
@@ -1820,38 +1821,50 @@ export class ProvidersScreen {
              <div class="space-y-6 relative z-10">
                <div>
                  <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Policy Name</label>
-                 <input type="text" [value]="selectedPolicy.name" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors">
+                 <input type="text" [value]="draft.name" (input)="handleNameInput($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors">
                </div>
 
                <div>
                  <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Description</label>
-                 <textarea rows="3" [value]="selectedPolicy.description" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors"></textarea>
+                 <textarea rows="3" [value]="draft.description" (input)="handleDescriptionInput($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors"></textarea>
                </div>
 
                <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Risk Level</label>
-                    <select class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
-                      <option [selected]="selectedPolicy.riskLevel === 'Low'">Low</option>
-                      <option [selected]="selectedPolicy.riskLevel === 'Medium'">Medium</option>
-                      <option [selected]="selectedPolicy.riskLevel === 'High'">High</option>
-                      <option [selected]="selectedPolicy.riskLevel === 'Critical'">Critical</option>
+                    <select [value]="draft.riskLevel" (change)="handleRiskLevelChange($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
                     </select>
                   </div>
                   <div>
                     <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Action</label>
-                    <select class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
-                      <option [selected]="selectedPolicy.action === 'Auto-Approve'">Auto-Approve</option>
-                      <option [selected]="selectedPolicy.action === 'Require Review'">Require Review</option>
-                      <option [selected]="selectedPolicy.action === 'Simulate'">Simulate</option>
-                      <option [selected]="selectedPolicy.action === 'Block'">Block</option>
+                    <select [value]="draft.action" (change)="handleActionChange($event)" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option value="Auto-Approve">Auto-Approve</option>
+                      <option value="Require Review">Require Review</option>
+                      <option value="Simulate">Simulate</option>
+                      <option value="Block">Block</option>
                     </select>
                   </div>
                </div>
 
                <div class="pt-4 border-t border-white/5 flex gap-3">
-                 <button class="flex-1 bg-violet-600 hover:bg-violet-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">Save Changes</button>
-                 <button class="px-4 py-2 border border-white/10 hover:bg-white/5 rounded-lg text-sm font-medium text-zinc-300 transition-colors">Cancel</button>
+                 <button
+                   (click)="saveChanges()"
+                   [disabled]="!hasUnsavedChanges()"
+                   class="flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                   [ngClass]="hasUnsavedChanges() ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'bg-violet-600/40 text-white/70'">
+                   Save Changes
+                 </button>
+                 <button
+                   (click)="cancelChanges()"
+                   [disabled]="!hasUnsavedChanges()"
+                   class="px-4 py-2 border rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                   [ngClass]="hasUnsavedChanges() ? 'border-white/10 hover:bg-white/5 text-zinc-300' : 'border-white/5 text-zinc-500'">
+                   Cancel
+                 </button>
                </div>
              </div>
           </div>
@@ -1871,14 +1884,66 @@ export class ProvidersScreen {
   `,
 })
 export class PolicyScreen {
-  public readonly policies: Policy[] = MOCK_POLICIES;
-  public selectedPolicy: Policy | null = null;
+  private readonly state = new PolicyScreenState(MOCK_POLICIES);
+  public readonly policies = this.state.policies;
+  public readonly selectedPolicyId = this.state.selectedPolicyId;
+  public readonly draftPolicy = this.state.draftPolicy;
+  public readonly selectedPolicy = this.state.selectedPolicy;
+  public readonly hasUnsavedChanges = this.state.hasUnsavedChanges;
 
-  public getPolicyStatusBadge(status: string): BadgeStatus {
+  public selectPolicy(policyId: string): void {
+    this.state.selectPolicy(policyId);
+  }
+
+  public closeDetails(): void {
+    this.state.closeDetails();
+  }
+
+  public updateDraftName(name: string): void {
+    this.state.updateDraftName(name);
+  }
+
+  public handleNameInput(event: Event): void {
+    this.updateDraftName(this.readInputValue(event));
+  }
+
+  public updateDraftDescription(description: string): void {
+    this.state.updateDraftDescription(description);
+  }
+
+  public handleDescriptionInput(event: Event): void {
+    this.updateDraftDescription(this.readInputValue(event));
+  }
+
+  public updateDraftRiskLevel(riskLevel: Policy['riskLevel']): void {
+    this.state.updateDraftRiskLevel(riskLevel);
+  }
+
+  public handleRiskLevelChange(event: Event): void {
+    this.updateDraftRiskLevel(this.readSelectValue(event) as Policy['riskLevel']);
+  }
+
+  public updateDraftAction(action: Policy['action']): void {
+    this.state.updateDraftAction(action);
+  }
+
+  public handleActionChange(event: Event): void {
+    this.updateDraftAction(this.readSelectValue(event) as Policy['action']);
+  }
+
+  public saveChanges(): void {
+    this.state.saveChanges();
+  }
+
+  public cancelChanges(): void {
+    this.state.cancelChanges();
+  }
+
+  public getPolicyStatusBadge(status: Policy['status']): BadgeStatus {
     return status === 'active' ? 'active' : 'idle';
   }
 
-  public getRiskColor(riskLevel: string): string {
+  public getRiskColor(riskLevel: Policy['riskLevel']): string {
     switch (riskLevel) {
       case 'Critical': return 'text-red-400';
       case 'High': return 'text-amber-400';
@@ -1886,6 +1951,14 @@ export class PolicyScreen {
       case 'Low': return 'text-emerald-400';
       default: return 'text-zinc-400';
     }
+  }
+
+  private readInputValue(event: Event): string {
+    return (event.target as HTMLInputElement | HTMLTextAreaElement).value;
+  }
+
+  private readSelectValue(event: Event): string {
+    return (event.target as HTMLSelectElement).value;
   }
 }
 
