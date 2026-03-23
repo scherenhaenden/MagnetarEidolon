@@ -13,7 +13,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
-import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, Agent, Run, Tool } from './ui/mock-data.js';
+import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Policy } from './ui/mock-data.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
@@ -1745,20 +1745,149 @@ export class ProvidersScreen {
 @Component({
   selector: 'screen-policy',
   standalone: true,
-  imports: [CommonModule, UiIconComponent],
+  imports: [CommonModule, UiIconComponent, UiBadgeComponent],
   template: `
-    <div class="space-y-6 animate-fade-in max-w-5xl mx-auto pb-12">
-      <div class="flex justify-between items-center bg-gradient-to-r from-violet-500/10 to-transparent p-6 rounded-2xl border border-violet-500/20">
+    <div class="space-y-6 animate-fade-in max-w-7xl mx-auto pb-12">
+      <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <h2 class="text-2xl font-light text-white tracking-tight flex items-center gap-3">
             <ui-icon name="shield" cssClass="text-violet-400" [size]="28"></ui-icon> Governance & Policy
           </h2>
+          <p class="text-sm text-zinc-400 mt-1 pl-10">
+            Define execution boundaries, approval requirements, and risk mitigation strategies for AI agents.
+          </p>
         </div>
+        <div class="flex items-center gap-3">
+          <button class="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-medium text-white hover:bg-white/10 transition-colors">
+            Audit Logs
+          </button>
+          <button class="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all flex items-center gap-2">
+            <ui-icon name="plus" [size]="16"></ui-icon> Create Policy
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start mt-6">
+        <div class="space-y-4">
+          <div class="bg-[#0f0f13] border border-white/5 rounded-2xl p-5 shadow-lg">
+            <h3 class="text-lg font-medium text-white mb-4">Active Policies</h3>
+            <div class="space-y-3">
+              <div *ngFor="let policy of policies" class="group bg-[#0a0a0d] border border-white/5 hover:border-violet-500/30 rounded-xl p-4 transition-all cursor-pointer shadow-sm relative overflow-hidden" (click)="selectedPolicy = policy" [ngClass]="{'border-violet-500/50 bg-violet-500/5': selectedPolicy?.id === policy.id}">
+                <div *ngIf="selectedPolicy?.id === policy.id" class="absolute left-0 top-0 bottom-0 w-1 bg-violet-500"></div>
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center mt-1 group-hover:bg-white/10 transition-colors" [ngClass]="{'text-red-400': policy.riskLevel === 'Critical', 'text-amber-400': policy.riskLevel === 'High', 'text-blue-400': policy.riskLevel === 'Medium', 'text-emerald-400': policy.riskLevel === 'Low'}">
+                      <ui-icon [name]="policy.icon" [size]="20"></ui-icon>
+                    </div>
+                    <div>
+                      <h4 class="text-base font-medium text-zinc-100 group-hover:text-white transition-colors">{{ policy.name }}</h4>
+                      <p class="text-sm text-zinc-400 mt-1 line-clamp-2 leading-relaxed">{{ policy.description }}</p>
+                      <div class="flex flex-wrap items-center gap-2 mt-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/5 border border-white/10 text-zinc-300">
+                          {{ policy.action }}
+                        </span>
+                        <span *ngFor="let tag of policy.tags" class="text-xs text-zinc-500 flex items-center gap-1 before:content-['#'] before:text-zinc-600">
+                          {{ tag }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col items-end gap-2 shrink-0">
+                    <ui-badge [status]="getPolicyStatusBadge(policy.status)">{{ policy.status }}</ui-badge>
+                    <div class="text-[10px] uppercase tracking-wider font-bold mt-2" [ngClass]="getRiskColor(policy.riskLevel)">
+                      {{ policy.riskLevel }} Risk
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sticky top-24 space-y-6">
+          <div *ngIf="selectedPolicy; else emptySelection" class="bg-[#0a0a0d] border border-violet-500/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+             <div class="absolute -right-10 -top-10 w-40 h-40 bg-violet-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+             <div class="flex items-center justify-between mb-6 relative z-10">
+               <h3 class="text-lg font-medium text-white flex items-center gap-2">
+                 <ui-icon name="settings" [size]="18" cssClass="text-violet-400"></ui-icon> Policy Details
+               </h3>
+               <button class="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-zinc-400 hover:text-white" (click)="selectedPolicy = null" aria-label="Close details">
+                 <ui-icon name="x" [size]="16"></ui-icon>
+               </button>
+             </div>
+
+             <div class="space-y-6 relative z-10">
+               <div>
+                 <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Policy Name</label>
+                 <input type="text" [value]="selectedPolicy.name" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors">
+               </div>
+
+               <div>
+                 <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Description</label>
+                 <textarea rows="3" [value]="selectedPolicy.description" class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 transition-colors"></textarea>
+               </div>
+
+               <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Risk Level</label>
+                    <select class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option [selected]="selectedPolicy.riskLevel === 'Low'">Low</option>
+                      <option [selected]="selectedPolicy.riskLevel === 'Medium'">Medium</option>
+                      <option [selected]="selectedPolicy.riskLevel === 'High'">High</option>
+                      <option [selected]="selectedPolicy.riskLevel === 'Critical'">Critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs uppercase tracking-wider text-zinc-500 mb-2">Action</label>
+                    <select class="w-full bg-[#050508] border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-violet-500/50 appearance-none">
+                      <option [selected]="selectedPolicy.action === 'Auto-Approve'">Auto-Approve</option>
+                      <option [selected]="selectedPolicy.action === 'Require Review'">Require Review</option>
+                      <option [selected]="selectedPolicy.action === 'Simulate'">Simulate</option>
+                      <option [selected]="selectedPolicy.action === 'Block'">Block</option>
+                    </select>
+                  </div>
+               </div>
+
+               <div class="pt-4 border-t border-white/5 flex gap-3">
+                 <button class="flex-1 bg-violet-600 hover:bg-violet-500 text-white py-2 rounded-lg text-sm font-medium transition-colors">Save Changes</button>
+                 <button class="px-4 py-2 border border-white/10 hover:bg-white/5 rounded-lg text-sm font-medium text-zinc-300 transition-colors">Cancel</button>
+               </div>
+             </div>
+          </div>
+
+          <ng-template #emptySelection>
+            <div class="bg-violet-500/5 border border-violet-500/10 rounded-2xl p-6 text-center shadow-inner">
+              <div class="w-12 h-12 bg-violet-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-violet-400">
+                <ui-icon name="shield" [size]="24"></ui-icon>
+              </div>
+              <h3 class="text-zinc-200 font-medium mb-2">No Policy Selected</h3>
+              <p class="text-sm text-zinc-400 leading-relaxed">Select a policy from the list to view or edit its rules, risk level, and required actions.</p>
+            </div>
+          </ng-template>
+        </aside>
       </div>
     </div>
   `,
 })
-export class PolicyScreen {}
+export class PolicyScreen {
+  public readonly policies: Policy[] = MOCK_POLICIES;
+  public selectedPolicy: Policy | null = null;
+
+  public getPolicyStatusBadge(status: string): BadgeStatus {
+    return status === 'active' ? 'active' : 'idle';
+  }
+
+  public getRiskColor(riskLevel: string): string {
+    switch (riskLevel) {
+      case 'Critical': return 'text-red-400';
+      case 'High': return 'text-amber-400';
+      case 'Medium': return 'text-blue-400';
+      case 'Low': return 'text-emerald-400';
+      default: return 'text-zinc-400';
+    }
+  }
+}
 
 @Component({
   selector: 'app-root',
