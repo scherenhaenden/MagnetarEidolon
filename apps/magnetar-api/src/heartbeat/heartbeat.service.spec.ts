@@ -5,7 +5,10 @@ import { ProviderRegistryService, type BackendProviderDefinition } from '../prov
 import { HeartbeatService } from './heartbeat.service.js';
 
 class HealthyProviderRegistryService extends ProviderRegistryService {
+  public callCount = 0;
+
   public override getProviders(): BackendProviderDefinition[] {
+    this.callCount += 1;
     return [
       {
         id: 'provider-lmstudio',
@@ -27,7 +30,10 @@ class HealthyProviderRegistryService extends ProviderRegistryService {
 }
 
 class BrokenProviderRegistryService extends ProviderRegistryService {
+  public callCount = 0;
+
   public override getProviders(): BackendProviderDefinition[] {
+    this.callCount += 1;
     throw new Error('provider catalog file missing');
   }
 }
@@ -60,4 +66,28 @@ test('HeartbeatService reports degraded when provider catalog loading fails', ()
   assert.equal(snapshot.checks.api.status, 'ok');
   assert.equal(snapshot.checks.providerRegistry.status, 'error');
   assert.equal(snapshot.checks.providerRegistry.detail, 'Provider catalog unavailable.');
+});
+
+test('HeartbeatService caches healthy provider-registry checks within the TTL window', () => {
+  const providerRegistry = new HealthyProviderRegistryService();
+  const service = new HeartbeatService(providerRegistry);
+
+  const firstSnapshot = service.getSnapshot();
+  const secondSnapshot = service.getSnapshot();
+
+  assert.equal(firstSnapshot.checks.providerRegistry.status, 'ok');
+  assert.equal(secondSnapshot.checks.providerRegistry.status, 'ok');
+  assert.equal(providerRegistry.callCount, 1);
+});
+
+test('HeartbeatService caches failed provider-registry checks within the TTL window', () => {
+  const providerRegistry = new BrokenProviderRegistryService();
+  const service = new HeartbeatService(providerRegistry);
+
+  const firstSnapshot = service.getSnapshot();
+  const secondSnapshot = service.getSnapshot();
+
+  assert.equal(firstSnapshot.checks.providerRegistry.status, 'error');
+  assert.equal(secondSnapshot.checks.providerRegistry.status, 'error');
+  assert.equal(providerRegistry.callCount, 1);
 });

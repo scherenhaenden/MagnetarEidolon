@@ -22,6 +22,8 @@ export interface HeartbeatSnapshot {
 @Injectable()
 export class HeartbeatService {
   private readonly logger = new Logger(HeartbeatService.name);
+  private readonly providerRegistryCheckTtlMs = 5_000;
+  private cachedProviderRegistryCheck: { value: HeartbeatCheck; expiresAt: number } | null = null;
 
   public constructor(
     @Inject(ProviderRegistryService)
@@ -48,12 +50,22 @@ export class HeartbeatService {
   }
 
   private buildProviderRegistryCheck(): HeartbeatCheck {
+    const now = Date.now();
+    if (this.cachedProviderRegistryCheck && this.cachedProviderRegistryCheck.expiresAt > now) {
+      return this.cachedProviderRegistryCheck.value;
+    }
+
     try {
       const providers = this.providerRegistryService.getProviders();
-      return {
+      const check: HeartbeatCheck = {
         status: 'ok',
         detail: `Provider catalog loaded successfully (${providers.length} provider${providers.length === 1 ? '' : 's'} available).`,
       };
+      this.cachedProviderRegistryCheck = {
+        value: check,
+        expiresAt: now + this.providerRegistryCheckTtlMs,
+      };
+      return check;
     } catch (error: unknown) {
       this.logger.warn(
         error instanceof Error
@@ -61,10 +73,15 @@ export class HeartbeatService {
           : 'Provider catalog unavailable during heartbeat due to an unknown error.',
       );
 
-      return {
+      const check: HeartbeatCheck = {
         status: 'error',
         detail: 'Provider catalog unavailable.',
       };
+      this.cachedProviderRegistryCheck = {
+        value: check,
+        expiresAt: now + this.providerRegistryCheckTtlMs,
+      };
+      return check;
     }
   }
 }
