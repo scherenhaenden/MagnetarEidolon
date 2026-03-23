@@ -1776,7 +1776,7 @@ export class ProvidersScreen {
         </div>
       </div>
 
-      <div class="rounded-2xl border border-violet-500/15 bg-violet-500/5 px-4 py-3 text-sm text-violet-100/80 flex items-start gap-3">
+      <div role="status" class="rounded-2xl border border-violet-500/15 bg-violet-500/5 px-4 py-3 text-sm text-violet-100/80 flex items-start gap-3">
         <ui-icon name="shield" [size]="16" cssClass="text-violet-300 mt-0.5"></ui-icon>
         <div class="leading-6">
           This Policy Center slice is a local governance PoC. Policy inspection and local policy editing are active here;
