@@ -14,7 +14,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Policy } from './ui/mock-data.js';
-import { getPolicyStatusBadge, getRiskColor } from './ui/policy-helpers.js';
+import { PolicyPresentation } from './ui/policy-helpers.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
 import { PolicyScreenState } from './core/models/policy-screen-state.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
@@ -1902,6 +1902,7 @@ export class ProvidersScreen {
 })
 export class PolicyScreen {
   private readonly state = new PolicyScreenState(MOCK_POLICIES);
+  private readonly presentation = new PolicyPresentation();
   public readonly policies = this.state.policies;
   public readonly selectedPolicyId = this.state.selectedPolicyId;
   public readonly draftPolicy = this.state.draftPolicy;
@@ -1957,11 +1958,11 @@ export class PolicyScreen {
   }
 
   public getPolicyStatusBadge(status: Policy['status']): BadgeStatus {
-    return getPolicyStatusBadge(status);
+    return this.presentation.getPolicyStatusBadge(status);
   }
 
   public getRiskColor(riskLevel: Policy['riskLevel']): string {
-    return getRiskColor(riskLevel);
+    return this.presentation.getRiskColor(riskLevel);
   }
 
   private readInputValue(event: Event): string {
