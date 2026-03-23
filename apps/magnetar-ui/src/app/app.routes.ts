@@ -1,15 +1,13 @@
 import { Routes } from '@angular/router';
 
-import {
-  BuilderScreen,
-  ChatScreen,
-  DashboardScreen,
-  LiveRunScreen,
-  MemoryScreen,
-  PolicyScreen,
-  ProvidersScreen,
-  ToolsScreen,
-} from './app.component.js';
+import { DashboardScreen } from './screens/dashboard/dashboard-screen.component.js';
+import { LiveRunScreen } from './screens/live-run/live-run-screen.component.js';
+import { ChatScreen } from './screens/chat/chat-screen.component.js';
+import { BuilderScreen } from './screens/builder/builder-screen.component.js';
+import { ToolsScreen } from './screens/tools/tools-screen.component.js';
+import { MemoryScreen } from './screens/memory/memory-screen.component.js';
+import { ProvidersScreen } from './screens/providers/providers-screen.component.js';
+import { PolicyScreen } from './screens/policy/policy-screen.component.js';
 
 export const APP_ROUTES: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
