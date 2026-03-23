@@ -1759,12 +1759,28 @@ export class ProvidersScreen {
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <button class="px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-sm font-medium text-white hover:bg-white/10 transition-colors">
-            Audit Logs
+          <button
+            type="button"
+            aria-disabled="true"
+            title="Planned follow-up: audit-log navigation is not implemented in this PoC."
+            class="px-4 py-2 rounded-lg border border-white/5 bg-white/[0.03] text-sm font-medium text-zinc-500 cursor-not-allowed opacity-70">
+            Audit Logs (Planned)
           </button>
-          <button class="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all flex items-center gap-2">
-            <ui-icon name="plus" [size]="16"></ui-icon> Create Policy
+          <button
+            type="button"
+            aria-disabled="true"
+            title="Planned follow-up: policy creation flow is not implemented in this PoC."
+            class="px-4 py-2 rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-200/70 text-sm font-medium cursor-not-allowed opacity-70 flex items-center gap-2">
+            <ui-icon name="plus" [size]="16"></ui-icon> Create Policy (Planned)
           </button>
+        </div>
+      </div>
+
+      <div role="status" class="rounded-2xl border border-violet-500/15 bg-violet-500/5 px-4 py-3 text-sm text-violet-100/80 flex items-start gap-3">
+        <ui-icon name="shield" [size]="16" cssClass="text-violet-300 mt-0.5"></ui-icon>
+        <div class="leading-6">
+          This Policy Center slice is a local governance PoC. Policy inspection and local policy editing are active here;
+          audit-log navigation and policy creation remain planned follow-up flows.
         </div>
       </div>
 
