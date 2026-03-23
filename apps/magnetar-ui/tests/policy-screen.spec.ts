@@ -68,6 +68,19 @@ describe('PolicyScreen', () => {
     expect(screen.hasUnsavedChanges()).toBe(false);
   });
 
+  it('preserves unsaved draft changes when the already-selected policy is clicked again', () => {
+    const screen = new PolicyScreenState(MOCK_POLICIES);
+
+    screen.selectPolicy('pol-03');
+    screen.updateDraftDescription('Unsaved draft description');
+
+    screen.selectPolicy('pol-03');
+
+    expect(screen.selectedPolicy()?.description).toBe('Any outbound network call to untrusted domains is strictly blocked.');
+    expect(screen.draftPolicy()?.description).toBe('Unsaved draft description');
+    expect(screen.hasUnsavedChanges()).toBe(true);
+  });
+
   it('clears the detail panel state when closed', () => {
     const screen = new PolicyScreenState(MOCK_POLICIES);
 

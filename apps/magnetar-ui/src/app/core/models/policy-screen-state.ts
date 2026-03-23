@@ -1,13 +1,13 @@
-import { computed, signal } from '@angular/core';
+import { computed, signal, type Signal, type WritableSignal } from '@angular/core';
 
 import { Policy } from '../../ui/mock-data.js';
 
 export class PolicyScreenState {
-  public readonly policies;
-  public readonly selectedPolicyId = signal<string | null>(null);
-  public readonly draftPolicy = signal<Policy | null>(null);
-  public readonly selectedPolicy;
-  public readonly hasUnsavedChanges;
+  public readonly policies: WritableSignal<Policy[]>;
+  public readonly selectedPolicyId: WritableSignal<string | null> = signal<string | null>(null);
+  public readonly draftPolicy: WritableSignal<Policy | null> = signal<Policy | null>(null);
+  public readonly selectedPolicy: Signal<Policy | null>;
+  public readonly hasUnsavedChanges: Signal<boolean>;
 
   public constructor(policies: Policy[]) {
     this.policies = signal<Policy[]>(policies.map((policy) => this.clonePolicy(policy)));
@@ -36,6 +36,10 @@ export class PolicyScreenState {
   }
 
   public selectPolicy(policyId: string): void {
+    if (this.selectedPolicyId() === policyId) {
+      return;
+    }
+
     const policy = this.policies().find((candidate) => candidate.id === policyId);
     if (!policy) {
       return;
