@@ -1,0 +1,136 @@
+<div class="h-[calc(100vh-6rem)] grid grid-cols-12 gap-6 animate-fade-in pb-6">
+  <div class="col-span-3 bg-[#0a0a0d] border border-white/5 rounded-xl flex flex-col overflow-hidden relative">
+    <div class="p-4 border-b border-white/5 bg-black/20 flex justify-between items-center backdrop-blur-md">
+      <h3 class="font-medium text-sm text-zinc-300 flex items-center gap-2">
+        <ui-icon name="git-branch" [size]="16" cssClass="text-violet-400"></ui-icon> Execution Plan
+      </h3>
+      <ui-badge status="active">Running</ui-badge>
+    </div>
+    <!-- ... (keeping existing template as is) ... -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-6 relative">
+      <div class="absolute left-[27px] top-6 bottom-6 w-px bg-white/10 z-0"></div>
+      <div class="relative z-10 flex gap-4">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <ui-icon name="check" [size]="12" cssClass="text-emerald-400"></ui-icon>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-zinc-200">Analyze Request</div>
+          <div class="text-xs text-zinc-500 mt-1">Parsed intent: Database migration prep.</div>
+        </div>
+      </div>
+      <div class="relative z-10 flex gap-4">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <ui-icon name="check" [size]="12" cssClass="text-emerald-400"></ui-icon>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-zinc-200">Check Schema</div>
+          <div class="text-xs text-zinc-500 mt-1">Invoked Postgres tool. Retrieved 4 tables.</div>
+        </div>
+      </div>
+      <div class="relative z-10 flex gap-4">
+        <div class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center flex-shrink-0 mt-0.5 animate-pulse shadow-[0_0_10px_rgba(56,189,248,0.5)]">
+          <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
+        </div>
+        <div>
+          <div class="text-sm font-medium text-cyan-400">Generate Migration Script</div>
+          <div class="text-xs text-zinc-500 mt-1">Synthesizing SQL dialect...</div>
+        </div>
+      </div>
+      <div class="relative z-10 flex gap-4 opacity-40">
+        <div class="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0 mt-0.5"></div>
+        <div>
+          <div class="text-sm font-medium text-zinc-400">Human Approval</div>
+          <div class="text-xs text-zinc-500 mt-1">Awaiting policy gate.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ... (keeping rest of template as is) ... -->
+  <div class="col-span-6 bg-[#0a0a0d] border border-white/5 rounded-xl flex flex-col relative overflow-hidden shadow-2xl">
+    <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"></div>
+    <div class="p-4 border-b border-white/5 flex justify-between items-center bg-black/40">
+      <div class="flex items-center gap-3">
+        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+        <span class="font-mono text-xs text-cyan-400 tracking-wider">LIVE STREAM</span>
+      </div>
+      <div class="text-xs font-mono text-zinc-500">RUN-ID: 992a-44f1</div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-6 space-y-6 font-mono text-sm leading-relaxed">
+      <div class="bg-white/5 border border-white/10 rounded-lg p-4 text-zinc-300">
+        <div class="text-xs text-zinc-500 mb-2 font-sans uppercase tracking-wider">User Input</div>
+        "Prepare a migration script to add a 'last_login' timestamp to the users table, and create an index on it."
+      </div>
+      <div class="pl-4 border-l-2 border-emerald-500/30 text-zinc-400">
+        [System]: Evaluating required tools...
+        <br />[System]: Selected tool <span class="text-emerald-400">Postgres Prod (RO)</span>
+      </div>
+      <div class="bg-[#050508] border border-zinc-800 rounded-lg p-4 font-mono text-xs text-emerald-300 shadow-inner">
+        <div class="text-zinc-600 mb-2 border-b border-zinc-800 pb-2">Tool Output: schema_users</div>
+        CREATE TABLE users (<br />
+        &nbsp;&nbsp;id uuid PRIMARY KEY,<br />
+        &nbsp;&nbsp;email text UNIQUE NOT NULL,<br />
+        &nbsp;&nbsp;created_at timestamptz DEFAULT now()<br />
+        );
+      </div>
+      <div class="pl-4 border-l-2 border-cyan-500/50 text-zinc-200">
+        Based on the current schema, here is the requested migration script. I will use PostgreSQL syntax.
+        <div class="mt-4 bg-[#050508] border border-cyan-500/20 rounded-lg p-4 text-cyan-100 font-mono text-sm relative group cursor-text">
+          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="bg-white/10 hover:bg-white/20 px-2 py-1 rounded text-xs text-white">Copy</button>
+          </div>
+          <span class="text-violet-400">ALTER TABLE</span> users<br />
+          <span class="text-violet-400">ADD COLUMN</span> last_login <span class="text-emerald-400">timestamptz</span>;<br /><br />
+          <span class="text-violet-400">CREATE INDEX</span> idx_users_last_login <br />
+          <span class="text-violet-400">ON</span> users(last_login);
+        </div>
+        <span class="inline-block w-2 h-4 bg-cyan-400 animate-pulse mt-2 align-middle"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-span-3 flex flex-col gap-6">
+    <div class="bg-[#0a0a0d] border border-white/5 rounded-xl flex-1 flex flex-col overflow-hidden">
+      <div class="p-3 border-b border-white/5 bg-black/20 text-xs font-medium text-zinc-400 uppercase tracking-wider">Context & Memory</div>
+      <div class="p-4 space-y-4">
+        <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+          <div class="flex items-center gap-2 text-xs text-violet-400 font-medium mb-1">
+            <ui-icon name="database" [size]="14"></ui-icon> Session Memory
+          </div>
+          <div class="text-xs text-zinc-400 leading-snug">
+            Remembered user preference: "Always use PostgreSQL syntax unless specified otherwise." (Confidence: 0.98)
+          </div>
+        </div>
+        <div class="bg-white/5 rounded-lg p-3 border border-white/5">
+          <div class="flex items-center gap-2 text-xs text-cyan-400 font-medium mb-1">
+            <ui-icon name="wrench" [size]="14"></ui-icon> Active Tools
+          </div>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-zinc-300">Postgres (RO)</span>
+            <span class="px-2 py-1 bg-white/5 border border-white/10 rounded text-xs text-zinc-300">File Writer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 relative overflow-hidden shadow-[0_0_20px_rgba(245,158,11,0.15)]">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/20 blur-3xl rounded-full"></div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 text-amber-400 font-medium text-sm mb-2">
+          <ui-icon name="shield" [size]="16"></ui-icon> Action Requires Approval
+        </div>
+        <p class="text-xs text-amber-200/80 mb-4 leading-relaxed">
+          Agent is attempting to execute
+          <span class="font-mono text-amber-300 bg-black/30 px-1 rounded">fs.writeFile</span>
+          outside of the temporary workspace. Policy "SecureFS" requires human review.
+        </p>
+        <div class="flex flex-col gap-2">
+          <button class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-amber-950 text-xs font-bold rounded shadow-lg transition-colors">Approve Once</button>
+          <div class="grid grid-cols-2 gap-2">
+            <button class="py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-xs font-medium rounded transition-colors">Deny</button>
+            <button class="py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 text-xs font-medium rounded transition-colors">Simulate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
