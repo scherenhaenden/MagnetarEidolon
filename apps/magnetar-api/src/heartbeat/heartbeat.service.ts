@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { ProviderRegistryService } from './provider-registry.service.js';
+import { ProviderRegistryService } from '../provider-registry.service.js';
 
 export interface HeartbeatCheck {
   status: 'ok' | 'error';

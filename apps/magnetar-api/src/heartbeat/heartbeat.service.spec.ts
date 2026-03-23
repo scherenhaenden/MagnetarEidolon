@@ -1,11 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { ProviderRegistryService, type BackendProviderDefinition } from '../provider-registry.service.js';
 import { HeartbeatService } from './heartbeat.service.js';
-import {
-  ProviderRegistryService,
-  type BackendProviderDefinition,
-} from './provider-registry.service.js';
 
 class HealthyProviderRegistryService extends ProviderRegistryService {
   public override getProviders(): BackendProviderDefinition[] {
