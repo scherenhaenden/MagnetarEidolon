@@ -17,9 +17,11 @@ import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Po
 import { PolicyPresentation } from './ui/policy-helpers.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
 import { PolicyScreenState } from './core/models/policy-screen-state.js';
+import { MemoryVisibilityFilter } from './core/models/memory-inspector.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
 import { ChatSessionService } from './core/services/chat-session.service.js';
 import { ProviderConfigService } from './core/services/provider-config.service.js';
+import { MemoryInspectorService } from './core/services/memory-inspector.service.js';
 
 @Component({
   selector: 'screen-dashboard',
@@ -781,47 +783,148 @@ export class ChatScreen implements AfterViewChecked {
         </div>
         <div class="flex flex-wrap gap-2 text-xs text-zinc-400">
           <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-            Session Items: {{ sessionMemory.length }}
+            Session Items: {{ memoryInspector.sessionRecords().length }}
           </span>
           <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-            Durable Notes: {{ durableMemory.length }}
+            Durable Notes: {{ memoryInspector.durableRecords().length }}
+          </span>
+          <span class="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            Pinned: {{ memoryInspector.pinnedCount() }}
           </span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
-          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
-            <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
-              <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
-              Active Context Stack
-            </div>
-            <ui-badge status="active">Inspectable</ui-badge>
-          </div>
-          <div class="divide-y divide-white/5">
-            <div *ngFor="let item of sessionMemory" class="px-5 py-4 flex items-start justify-between gap-4">
-              <div>
-                <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
-                <div class="text-xs text-zinc-500 mt-1">{{ item.scope }}</div>
-                <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
-              </div>
-              <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
-            </div>
-          </div>
-        </div>
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let filter of filters"
+          type="button"
+          (click)="setFilter(filter.id)"
+          class="px-3 py-2 rounded-full border text-xs font-medium transition-colors"
+          [class.bg-cyan-500/20]="memoryInspector.filter() === filter.id"
+          [class.border-cyan-400/30]="memoryInspector.filter() === filter.id"
+          [class.text-cyan-200]="memoryInspector.filter() === filter.id"
+          [class.bg-white/5]="memoryInspector.filter() !== filter.id"
+          [class.border-white/10]="memoryInspector.filter() !== filter.id"
+          [class.text-zinc-400]="memoryInspector.filter() !== filter.id">
+          {{ filter.label }}
+        </button>
+        <button
+          type="button"
+          (click)="restoreDefaults()"
+          class="ml-auto px-3 py-2 rounded-full border border-white/10 bg-white/5 text-xs font-medium text-zinc-300 transition-colors hover:bg-white/10">
+          Restore defaults
+        </button>
+      </div>
 
-        <div class="space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)] gap-6">
+        <div class="space-y-6">
+          <div class="bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between bg-black/20">
+              <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
+                <ui-icon name="database" [size]="16" cssClass="text-cyan-400"></ui-icon>
+                Active Context Stack
+              </div>
+              <ui-badge status="active">Inspectable</ui-badge>
+            </div>
+            <div class="divide-y divide-white/5">
+              <button
+                *ngFor="let item of memoryInspector.visibleSessionRecords()"
+                type="button"
+                (click)="selectRecord(item.id)"
+                class="w-full px-5 py-4 flex items-start justify-between gap-4 text-left transition-colors hover:bg-white/[0.03]"
+                [class.bg-cyan-500/10]="memoryInspector.selectedRecord()?.id === item.id">
+                <div>
+                  <div class="text-sm font-medium text-zinc-100">{{ item.title }}</div>
+                  <div class="text-xs text-zinc-500 mt-1">{{ item.scope }} · {{ item.lastUpdated }}</div>
+                  <p class="text-sm text-zinc-300 mt-3 leading-relaxed">{{ item.summary }}</p>
+                </div>
+                <ui-badge [status]="item.status">{{ item.badge }}</ui-badge>
+              </button>
+              <div *ngIf="memoryInspector.visibleSessionRecords().length === 0" class="px-5 py-6 text-sm text-zinc-500">
+                No session memory matches the current filter.
+              </div>
+            </div>
+          </div>
+
           <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
             <div class="text-sm font-medium text-zinc-200 flex items-center gap-2">
               <ui-icon name="book-open" [size]="16" cssClass="text-violet-400"></ui-icon>
               Durable Notes
             </div>
             <div class="mt-4 space-y-3">
-              <div *ngFor="let note of durableMemory" class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                <div class="text-sm text-zinc-200">{{ note.title }}</div>
-                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-1">{{ note.tag }}</div>
+              <button
+                *ngFor="let note of memoryInspector.visibleDurableRecords()"
+                type="button"
+                (click)="selectRecord(note.id)"
+                class="w-full rounded-xl border border-white/5 bg-white/[0.03] p-3 text-left transition-colors hover:border-violet-400/30"
+                [class.border-violet-400/30]="memoryInspector.selectedRecord()?.id === note.id">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="text-sm text-zinc-200">{{ note.title }}</div>
+                  <ui-badge [status]="note.status">{{ note.badge }}</ui-badge>
+                </div>
+                <div class="text-[11px] uppercase tracking-wider text-zinc-500 mt-2">{{ note.tag }} · {{ note.lastUpdated }}</div>
+              </button>
+              <div *ngIf="memoryInspector.visibleDurableRecords().length === 0" class="text-sm text-zinc-500">
+                No durable notes match the current filter.
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-[#0a0a0d] border border-white/5 rounded-2xl p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <div class="text-sm font-medium text-zinc-200">Selected Memory Detail</div>
+                <div class="text-xs text-zinc-500 mt-1">What is shaping the runtime right now.</div>
+              </div>
+              <ui-badge [status]="memoryInspector.selectedRecord()?.status ?? 'idle'">{{ memoryInspector.selectedRecord()?.kind ?? 'none' }}</ui-badge>
+            </div>
+
+            <ng-container *ngIf="memoryInspector.selectedRecord() as selected; else noSelection">
+              <div class="mt-5 space-y-4">
+                <div>
+                  <div class="text-lg font-medium text-white">{{ selected.title }}</div>
+                  <div class="text-xs uppercase tracking-[0.24em] text-zinc-500 mt-2">{{ selected.scope }}</div>
+                </div>
+                <p class="text-sm leading-relaxed text-zinc-300">{{ selected.summary }}</p>
+                <div class="grid grid-cols-2 gap-3 text-xs text-zinc-400">
+                  <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider">Tag</div>
+                    <div class="mt-2 text-zinc-200">{{ selected.tag }}</div>
+                  </div>
+                  <div class="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+                    <div class="text-zinc-500 uppercase tracking-wider">Updated</div>
+                    <div class="mt-2 text-zinc-200">{{ selected.lastUpdated }}</div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    (click)="togglePinned(selected.id)"
+                    class="px-3 py-2 rounded-xl border border-cyan-400/20 bg-cyan-500/10 text-xs font-medium text-cyan-100 transition-colors hover:bg-cyan-500/20">
+                    {{ selected.pinned ? 'Unpin memory' : 'Pin memory' }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="removeRecord(selected.id)"
+                    [disabled]="!selected.removable"
+                    class="px-3 py-2 rounded-xl border text-xs font-medium transition-colors"
+                    [class.border-rose-400/20]="selected.removable"
+                    [class.bg-rose-500/10]="selected.removable"
+                    [class.text-rose-100]="selected.removable"
+                    [class.border-white/10]="!selected.removable"
+                    [class.bg-white/5]="!selected.removable"
+                    [class.text-zinc-500]="!selected.removable">
+                    {{ selected.removable ? 'Delete memory' : 'Protected entry' }}
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-template #noSelection>
+              <div class="mt-5 text-sm text-zinc-500">Select a memory item to inspect its details.</div>
+            </ng-template>
           </div>
 
           <div class="bg-cyan-500/10 border border-cyan-500/20 rounded-2xl p-5">
@@ -840,35 +943,33 @@ export class ChatScreen implements AfterViewChecked {
   `,
 })
 export class MemoryScreen {
-  public readonly sessionMemory = [
-    {
-      title: 'Current execution objective',
-      scope: 'session / goal',
-      summary: 'Prepare a migration script with explicit approval before any write-capable execution path is enabled.',
-      badge: 'Pinned',
-      status: 'active' as BadgeStatus,
-    },
-    {
-      title: 'Recent schema evidence',
-      scope: 'session / tool output',
-      summary: 'Users table inspected successfully. Runtime should preserve the evidence trail before proposing changes.',
-      badge: 'Fresh',
-      status: 'pending_approval' as BadgeStatus,
-    },
-    {
-      title: 'Policy reminder',
-      scope: 'session / governance',
-      summary: 'Write operations remain approval-gated by default, even when a provider returns a valid migration plan.',
-      badge: 'Guarded',
-      status: 'idle' as BadgeStatus,
-    },
+  protected readonly memoryInspector = inject(MemoryInspectorService);
+  protected readonly filters: Array<{ id: MemoryVisibilityFilter; label: string }> = [
+    { id: 'all', label: 'All memory' },
+    { id: 'session', label: 'Session' },
+    { id: 'durable', label: 'Durable' },
+    { id: 'pinned', label: 'Pinned' },
   ];
 
-  public readonly durableMemory = [
-    { title: 'Default provider path starts local-first with LM Studio', tag: 'provider' },
-    { title: 'Traceability required for every sensitive action', tag: 'policy' },
-    { title: 'SDK contract remains shared between UI and CLI', tag: 'architecture' },
-  ];
+  public setFilter(filter: MemoryVisibilityFilter): void {
+    this.memoryInspector.setFilter(filter);
+  }
+
+  public selectRecord(recordId: string): void {
+    this.memoryInspector.selectRecord(recordId);
+  }
+
+  public togglePinned(recordId: string): void {
+    this.memoryInspector.togglePinned(recordId);
+  }
+
+  public removeRecord(recordId: string): void {
+    this.memoryInspector.removeRecord(recordId);
+  }
+
+  public restoreDefaults(): void {
+    this.memoryInspector.restoreDefaults();
+  }
 }
 
 @Component({
