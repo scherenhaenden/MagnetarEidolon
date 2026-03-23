@@ -7,3 +7,5 @@
 - Added independent release pipelines for npm global publishing, DEB packaging, Windows EXE packaging, and AppImage packaging, each with build + smoke-test steps before artifact upload.
 - Bumped `apps/magnetar-ui` package version to `0.2.0`, made package publishable (`private: false`), and added `publishConfig.access=public` to support npm global distribution.
 - Updated `RELEASING.md` to document the new packaging workflows and recommended npm-first release path.
+- Chose a heartbeat-first diagnostics approach for chat stabilization: a lightweight backend liveness probe now ships as a PoC at `/api/heartbeat`, with project-module docs updated to recommend separating cheap heartbeat checks from deeper provider diagnostics.
+
