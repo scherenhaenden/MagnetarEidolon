@@ -33,6 +33,21 @@ export interface Tool {
   icon: string;
 }
 
+export type PolicyRiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+export type PolicyAction = 'Auto-Approve' | 'Require Review' | 'Block' | 'Simulate';
+export type PolicyStatus = 'active' | 'disabled';
+
+export interface Policy {
+  id: string;
+  name: string;
+  description: string;
+  riskLevel: PolicyRiskLevel;
+  action: PolicyAction;
+  status: PolicyStatus;
+  icon: string;
+  tags: string[];
+}
+
 export const MOCK_AGENTS: Agent[] = [
   {
     id: 'ag-01',
@@ -248,5 +263,68 @@ export const MOCK_TOOLS: Tool[] = [
     trust: 'Critical',
     status: 'requires_auth',
     icon: 'lock',
+  },
+];
+
+export const MOCK_POLICIES: Policy[] = [
+  {
+    id: 'pol-01',
+    name: 'Prevent File Deletion',
+    description: 'Any action attempting to delete files in production environments requires human review.',
+    riskLevel: 'Critical',
+    action: 'Require Review',
+    status: 'active',
+    icon: 'file-minus',
+    tags: ['filesystem', 'production'],
+  },
+  {
+    id: 'pol-02',
+    name: 'Auto-Approve Read-Only DB',
+    description: 'Database queries identified as SELECT operations without side-effects are auto-approved.',
+    riskLevel: 'Low',
+    action: 'Auto-Approve',
+    status: 'active',
+    icon: 'database',
+    tags: ['database', 'read-only'],
+  },
+  {
+    id: 'pol-03',
+    name: 'Block External Network Calls',
+    description: 'Any outbound network call to untrusted domains is strictly blocked.',
+    riskLevel: 'High',
+    action: 'Block',
+    status: 'active',
+    icon: 'globe',
+    tags: ['network', 'security'],
+  },
+  {
+    id: 'pol-04',
+    name: 'Simulate Schema Changes',
+    description: 'Database schema modifications (ALTER, DROP, CREATE) must be simulated before execution.',
+    riskLevel: 'High',
+    action: 'Simulate',
+    status: 'active',
+    icon: 'layers',
+    tags: ['database', 'schema'],
+  },
+  {
+    id: 'pol-05',
+    name: 'Require Review for Cloud Resources',
+    description: 'Provisioning or modifying cloud infrastructure (AWS, GCP, Azure) needs explicit approval.',
+    riskLevel: 'Critical',
+    action: 'Require Review',
+    status: 'active',
+    icon: 'cloud',
+    tags: ['infrastructure', 'cloud'],
+  },
+  {
+    id: 'pol-06',
+    name: 'Auto-Approve Local Logs',
+    description: 'Operations reading local log files are inherently safe and auto-approved.',
+    riskLevel: 'Low',
+    action: 'Auto-Approve',
+    status: 'disabled',
+    icon: 'file-text',
+    tags: ['filesystem', 'logs'],
   },
 ];
