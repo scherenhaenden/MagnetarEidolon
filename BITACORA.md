@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-23 07:00 UTC
+  **Author:** Copilot
+  **Entry:** State Change: Completed `task-voice-101` (Re-scope voice UI foundations for the TypeScript workspace). Created the `projects/voice-ui-module/` planning module with all required documentation files: README, ARCHITECTURE, REQUIREMENTS, TESTING, PLAN, STATUS, and BITACORA. Defined module boundaries between the Angular `VoiceCaptureModule`, `packages/magnetar-sdk` interfaces (`VoiceCapturePort`, `TranscriptionPort`), and the `apps/magnetar-api` backend boundary. Documented browser/runtime constraints (secure context, permission model, `SpeechRecognition` support matrix, sandbox restrictions, local-first fallback). Documented four voice-specific risks with mitigations. Confirmed that no Python, Gradio, or Poetry assumptions remain in the voice roadmap. Transitioned `task-voice-101` to `in_review`; `task-voice-102` is now unblocked. Updated `projects/magnetar-voice-ui.project.yml`, root `PLAN.md`, `STATUS.md`, and this logbook.
+
 - **Timestamp:** 2026-03-20 19:27 UTC
   **Author:** Copilot
   **Entry:** State Change: Verified and closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). PR #211 had introduced the preset list in two places — the left-rail Quick Add accordion and a middle-column Preset Catalog. The subsequent `feature/provider-config-quick-add-editor-flow` slice removed the middle-column duplicate. The current `app.component.ts` contains a single `*ngFor let preset of presets()` loop inside the Quick Add accordion; no duplicate preset-item markup remains. Planning documents were updated to record this task as done.

@@ -34,6 +34,7 @@ Update rule:
 | Observability / Replay | 15% | 5% | 80% | Early-stage only |
 | UX / Experience Foundation | 65% | 15% | 20% | Shell is real, not fully integrated |
 | Distribution / packaged operations | 60% | 10% | 30% | Usable, not polished |
+| Voice UI | 40% | 0% | 60% | Re-scope complete; module boundaries, SDK interfaces, browser constraints, and testing strategy documented; implementation not yet started |
 
 ### Chat Breakdown
 
@@ -95,6 +96,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | `ms-17` | LM Studio Provider Integration | Ready | 2026-04-29 |
 | `ms-18` | In-App Chat Surface | Ready | 2026-05-02 |
 | `ms-19` | Provider Configuration & Failover | In Progress | 2026-05-06 |
+| `ms-voice-01` | Voice Interaction Re-scope | In Progress | 2026-03-31 |
 | `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
 | `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
 | `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
@@ -118,6 +120,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | **In-app chat** | **in_progress** | Chat tab, state service, real LM Studio streaming, and a NestJS BFF path now exist; richer rendering and production validation still remain. |
 | **Chat runtime stabilization** | **in_progress** | The browser chat path now works through the NestJS backend with provider-id handoff and backend-owned provider resolution; LM Studio is working and OpenRouter is now testable, while diagnostics and workflow hardening still remain. |
 | **Provider configuration** | **in_progress** | UI state model, first configuration screen, and a backend-owned provider registry foundation now exist; runtime persistence, richer failover behavior, and template-driven provider onboarding still remain. |
+| **Voice UI** | **in_review** | Re-scope complete; `projects/voice-ui-module/` documents module boundaries, SDK interfaces, browser/runtime constraints, risks, and testing strategy; implementation (`task-voice-102`) is planned. |
 
 ## Risks and Mitigations
 
@@ -131,6 +134,10 @@ The repository is in a controlled transition state. The core migration to TypeSc
    Mitigation: Provider-agnostic design that allows switching to stronger models when needed.
 5. **Risk**: API consistency between Node.js and Browser environments for the shared SDK.
    Mitigation: Strict interfaces and environment-specific adapters.
+6. **Risk** (`risk-voice-001`): Browser microphone permissions, local-runtime constraints, and provider compatibility may complicate the first voice implementation.
+   Mitigation: Design for browser-safe capture first; keep adapters isolated behind `VoiceCapturePort` and `TranscriptionPort`; use mocked or file-based audio for staged validation.
+7. **Risk** (`risk-voice-002`): `SpeechRecognition` API is absent in Firefox as of early 2026, requiring a feature-detection guard and a backend-routed fallback path.
+   Mitigation: `BrowserSpeechTranscriptionAdapter.isSupported()` guard is defined from the start; backend adapter interface is in the SDK contract.
 
 ## Reporting Cadence
 Update at least once per day and immediately after each merged PR.
