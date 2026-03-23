@@ -45,12 +45,14 @@ npm run build
 Useful direct workspace commands:
 
 ```bash
-cd apps/magnetar-ui
+# Commands for the Angular UI workspace (run from within apps/magnetar-ui)
+# Note: `npm run start` is a long-running process. Run the other commands in a new terminal.
 npm run start
 npm run cli:dev -- about
 npm run test:ci
 
-cd ../magnetar-api
+# Commands for the NestJS API workspace (run from within apps/magnetar-api)
+# Note: `npm run start:dev` is a long-running process. Run the other commands in a new terminal.
 npm run start:dev
 npm run test
 ```
