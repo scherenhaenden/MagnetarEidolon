@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { ProviderRegistryService } from '../provider-registry.service.js';
 
@@ -21,6 +21,8 @@ export interface HeartbeatSnapshot {
 
 @Injectable()
 export class HeartbeatService {
+  private readonly logger = new Logger(HeartbeatService.name);
+
   public constructor(
     @Inject(ProviderRegistryService)
     private readonly providerRegistryService: ProviderRegistryService,
@@ -32,7 +34,7 @@ export class HeartbeatService {
     return {
       status: providerRegistryCheck.status === 'ok' ? 'ok' : 'degraded',
       service: '@magnetar/magnetar-api',
-      version: process.env.npm_package_version ?? '0.1.0',
+      version: process.env.npm_package_version ?? 'unknown',
       timestamp: new Date().toISOString(),
       uptimeSeconds: Math.max(0, Math.round(process.uptime())),
       checks: {
@@ -53,12 +55,15 @@ export class HeartbeatService {
         detail: `Provider catalog loaded successfully (${providers.length} provider${providers.length === 1 ? '' : 's'} available).`,
       };
     } catch (error: unknown) {
+      this.logger.warn(
+        error instanceof Error
+          ? `Provider catalog unavailable during heartbeat: ${error.message}`
+          : 'Provider catalog unavailable during heartbeat due to an unknown error.',
+      );
+
       return {
         status: 'error',
-        detail:
-          error instanceof Error
-            ? `Provider catalog unavailable: ${error.message}`
-            : 'Provider catalog unavailable due to an unknown error.',
+        detail: 'Provider catalog unavailable.',
       };
     }
   }
