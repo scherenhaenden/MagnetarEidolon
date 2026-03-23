@@ -1760,13 +1760,15 @@ export class ProvidersScreen {
         </div>
         <div class="flex items-center gap-3">
           <button
-            disabled
+            type="button"
+            aria-disabled="true"
             title="Planned follow-up: audit-log navigation is not implemented in this PoC."
             class="px-4 py-2 rounded-lg border border-white/5 bg-white/[0.03] text-sm font-medium text-zinc-500 cursor-not-allowed opacity-70">
             Audit Logs (Planned)
           </button>
           <button
-            disabled
+            type="button"
+            aria-disabled="true"
             title="Planned follow-up: policy creation flow is not implemented in this PoC."
             class="px-4 py-2 rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-200/70 text-sm font-medium cursor-not-allowed opacity-70 flex items-center gap-2">
             <ui-icon name="plus" [size]="16"></ui-icon> Create Policy (Planned)
