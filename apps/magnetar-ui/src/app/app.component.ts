@@ -14,6 +14,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { UiBadgeComponent, BadgeStatus } from './ui/badge.component.js';
 import { UiIconComponent } from './ui/icon.component.js';
 import { MOCK_AGENTS, MOCK_RUNS, MOCK_TOOLS, MOCK_POLICIES, Agent, Run, Tool, Policy } from './ui/mock-data.js';
+import { getPolicyStatusBadge, getRiskColor } from './ui/policy-helpers.js';
 import { ChatBlock, ChatMessage } from './core/models/chat.js';
 import { PolicyScreenState } from './core/models/policy-screen-state.js';
 import { ProviderConfig, ProviderPreset } from './core/models/provider-config.js';
@@ -1956,17 +1957,11 @@ export class PolicyScreen {
   }
 
   public getPolicyStatusBadge(status: Policy['status']): BadgeStatus {
-    return status === 'active' ? 'active' : 'idle';
+    return getPolicyStatusBadge(status);
   }
 
   public getRiskColor(riskLevel: Policy['riskLevel']): string {
-    switch (riskLevel) {
-      case 'Critical': return 'text-red-400';
-      case 'High': return 'text-amber-400';
-      case 'Medium': return 'text-blue-400';
-      case 'Low': return 'text-emerald-400';
-      default: return 'text-zinc-400';
-    }
+    return getRiskColor(riskLevel);
   }
 
   private readInputValue(event: Event): string {
