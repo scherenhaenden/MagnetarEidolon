@@ -18,6 +18,10 @@ This document is a logbook that records decisions, state changes, discoveries, a
 
 ## Log Entries
 
+- **Timestamp:** 2026-03-20 20:00 UTC
+  **Author:** Jules
+  **Entry:** Discovery: Initialized the planning module for Observability and Replay. Decided on an Event-Sourced State Logging approach for the Proof of Concept (PoC) to fulfill the cognitive observability requirements. Created `ARCHITECTURE.md`, `REQUIREMENTS.md`, `PLAN.md`, `STATUS.md`, `TESTING.md`, and the project YAML file in `projects/observability-replay-module/`.
+
 - **Timestamp:** 2026-03-20 19:27 UTC
   **Author:** Copilot
   **Entry:** State Change: Verified and closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). PR #211 had introduced the preset list in two places — the left-rail Quick Add accordion and a middle-column Preset Catalog. The subsequent `feature/provider-config-quick-add-editor-flow` slice removed the middle-column duplicate. The current `app.component.ts` contains a single `*ngFor let preset of presets()` loop inside the Quick Add accordion; no duplicate preset-item markup remains. Planning documents were updated to record this task as done.

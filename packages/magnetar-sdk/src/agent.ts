@@ -1,6 +1,6 @@
 import { Observable, of, map, switchMap, tap } from 'rxjs';
 import { MagnetarEidolon, ToolCall } from './models.js';
-import { LLMProvider, Tool, MemoryStore, ToolResult } from './interfaces.js';
+import { LLMProvider, Tool, MemoryStore, ToolResult, TraceStore } from './interfaces.js';
 
 export type AgentAction =
   | { type: 'tool'; name: string; args: Record<string, unknown> }
@@ -14,7 +14,8 @@ export class MagnetarAgent {
     private state: MagnetarEidolon,
     tools: Tool[],
     private memoryStore: MemoryStore,
-    private llm: LLMProvider
+    private llm: LLMProvider,
+    private traceStore?: TraceStore
   ) {
     tools.forEach(t => this.tools.set(t.name, t));
   }
@@ -44,12 +45,27 @@ export class MagnetarAgent {
       currentDirectory: '/',
       timestamp: new Date()
     };
+    if (this.traceStore) {
+      this.traceStore.addEvent({
+        type: 'observe',
+        data: { environment: { ...this.state.environment } }
+      });
+    }
   }
 
   private think(): Observable<AgentAction | null> {
     const prompt = this.constructPrompt();
     return this.llm.generate([{ role: 'user', content: prompt }]).pipe(
-          map(response => response.content ? this.parseAction(response.content) : null)
+          map(response => {
+            const action = response.content ? this.parseAction(response.content) : null;
+            if (this.traceStore) {
+              this.traceStore.addEvent({
+                type: 'think',
+                data: { prompt, response: response.content, parsedAction: action }
+              });
+            }
+            return action;
+          })
     );
   }
 
@@ -73,16 +89,29 @@ export class MagnetarAgent {
               timestamp: new Date(),
               metadata: {}
             });
+            if (this.traceStore) {
+              this.traceStore.addEvent({
+                type: 'act',
+                data: { action, result }
+              });
+            }
           }),
           map(() => void 0)
         );
       } else {
+        const errorMsg = `Error: Tool ${action.name} not found.`;
         this.state.shortTermMemory.push({
           id: crypto.randomUUID(),
-          content: `Error: Tool ${action.name} not found.`,
+          content: errorMsg,
           timestamp: new Date(),
           metadata: {}
         });
+        if (this.traceStore) {
+          this.traceStore.addEvent({
+            type: 'error',
+            data: { action, error: errorMsg }
+          });
+        }
         return of(void 0);
       }
     } else if (action.type === 'finish') {
@@ -95,6 +124,20 @@ export class MagnetarAgent {
         timestamp: new Date(),
         metadata: {}
       });
+      if (this.traceStore) {
+        this.traceStore.addEvent({
+          type: 'finish',
+          data: { message: action.message }
+        });
+      }
+      return of(void 0);
+    } else if (action.type === 'error') {
+      if (this.traceStore) {
+        this.traceStore.addEvent({
+          type: 'error',
+          data: { error: action.message }
+        });
+      }
       return of(void 0);
     }
     return of(void 0);
@@ -103,7 +146,16 @@ export class MagnetarAgent {
   private reflect(): Observable<void> {
     if (this.state.shortTermMemory.length > 0) {
       const lastMem = this.state.shortTermMemory[this.state.shortTermMemory.length - 1];
-      return this.memoryStore.addMemory(lastMem.content, { timestamp: lastMem.timestamp.toISOString() });
+      return this.memoryStore.addMemory(lastMem.content, { timestamp: lastMem.timestamp.toISOString() }).pipe(
+        tap(() => {
+          if (this.traceStore) {
+            this.traceStore.addEvent({
+              type: 'reflect',
+              data: { memoryAdded: lastMem }
+            });
+          }
+        })
+      );
     }
     return of(void 0);
   }
