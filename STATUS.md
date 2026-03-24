@@ -69,12 +69,12 @@ Update rule:
 | Observability / Replay | Red | under 40% |
 
 ## Current Direction
-The repository is in a controlled transition state. The core migration to TypeScript has been completed and the shared SDK is operational. The Python implementation remains available only as a historical reference and cross-validation baseline until the TypeScript prototype is declared production-stable. The strategic focus is now the consolidation of the UI in `apps/magnetar-ui` and the final extraction of the shared runtime.
+The repository is in a controlled TypeScript-first transition state. The core migration to TypeScript has been completed and the shared SDK is operational. The legacy Python implementation remains in the repository only as historical reference and limited cross-check context, not as the active product direction. The strategic focus is now the consolidation of the UI in `apps/magnetar-ui`, the NestJS backend boundary in `apps/magnetar-api`, and the final extraction of the shared runtime into `packages/magnetar-sdk`.
 
 ## Immediate Focus
 - Consolidate the rehomed TypeScript UI in `apps/magnetar-ui`.
 - Turn `apps/magnetar-ui` into a genuinely runnable web and CLI surface, not only something that builds and tests.
-- Activate and stabilize a dedicated TypeScript validation pipeline instead of relying only on the legacy Python CI.
+- Activate and stabilize a dedicated TypeScript validation pipeline as the primary validation path for the active product architecture.
 - Execute the shared runtime extraction into `packages/magnetar-sdk` and lock down its initial contract.
 - Continue the first real provider integration path through LM Studio.
 - Define an embedded chat surface so provider testing happens inside the product UI.
