@@ -30,6 +30,7 @@
 ### 4. Backend Transcription Path Tests
 - `POST /voice/transcribe` in `apps/magnetar-api` (see `ARCHITECTURE.md` Backend Boundary section for the full endpoint contract): returns a `TranscriptionResult` JSON body for a valid audio upload.
 - Multer file parsing: rejects non-audio MIME types with HTTP 422.
+- `BackendTranscriptionAdapter` maps unsupported audio format or HTTP 422 responses into a deterministic user-visible error state rather than a generic failure.
 - Upstream STT provider timeout → the controller returns HTTP 502 with a structured error body.
 - `BackendTranscriptionAdapter` handles HTTP 502 by emitting a `BACKEND_UNAVAILABLE` error state in `VoiceSessionService`.
 

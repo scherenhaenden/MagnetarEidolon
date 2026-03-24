@@ -114,6 +114,7 @@ voiceSession.transcript$.subscribe(text => this.promptControl.setValue(text));
 5. The backend adapter and the browser adapter must be interchangeable behind `TranscriptionPort` so testing can use stubs.
 6. Microphone permission requests must be deferred until the user explicitly activates the voice input button.
 7. Permission denial and unsupported-browser states must produce visible, actionable UI feedback rather than silent failures.
+8. `VoiceCaptureService`, transcription adapters, and `VoiceSessionService` must expose explicit failure states so network, permission, browser-support, and backend errors map to deterministic UI feedback.
 
 ## Browser and Runtime Constraints
 
@@ -158,6 +159,12 @@ The `BrowserSpeechTranscriptionAdapter` must implement an `isSupported()` guard 
 - **BrowserSpeechTranscriptionAdapter**: wraps `SpeechRecognition`, emits interim and final transcript results.
 - **BackendTranscriptionAdapter**: posts `AudioBlob` to `apps/magnetar-api /voice/transcribe`; maps the response to `TranscriptionResult`.
 - **VoiceSessionService**: orchestrates capture and transcription adapters; maintains transcript accumulation and error state; exposes `transcript$` observable for the chat composer.
+
+### Error Handling Expectations by Service
+- **VoiceCaptureService**: must surface secure-context, permission-denied, missing-device, and stream-start failures as explicit error states.
+- **BrowserSpeechTranscriptionAdapter**: must surface unsupported-browser and recognition failures without throwing uncaught runtime errors.
+- **BackendTranscriptionAdapter**: must distinguish unreachable backend, unsupported-format, and upstream-provider failure cases where the response contract allows it.
+- **VoiceSessionService**: must translate service-level failures into stable UI-facing states so the composer button and status indicator never leave the user in an ambiguous state.
 
 ## Key Decisions
 1. The first implementation uses the browser-native `SpeechRecognition` API so no backend wiring is required for the happy path.

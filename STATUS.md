@@ -34,7 +34,7 @@ Update rule:
 | Observability / Replay | 20% | 15% | 65% | PoC planning active and tracer implementation underway. |
 | UX / Experience Foundation | 65% | 15% | 20% | Shell is real, not fully integrated |
 | Distribution / packaged operations | 60% | 10% | 30% | Usable, not polished |
-| Voice UI | 40% | 0% | 60% | Re-scope complete; module boundaries, SDK interfaces, browser constraints, and testing strategy documented; implementation not yet started |
+| Voice UI | 40% | 0% | 60% | Re-scope complete. Module boundaries, SDK interfaces, browser constraints, and testing strategy are documented. Implementation has not started yet. |
 
 ### Chat Breakdown
 

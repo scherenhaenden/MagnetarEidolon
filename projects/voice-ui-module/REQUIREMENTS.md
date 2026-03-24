@@ -25,8 +25,9 @@
   - No microphone hardware found (`NotFoundError`).
   - Unsupported browser (no `SpeechRecognition` API and no backend adapter available).
   - Non-secure context (HTTP when not accessed via localhost).
-  - Backend transcription service unreachable.
+  - Backend transcription service unreachable, including network failures and backend-unavailable responses.
   - Transcription returned empty or unusable text.
+- The module must keep the user informed during backend transcription failures instead of failing silently or leaving the capture/transcription state ambiguous.
 
 ## Non-Functional Requirements
 
