@@ -27,5 +27,9 @@
 - Root documentation conflicts were resolved without dropping the voice module updates.
 - Post-merge validation should run through the repository standard path before merge to `master`.
 
+## BITACORA archive migration
+- Verified that root `BITACORA.md` entries older than the newest 20 were preserved in GitHub Discussion `#288` before deleting them from the root logbook.
+- Trimmed the root `BITACORA.md` to its newest 20 entries and added a direct pointer to the archive discussion so older history remains discoverable.
+
 ## BITACORA.md candidate
 - **2026-03-24 12:35 UTC**: Merged `master` into `copilot/task-voice-101-rescope-ui-foundations`, keeping the current modularized application structure and inherited observability work from `master` while preserving the voice re-scope planning updates. Resolved the sync through root documentation conflict reconciliation in `BITACORA.md` and `STATUS.md`.
