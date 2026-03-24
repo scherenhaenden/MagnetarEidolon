@@ -1,0 +1,105 @@
+<div class="space-y-8 animate-fade-in pb-12">
+  <!-- ... (keeping existing template as is) ... -->
+  <div class="relative group">
+    <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-cyan-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+    <div class="relative bg-[#0d0d12]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
+      <div class="flex items-center gap-3 text-cyan-400 font-medium tracking-wide text-sm">
+        <ui-icon name="command" [size]="16"></ui-icon>
+        MAGNETAR EIDOLON COMMAND
+      </div>
+      <input
+        type="text"
+        placeholder="What do you want to automate today?"
+        class="bg-transparent border-none text-3xl font-light text-white placeholder-zinc-600 focus:outline-none focus:ring-0 w-full" />
+      <div class="flex justify-between items-center pt-4 border-t border-white/5">
+        <div class="flex gap-2">
+          <button class="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-zinc-300 rounded-md border border-white/5 transition-colors flex items-center gap-2">
+            <ui-icon name="git-branch" [size]="14"></ui-icon> Load Template
+          </button>
+          <button class="px-3 py-1.5 text-xs font-medium bg-white/5 hover:bg-white/10 text-zinc-300 rounded-md border border-white/5 transition-colors flex items-center gap-2">
+            <ui-icon name="wrench" [size]="14"></ui-icon> Attach Tools
+          </button>
+        </div>
+        <button class="px-6 py-2 text-sm font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-900 rounded-lg shadow-[0_0_15px_rgba(56,189,248,0.4)] transition-all">
+          Initialize Agent
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gradient-to-b from-white/[0.03] to-transparent border border-white/5 rounded-xl p-5 flex flex-col justify-between h-32">
+      <div class="text-zinc-400 text-sm font-medium">Active Agents</div>
+      <div class="text-4xl font-light text-white">
+        24 <span class="text-emerald-400 text-sm font-medium ml-2">+3 today</span>
+      </div>
+    </div>
+    <div class="bg-gradient-to-b from-white/[0.03] to-transparent border border-white/5 rounded-xl p-5 flex flex-col justify-between h-32 relative overflow-hidden">
+      <div class="absolute right-0 bottom-0 w-32 h-32 bg-violet-500/10 blur-2xl rounded-full"></div>
+      <div class="text-zinc-400 text-sm font-medium relative z-10">Total Operations (24h)</div>
+      <div class="text-4xl font-light text-white relative z-10">
+        1.2M <span class="text-cyan-400 text-sm font-medium ml-2">99.9% SR</span>
+      </div>
+    </div>
+    <div class="bg-gradient-to-b from-amber-500/[0.05] to-transparent border border-amber-500/20 rounded-xl p-5 flex flex-col justify-between h-32 shadow-[0_0_30px_rgba(245,158,11,0.05)]">
+      <div class="text-amber-400/80 text-sm font-medium flex items-center gap-2">
+        <ui-icon name="alert" [size]="16"></ui-icon> Pending Approvals
+      </div>
+      <div class="text-4xl font-light text-amber-400">
+        3
+        <button class="ml-4 text-xs bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 px-3 py-1 rounded border border-amber-500/30 transition-colors uppercase tracking-wider font-bold">
+          Review
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-4">
+      <h3 class="text-lg font-medium text-zinc-200">Recent Telemetry</h3>
+      <div class="bg-[#0f0f13] border border-white/5 rounded-xl overflow-hidden">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-black/40 border-b border-white/5 text-zinc-500">
+            <tr>
+              <th class="px-4 py-3 font-medium">Run ID</th>
+              <th class="px-4 py-3 font-medium">Agent</th>
+              <th class="px-4 py-3 font-medium">Status</th>
+              <th class="px-4 py-3 font-medium">Metrics</th>
+              <th class="px-4 py-3 font-medium text-right">Time</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-zinc-300">
+            <tr *ngFor="let run of runs" class="hover:bg-white/[0.02] transition-colors cursor-pointer">
+              <td class="px-4 py-3 font-mono text-xs text-zinc-500">{{ run.id }}</td>
+              <td class="px-4 py-3 font-medium">{{ run.agent }}</td>
+              <td class="px-4 py-3"><ui-badge [status]="getRunStatus(run)">{{ run.status }}</ui-badge></td>
+              <td class="px-4 py-3 font-mono text-xs text-zinc-400">{{ run.tokens }} tok / {{ run.cost }}</td>
+              <td class="px-4 py-3 text-right text-zinc-500">{{ run.time }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-zinc-200">Active Fleet</h3>
+      <div class="flex flex-col gap-3">
+        <div *ngFor="let agent of agents" class="bg-[#0f0f13] border border-white/5 rounded-xl p-4 flex items-center justify-between hover:border-cyan-500/30 transition-colors group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500/10 transition-colors">
+              <ui-icon name="cpu" [size]="20"></ui-icon>
+            </div>
+            <div>
+              <div class="font-medium text-zinc-200">{{ agent.name }}</div>
+              <div class="text-xs text-zinc-500 flex items-center gap-2 mt-1">
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="{ 'bg-emerald-500': agent.status === 'active', 'bg-zinc-600': agent.status !== 'active' }"></span>
+                {{ agent.type }}
+              </div>
+            </div>
+          </div>
+          <ui-icon name="play" [size]="16" cssClass="text-zinc-600 group-hover:text-cyan-400 cursor-pointer"></ui-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

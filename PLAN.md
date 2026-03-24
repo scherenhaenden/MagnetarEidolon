@@ -29,6 +29,8 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `ms-17` | LM Studio Provider Integration | 2026-04-29 | ready | First concrete local AI provider integration through LM Studio. |
 | `ms-18` | In-App Chat Surface | 2026-05-02 | ready | Embedded chat UI for provider testing, debugging, and user-facing conversation flows. |
 | `ms-19` | Provider Configuration & Failover | 2026-05-06 | in_progress | Configure multiple AI providers, assign primary and backup roles, and prepare failover behavior. |
+| `ms-20` | Release Hardening & Compatibility | 2026-05-20 | planned | Harden distribution pipelines, clarify portability guarantees, and close remaining packaging/security gaps. |
+| `ms-21` | Canon Cleanup | 2026-04-18 | planned | Remove stale architecture drift and align canonical documentation with the TypeScript product path. |
 | `ms-04` | Project Initialization | 2026-05-15 | done | Initial structure and governance files. |
 | `ms-05` | Core Implementation | 2026-06-01 | done | Historical base implementation; legacy Python code retired from the primary path. |
 | `ms-06` | Tool System | 2026-06-15 | done | Tool abstraction and OS tools. |
@@ -94,6 +96,11 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-provider-112` | `ms-19` | Expose resolved JSON inspection for configured providers | Core Team | in_progress | Add a provider-editor affordance that shows the final configured JSON for existing provider instances so users can inspect the exact stored shape before later file-based persistence lands. |
 | `task-provider-111` | `ms-19` | Persist provider presets and configuration instances as JSON artifacts | Core Team | planned | Next slice: define and store provider catalog data plus configured instance state in JSON so the Providers route can load, reset, and delete configurations from durable files instead of only local UI state. |
 | `task-ui-117` | `ms-19` | Remove duplicated preset rendering in ProvidersScreen | Core Team | done | PR #211 rendered preset list in two places (left-rail Quick Add accordion and middle-column Preset Catalog). The middle-column duplicate was removed; preset-item markup now exists only in the Quick Add accordion. GitHub issue resolved via the simplification path noted in the issue. |
+| `task-release-101` | `ms-20` | Pin and verify externally downloaded release tooling | Core Team | planned | Harden AppImage and similar packaging workflows so downloaded binaries are version-pinned and checksum-verified before execution. |
+| `task-release-102` | `ms-20` | Define the portable runtime packaging strategy | Core Team | planned | Decide and implement whether packaged CLI/AppImage/EXE artifacts bundle Node or explicitly depend on a host runtime, then align docs and smoke validation with that contract. |
+| `task-security-101` | `ms-20` | Close symlink escape in Node file-system tooling | Core Team | planned | Replace path-only workspace checks with realpath-aware validation so symlink traversal cannot escape allowed roots. |
+| `task-devops-101` | `ms-20` | Clarify Docker and Compose product scope | Core Team | planned | Either ship a real full-stack local runtime in container workflows or mark the current container story as UI-only and document the backend requirement explicitly. |
+| `task-docs-109` | `ms-21` | Rewrite technology stack documentation for the TypeScript architecture | Core Team | planned | Remove Python-first claims from canonical stack documentation and restate the active Angular/NestJS/SDK architecture as the primary product path. |
 | `task-104` | `ms-03` | Define branching/WIP governance | Core Team | ready | Pending review. |
 | `task-105` | `ms-03` | Establish test/blocker controls | Core Team | in_progress | Draft escalation mechanisms. |
 | `task-201` | `ms-04` | Create canonical documentation files | Jules | done | RULES, PLAN, etc. |

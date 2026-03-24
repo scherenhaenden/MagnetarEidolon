@@ -22,6 +22,18 @@ This document is a logbook that records decisions, state changes, discoveries, a
   **Author:** Copilot
   **Entry:** State Change: Completed `task-voice-101` (Re-scope voice UI foundations for the TypeScript workspace). Created the `projects/voice-ui-module/` planning module with all required documentation files: README, ARCHITECTURE, REQUIREMENTS, TESTING, PLAN, STATUS, and BITACORA. Defined module boundaries between the Angular `VoiceCaptureModule`, `packages/magnetar-sdk` interfaces (`VoiceCapturePort`, `TranscriptionPort`), and the `apps/magnetar-api` backend boundary. Documented browser/runtime constraints (secure context, permission model, `SpeechRecognition` support matrix, sandbox restrictions, local-first fallback). Documented four voice-specific risks with mitigations. Confirmed that no Python, Gradio, or Poetry assumptions remain in the voice roadmap. Transitioned `task-voice-101` to `in_review`; `task-voice-102` is now unblocked. Updated `projects/magnetar-voice-ui.project.yml`, root `PLAN.md`, `STATUS.md`, and this logbook.
 
+- **Timestamp:** 2026-03-20 20:37 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #241 (feat(governance): enforce required documentation baseline). The repository now has a parallelized validator for required docs, repo-relative test fixtures, and CI enforcement in the TypeScript workflow.
+
+- **Timestamp:** 2026-03-20 20:15 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #240 (feat(governance): add project schema validation pipeline). All `projects/*.project.yml` files are now validated against the required schema as part of the standard test path.
+
+- **Timestamp:** 2026-03-20 20:00 UTC
+  **Author:** Jules
+  **Entry:** Discovery: Initialized the planning module for Observability and Replay. Decided on an Event-Sourced State Logging approach for the Proof of Concept (PoC) to fulfill the cognitive observability requirements. Created `ARCHITECTURE.md`, `REQUIREMENTS.md`, `PLAN.md`, `STATUS.md`, `TESTING.md`, and the project YAML file in `projects/observability-replay-module/`.
+
 - **Timestamp:** 2026-03-20 19:27 UTC
   **Author:** Copilot
   **Entry:** State Change: Verified and closed `task-ui-117` (Remove duplicated preset rendering in ProvidersScreen). PR #211 had introduced the preset list in two places — the left-rail Quick Add accordion and a middle-column Preset Catalog. The subsequent `feature/provider-config-quick-add-editor-flow` slice removed the middle-column duplicate. The current `app.component.ts` contains a single `*ngFor let preset of presets()` loop inside the Quick Add accordion; no duplicate preset-item markup remains. Planning documents were updated to record this task as done.
@@ -29,6 +41,18 @@ This document is a logbook that records decisions, state changes, discoveries, a
 - **Timestamp:** 2026-03-20 19:22 UTC
   **Author:** Codex
   **Entry:** Blocker: Resolved `blocker-002` / issue `#80` by adding a repository-level validator for the required documentation baseline defined in `RULES.md`, adding validator regression tests, wiring the validator into root `npm test`, and enforcing the same path in the `CI TypeScript` workflow. Verified closure evidence with successful runs of `npm run validate:required-docs`, `npm run test:required-docs`, root `npm test`, and root `npm run typecheck`.
+
+- **Timestamp:** 2026-03-20 19:11 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #235 (feature/provider-config-json-runtime). Completed the runtime provider handoff by resolving configured provider instances through a JSON-backed backend registry.
+
+- **Timestamp:** 2026-03-20 19:04 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #236 (feature/provider-config-json-inspector). Added a raw JSON inspector to the Providers UI for inspecting resolved configuration shapes.
+
+- **Timestamp:** 2026-03-20 19:03 UTC
+  **Author:** scherenhaenden
+  **Entry:** PR Merge: Merged #233 (feature/provider-config-instance-management). Refined provider instance management with opaque IDs and separated the preset catalog from user-created config instances.
 
 - **Timestamp:** 2026-03-20 18:22 UTC
   **Author:** Codex
