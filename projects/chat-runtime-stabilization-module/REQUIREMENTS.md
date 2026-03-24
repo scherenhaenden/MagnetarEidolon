@@ -5,8 +5,8 @@
 - **FR-CS-02 (Must)**: The backend must forward LM Studio chat requests using the correct API style and request schema.
 - **FR-CS-03 (Must)**: The chat response must stream incrementally back to the UI.
 - **FR-CS-04 (Must)**: The system must expose enough diagnostics to tell whether failure is in the UI, backend, or provider.
-- **FR-CS-06 (Should)**: The backend should expose a lightweight heartbeat endpoint that is cheap to call and clearly distinguishes process liveness from deeper provider-health checks.
 - **FR-CS-05 (Must)**: Root development commands must reliably start the services required for chat work.
+- **FR-CS-06 (Should)**: The backend should expose a lightweight heartbeat endpoint that is cheap to call and clearly distinguishes process liveness from deeper provider-health checks.
 
 ## Non-Functional Requirements
 - **NFR-CS-01 (Must)**: Provider-specific secrets and transport details must stay out of the browser.

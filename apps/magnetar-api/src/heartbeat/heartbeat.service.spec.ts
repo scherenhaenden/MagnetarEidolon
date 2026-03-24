@@ -1,14 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { ProviderRegistryService, type BackendProviderDefinition } from '../provider-registry.service.js';
 import { HeartbeatService } from './heartbeat.service.js';
-import {
-  ProviderRegistryService,
-  type BackendProviderDefinition,
-} from './provider-registry.service.js';
 
 class HealthyProviderRegistryService extends ProviderRegistryService {
+  public callCount = 0;
+
   public override getProviders(): BackendProviderDefinition[] {
+    this.callCount += 1;
     return [
       {
         id: 'provider-lmstudio',
@@ -30,19 +30,26 @@ class HealthyProviderRegistryService extends ProviderRegistryService {
 }
 
 class BrokenProviderRegistryService extends ProviderRegistryService {
+  public callCount = 0;
+
   public override getProviders(): BackendProviderDefinition[] {
+    this.callCount += 1;
     throw new Error('provider catalog file missing');
   }
 }
 
 test('HeartbeatService reports ok when the provider catalog is available', () => {
-  const service = new HeartbeatService(new HealthyProviderRegistryService());
+  const originalVersion = process.env.npm_package_version;
+  delete process.env.npm_package_version;
 
+  const service = new HeartbeatService(new HealthyProviderRegistryService());
   const snapshot = service.getSnapshot();
+
+  process.env.npm_package_version = originalVersion;
 
   assert.equal(snapshot.status, 'ok');
   assert.equal(snapshot.service, '@magnetar/magnetar-api');
-  assert.equal(snapshot.version, '0.1.0');
+  assert.equal(snapshot.version, 'unknown');
   assert.match(snapshot.timestamp, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(snapshot.checks.api.status, 'ok');
   assert.equal(snapshot.checks.providerRegistry.status, 'ok');
@@ -58,5 +65,29 @@ test('HeartbeatService reports degraded when provider catalog loading fails', ()
   assert.equal(snapshot.status, 'degraded');
   assert.equal(snapshot.checks.api.status, 'ok');
   assert.equal(snapshot.checks.providerRegistry.status, 'error');
-  assert.match(snapshot.checks.providerRegistry.detail, /provider catalog file missing/);
+  assert.equal(snapshot.checks.providerRegistry.detail, 'Provider catalog unavailable.');
+});
+
+test('HeartbeatService caches healthy provider-registry checks within the TTL window', () => {
+  const providerRegistry = new HealthyProviderRegistryService();
+  const service = new HeartbeatService(providerRegistry);
+
+  const firstSnapshot = service.getSnapshot();
+  const secondSnapshot = service.getSnapshot();
+
+  assert.equal(firstSnapshot.checks.providerRegistry.status, 'ok');
+  assert.equal(secondSnapshot.checks.providerRegistry.status, 'ok');
+  assert.equal(providerRegistry.callCount, 1);
+});
+
+test('HeartbeatService caches failed provider-registry checks within the TTL window', () => {
+  const providerRegistry = new BrokenProviderRegistryService();
+  const service = new HeartbeatService(providerRegistry);
+
+  const firstSnapshot = service.getSnapshot();
+  const secondSnapshot = service.getSnapshot();
+
+  assert.equal(firstSnapshot.checks.providerRegistry.status, 'error');
+  assert.equal(secondSnapshot.checks.providerRegistry.status, 'error');
+  assert.equal(providerRegistry.callCount, 1);
 });
