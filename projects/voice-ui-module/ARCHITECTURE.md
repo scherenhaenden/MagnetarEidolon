@@ -138,7 +138,7 @@ The browser requires an explicit user gesture before the microphone permission p
 | Safari (macOS 14+) | Partial | Works in secure context, some interim-result quirks |
 | Electron / Tauri runtime | Varies | Depends on embedded Chromium version |
 
-The `BrowserSpeechTranscriptionAdapter` must implement a `isSupported()` guard and the module must route to the backend adapter if unsupported.
+The `BrowserSpeechTranscriptionAdapter` must implement an `isSupported()` guard and the module must route to the backend adapter if unsupported.
 
 ### Sandbox Limitations
 - Browsers running inside iframes with `allow-scripts` but without `allow-same-origin` will block microphone access.
