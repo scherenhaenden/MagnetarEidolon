@@ -37,6 +37,10 @@ The TypeScript implementation of the Magnetar SDK must adhere to the highest qua
     - **Focus**: Pure functions, state models, and individual agent logic steps.
     - **Tooling**: `Vitest`.
     - **Data Strategy**: Use `@faker-js/faker` to generate realistic, diverse, and unexpected data payloads. Mocking must be granular and modular.
+    - **Shared Factory Location**: Core runtime generated fixtures live in `packages/magnetar-sdk/tests/factories/`.
+    - **Seed Strategy**: Use `createTestFaker(deriveTestSeed('<suite-or-scenario-name>'))` so generated data stays reproducible in CI and across local runs.
+    - **Readability Rule**: Prefer generated fixtures for broad state/data combinations and edge cases; keep explicit hand-written fixtures when a test depends on exact strings, exact prompts, or exact rendering output.
+    - **Override Rule**: When using generated fixtures, override the exact fields asserted by the test so the scenario remains easy to understand and debug.
     - **Requirement**: No code in `packages/magnetar-sdk/src/` may be merged without complete coverage for the affected module. While shared code still lives temporarily inside the UI workspace, the same standard applies there.
 
 2.  **Integration Tests**
