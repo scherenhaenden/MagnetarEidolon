@@ -1,36 +1,57 @@
 import { describe, it, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+
 import { MagnetarAgent } from '../src/agent.js';
-import { InMemoryTraceStore } from '../src/providers/in-memory-trace-store.js';
-import { MagnetarEidolon } from '../src/models.js';
 import { LLMProvider, MemoryStore, Tool } from '../src/interfaces.js';
+import { InMemoryTraceStore } from '../src/providers/in-memory-trace-store.js';
+import {
+  createGoal,
+  createMagnetarState,
+  createMemoryItem,
+  createToolResult,
+} from './factories/magnetar-factories.js';
+import { createTestFaker, deriveTestSeed } from './factories/faker.js';
+
+function createTestState(seedNamespace: string, overrides = {}) {
+  const faker = createTestFaker(deriveTestSeed(seedNamespace));
+
+  return createMagnetarState(
+    {
+      agentId: 'test-agent',
+      plan: [],
+      shortTermMemory: [],
+      toolHistory: [],
+      metadata: {},
+      ...overrides,
+    },
+    faker,
+  );
+}
+
+function createMemoryStoreMock(): MemoryStore {
+  return {
+    addMemory: vi.fn().mockReturnValue(of(void 0)),
+    query: vi.fn().mockReturnValue(of([])),
+  };
+}
 
 describe('MagnetarAgent Tracing', () => {
   it('should emit trace events during the step lifecycle', () => {
     return new Promise<void>((resolve, reject) => {
-      const state: MagnetarEidolon = {
-        agentId: 'test-agent',
-        plan: [],
-        shortTermMemory: [],
-        toolHistory: [],
-        metadata: {}
-      };
+      const state = createTestState('agent-tracing-tool-step');
 
       const mockTool: Tool = {
         name: 'testTool',
         description: 'A test tool',
-        execute: vi.fn().mockReturnValue(of({ success: true, output: 'Tool success' }))
+        execute: vi.fn().mockReturnValue(of(createToolResult({ output: 'Tool success' }))),
       };
 
-      const mockMemoryStore: MemoryStore = {
-        addMemory: vi.fn().mockReturnValue(of(void 0)),
-        query: vi.fn().mockReturnValue(of([]))
-      };
+      const mockMemoryStore = createMemoryStoreMock();
 
       const mockLlm: LLMProvider = {
         generate: vi.fn().mockReturnValue(of({
           content: 'TOOL: testTool\nARGS: {"param": "value"}'
-        }))
+        })),
       };
 
       const traceStore = new InMemoryTraceStore();
@@ -72,30 +93,23 @@ describe('MagnetarAgent Tracing', () => {
             reject(e);
           }
         },
-        error: (err) => reject(err)
+        error: (err) => reject(err),
       });
     });
   });
 
   it('should emit finish event on FINAL action', () => {
     return new Promise<void>((resolve, reject) => {
-      const state: MagnetarEidolon = {
-        agentId: 'test-agent',
-        plan: [],
-        shortTermMemory: [],
-        toolHistory: [],
-        metadata: {}
-      };
+      const state = createTestState('agent-tracing-finish-step', {
+        goal: createGoal({ status: 'active' }, createTestFaker(deriveTestSeed('agent-tracing-finish-goal'))),
+      });
 
-      const mockMemoryStore: MemoryStore = {
-        addMemory: vi.fn().mockReturnValue(of(void 0)),
-        query: vi.fn().mockReturnValue(of([]))
-      };
+      const mockMemoryStore = createMemoryStoreMock();
 
       const mockLlm: LLMProvider = {
         generate: vi.fn().mockReturnValue(of({
           content: 'FINAL: Task completed'
-        }))
+        })),
       };
 
       const traceStore = new InMemoryTraceStore();
@@ -109,36 +123,28 @@ describe('MagnetarAgent Tracing', () => {
             const finishEvent = events.find(e => e.type === 'finish');
             expect(finishEvent).toBeDefined();
             expect(finishEvent?.data.message).toBe('Task completed');
+            expect(state.goal?.status).toBe('completed');
 
             resolve();
           } catch (e) {
             reject(e);
           }
         },
-        error: (err) => reject(err)
+        error: (err) => reject(err),
       });
     });
   });
 
   it('should emit an error trace when a tool is not found', () => {
     return new Promise<void>((resolve, reject) => {
-      const state: MagnetarEidolon = {
-        agentId: 'test-agent',
-        plan: [],
-        shortTermMemory: [],
-        toolHistory: [],
-        metadata: {}
-      };
+      const state = createTestState('agent-tracing-missing-tool');
 
-      const mockMemoryStore: MemoryStore = {
-        addMemory: vi.fn().mockReturnValue(of(void 0)),
-        query: vi.fn().mockReturnValue(of([]))
-      };
+      const mockMemoryStore = createMemoryStoreMock();
 
       const mockLlm: LLMProvider = {
         generate: vi.fn().mockReturnValue(of({
           content: 'TOOL: missingTool\nARGS: {}'
-        }))
+        })),
       };
 
       const traceStore = new InMemoryTraceStore();
@@ -159,7 +165,53 @@ describe('MagnetarAgent Tracing', () => {
             reject(e);
           }
         },
-        error: (err) => reject(err)
+        error: (err) => reject(err),
+      });
+    });
+  });
+
+  it('should build prompts from the last five generated memory entries only', () => {
+    return new Promise<void>((resolve, reject) => {
+      const faker = createTestFaker(deriveTestSeed('agent-tracing-history-window'));
+      const history = Array.from({ length: 6 }, (_, index) =>
+        createMemoryItem({ content: `memory-${index}` }, faker),
+      );
+      const state = createMagnetarState(
+        {
+          agentId: 'test-agent',
+          goal: createGoal({ description: 'Inspect history', status: 'active' }, faker),
+          plan: [],
+          shortTermMemory: history,
+          toolHistory: [],
+          metadata: {},
+        },
+        faker,
+      );
+      const mockMemoryStore = createMemoryStoreMock();
+      const mockLlm: LLMProvider = {
+        generate: vi.fn().mockReturnValue(of({
+          content: 'FINAL: History inspected'
+        })),
+      };
+      const traceStore = new InMemoryTraceStore();
+      const agent = new MagnetarAgent(state, [], mockMemoryStore, mockLlm, traceStore);
+
+      agent.step().subscribe({
+        next: () => {
+          try {
+            const prompt = mockLlm.generate.mock.calls[0]?.[0]?.[0]?.content as string;
+
+            expect(prompt).not.toContain('memory-0');
+            expect(prompt).toContain('memory-1');
+            expect(prompt).toContain('memory-5');
+            expect(state.goal?.status).toBe('completed');
+
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        },
+        error: (err) => reject(err),
       });
     });
   });
