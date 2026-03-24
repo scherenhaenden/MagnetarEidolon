@@ -1,6 +1,15 @@
 import { Observable, of, map, switchMap, tap } from 'rxjs';
 import { MagnetarEidolon, ToolCall } from './models.js';
-import { LLMProvider, Tool, MemoryStore, ToolResult, TraceStore } from './interfaces.js';
+import {
+  EnvironmentSnapshot,
+  LLMProvider,
+  MemoryStore,
+  Tool,
+  ToolResult,
+  TraceAction,
+  TraceEventInput,
+  TraceStore
+} from './interfaces.js';
 
 export type AgentAction =
   | { type: 'tool'; name: string; args: Record<string, unknown> }
@@ -9,6 +18,7 @@ export type AgentAction =
 
 export class MagnetarAgent {
   private tools: Map<string, Tool> = new Map();
+  private readonly tracePreviewLength = 200;
 
   constructor(
     private state: MagnetarEidolon,
@@ -45,27 +55,32 @@ export class MagnetarAgent {
       currentDirectory: '/',
       timestamp: new Date()
     };
-    if (this.traceStore) {
-      this.traceStore.addEvent({
-        type: 'observe',
-        data: { environment: { ...this.state.environment } }
-      });
-    }
+    this.trace({
+      type: 'observe',
+      data: { environment: this.getEnvironmentSnapshot() }
+    });
   }
 
   private think(): Observable<AgentAction | null> {
     const prompt = this.constructPrompt();
     return this.llm.generate([{ role: 'user', content: prompt }]).pipe(
-          map(response => {
-            const action = response.content ? this.parseAction(response.content) : null;
-            if (this.traceStore) {
-              this.traceStore.addEvent({
-                type: 'think',
-                data: { prompt, response: response.content, parsedAction: action }
-              });
-            }
-            return action;
-          })
+      map(response => {
+        const responseContent = response.content ?? '';
+        const action = responseContent ? this.parseAction(responseContent) : null;
+
+        this.trace({
+          type: 'think',
+          data: {
+            promptPreview: this.createTracePreview(prompt),
+            promptLength: prompt.length,
+            responsePreview: this.createTracePreview(responseContent),
+            responseLength: responseContent.length,
+            parsedAction: this.toTraceAction(action)
+          }
+        });
+
+        return action;
+      })
     );
   }
 
@@ -89,12 +104,10 @@ export class MagnetarAgent {
               timestamp: new Date(),
               metadata: {}
             });
-            if (this.traceStore) {
-              this.traceStore.addEvent({
-                type: 'act',
-                data: { action, result }
-              });
-            }
+            this.trace({
+              type: 'act',
+              data: { action: this.toTraceAction(action)!, result }
+            });
           }),
           map(() => void 0)
         );
@@ -106,12 +119,10 @@ export class MagnetarAgent {
           timestamp: new Date(),
           metadata: {}
         });
-        if (this.traceStore) {
-          this.traceStore.addEvent({
-            type: 'error',
-            data: { action, error: errorMsg }
-          });
-        }
+        this.trace({
+          type: 'error',
+          data: { action: this.toTraceAction(action)!, error: errorMsg }
+        });
         return of(void 0);
       }
     } else if (action.type === 'finish') {
@@ -124,20 +135,22 @@ export class MagnetarAgent {
         timestamp: new Date(),
         metadata: {}
       });
-      if (this.traceStore) {
-        this.traceStore.addEvent({
-          type: 'finish',
-          data: { message: action.message }
-        });
-      }
+      this.trace({
+        type: 'finish',
+        data: { message: action.message }
+      });
       return of(void 0);
     } else if (action.type === 'error') {
-      if (this.traceStore) {
-        this.traceStore.addEvent({
-          type: 'error',
-          data: { error: action.message }
-        });
-      }
+      this.state.shortTermMemory.push({
+        id: crypto.randomUUID(),
+        content: `Error: ${action.message}`,
+        timestamp: new Date(),
+        metadata: {}
+      });
+      this.trace({
+        type: 'error',
+        data: { error: action.message }
+      });
       return of(void 0);
     }
     return of(void 0);
@@ -148,16 +161,65 @@ export class MagnetarAgent {
       const lastMem = this.state.shortTermMemory[this.state.shortTermMemory.length - 1];
       return this.memoryStore.addMemory(lastMem.content, { timestamp: lastMem.timestamp.toISOString() }).pipe(
         tap(() => {
-          if (this.traceStore) {
-            this.traceStore.addEvent({
-              type: 'reflect',
-              data: { memoryAdded: lastMem }
-            });
-          }
+          this.trace({
+            type: 'reflect',
+            data: { memoryAdded: lastMem }
+          });
         })
       );
     }
     return of(void 0);
+  }
+
+  private trace(event: TraceEventInput): void {
+    this.traceStore?.addEvent(event);
+  }
+
+  private getEnvironmentSnapshot(): EnvironmentSnapshot {
+    const environment = this.state.environment;
+    if (!environment) {
+      return {};
+    }
+
+    return {
+      ...(environment.os !== undefined ? { os: environment.os } : {}),
+      ...(environment.currentDirectory !== undefined ? { currentDirectory: environment.currentDirectory } : {}),
+      ...(environment.timestamp !== undefined ? { timestamp: environment.timestamp } : {})
+    };
+  }
+
+  private createTracePreview(content: string): string {
+    if (content.length <= this.tracePreviewLength) {
+      return content;
+    }
+
+    return `${content.slice(0, this.tracePreviewLength)}...`;
+  }
+
+  private toTraceAction(action: AgentAction | null): TraceAction | null {
+    if (!action) {
+      return null;
+    }
+
+    if (action.type === 'tool') {
+      return {
+        type: 'tool',
+        name: action.name,
+        args: action.args
+      };
+    }
+
+    if (action.type === 'finish') {
+      return {
+        type: 'finish',
+        message: action.message
+      };
+    }
+
+    return {
+      type: 'error',
+      message: action.message
+    };
   }
 
   private constructPrompt(): string {

@@ -4,6 +4,9 @@
   "private": true,
   "description": "Shared TypeScript runtime contract for MagnetarEidolon UI and CLI clients.",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist",
     "README.md"

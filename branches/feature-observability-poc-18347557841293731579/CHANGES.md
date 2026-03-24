@@ -27,6 +27,15 @@
 - Verified `apps/magnetar-api` tests passed.
 - Verified `apps/magnetar-ui` tests passed with coverage enforcement active.
 
+## PR #253 review follow-up
+- Reviewed the PR #253 comments after the merge and applied the valid SDK/documentation follow-ups that were still outstanding.
+- Replaced generic trace payload typing with structured trace-event shapes in `packages/magnetar-sdk/src/interfaces.ts`.
+- Centralized trace emission in `MagnetarAgent` with a dedicated helper instead of repeated inline `traceStore` checks.
+- Reduced trace sensitivity by storing a whitelisted environment snapshot plus prompt/response previews and lengths instead of full prompt/response payloads.
+- Added missing `shortTermMemory` recording for `action.type === 'error'` so the error path stays consistent with other agent outcomes.
+- Added SDK test coverage for the error-trace path when a tool lookup fails.
+- Updated `projects/observability-replay-module/PLAN.md` and `projects/observability-replay-module/STATUS.md` so the module docs reflect the implemented PoC state.
+
 ## Notes
 - This branch originally lacked its required branch-local documentation directory under `branches/`.
 - This file was added after the merge so the branch now complies with the repository's branch-documentation rule.

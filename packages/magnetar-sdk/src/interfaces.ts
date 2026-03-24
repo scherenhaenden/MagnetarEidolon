@@ -33,15 +33,66 @@ export interface MemoryStore {
 
 export type TraceEventType = 'observe' | 'think' | 'act' | 'reflect' | 'error' | 'finish';
 
-export interface TraceEvent {
-  id: string;
-  timestamp: Date;
-  type: TraceEventType;
-  data: Record<string, any>;
+export type TraceAction =
+  | { type: 'tool'; name: string; args: Record<string, unknown> }
+  | { type: 'finish'; message: string }
+  | { type: 'error'; message: string };
+
+export interface EnvironmentSnapshot {
+  os?: string;
+  currentDirectory?: string;
+  timestamp?: Date;
 }
 
+export interface TraceEventBase<TType extends TraceEventType, TData> {
+  id: string;
+  timestamp: Date;
+  type: TType;
+  data: TData;
+}
+
+export type ObserveTraceEvent = TraceEventBase<'observe', {
+  environment: EnvironmentSnapshot;
+}>;
+
+export type ThinkTraceEvent = TraceEventBase<'think', {
+  promptPreview: string;
+  promptLength: number;
+  responsePreview: string;
+  responseLength: number;
+  parsedAction: TraceAction | null;
+}>;
+
+export type ActTraceEvent = TraceEventBase<'act', {
+  action: TraceAction;
+  result: ToolResult;
+}>;
+
+export type ReflectTraceEvent = TraceEventBase<'reflect', {
+  memoryAdded: MemoryItem;
+}>;
+
+export type ErrorTraceEvent = TraceEventBase<'error', {
+  error: string;
+  action?: TraceAction;
+}>;
+
+export type FinishTraceEvent = TraceEventBase<'finish', {
+  message: string;
+}>;
+
+export type TraceEvent =
+  | ObserveTraceEvent
+  | ThinkTraceEvent
+  | ActTraceEvent
+  | ReflectTraceEvent
+  | ErrorTraceEvent
+  | FinishTraceEvent;
+
+export type TraceEventInput = Omit<TraceEvent, 'id' | 'timestamp'>;
+
 export interface TraceStore {
-  addEvent(event: Omit<TraceEvent, 'id' | 'timestamp'>): void;
+  addEvent(event: TraceEventInput): void;
   getTrace(): TraceEvent[];
   clear(): void;
 }

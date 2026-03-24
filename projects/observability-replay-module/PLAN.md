@@ -12,9 +12,12 @@ Implement an Event-Sourced State Logging PoC within the `magnetar-sdk`.
 
 | ID | Title | Status |
 | :--- | :--- | :--- |
-| `task-obs-101` | Define Trace Event Models | planned |
-| `task-obs-102` | Instrument MagnetarAgent | planned |
-| `task-obs-103` | Implement In-Memory Trace Store | planned |
+| `task-obs-101` | Define Trace Event Models | done |
+| `task-obs-102` | Instrument MagnetarAgent | done |
+| `task-obs-103` | Implement In-Memory Trace Store | done |
+
+## Completion Note
+- 2026-03-24: `task-obs-101`, `task-obs-102`, and `task-obs-103` are implemented in the current PoC branch via the SDK trace-event types, `MagnetarAgent` tracing hooks, and `InMemoryTraceStore`.
 
 ## Detailed Implementation Steps
 

@@ -49,7 +49,9 @@ describe('MagnetarAgent Tracing', () => {
 
             const thinkEvent = events.find(e => e.type === 'think');
             expect(thinkEvent).toBeDefined();
-            expect(thinkEvent?.data.prompt).toBeDefined();
+            expect(thinkEvent?.data.promptPreview).toBeDefined();
+            expect(thinkEvent?.data.promptLength).toBeGreaterThan(0);
+            expect(thinkEvent?.data.responsePreview).toContain('TOOL: testTool');
             expect(thinkEvent?.data.parsedAction).toEqual({
               type: 'tool',
               name: 'testTool',
@@ -107,6 +109,50 @@ describe('MagnetarAgent Tracing', () => {
             const finishEvent = events.find(e => e.type === 'finish');
             expect(finishEvent).toBeDefined();
             expect(finishEvent?.data.message).toBe('Task completed');
+
+            resolve();
+          } catch (e) {
+            reject(e);
+          }
+        },
+        error: (err) => reject(err)
+      });
+    });
+  });
+
+  it('should emit an error trace when a tool is not found', () => {
+    return new Promise<void>((resolve, reject) => {
+      const state: MagnetarEidolon = {
+        agentId: 'test-agent',
+        plan: [],
+        shortTermMemory: [],
+        toolHistory: [],
+        metadata: {}
+      };
+
+      const mockMemoryStore: MemoryStore = {
+        addMemory: vi.fn().mockReturnValue(of(void 0)),
+        query: vi.fn().mockReturnValue(of([]))
+      };
+
+      const mockLlm: LLMProvider = {
+        generate: vi.fn().mockReturnValue(of({
+          content: 'TOOL: missingTool\nARGS: {}'
+        }))
+      };
+
+      const traceStore = new InMemoryTraceStore();
+      const agent = new MagnetarAgent(state, [], mockMemoryStore, mockLlm, traceStore);
+
+      agent.step().subscribe({
+        next: () => {
+          const events = traceStore.getTrace();
+
+          try {
+            const errorEvent = events.find(e => e.type === 'error');
+            expect(errorEvent).toBeDefined();
+            expect(errorEvent?.data.error).toContain('not found');
+            expect(state.shortTermMemory.at(-1)?.content).toContain('missingTool');
 
             resolve();
           } catch (e) {
