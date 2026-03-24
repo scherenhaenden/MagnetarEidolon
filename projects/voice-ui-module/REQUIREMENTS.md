@@ -1,5 +1,7 @@
 # Voice UI Module Requirements
 
+This document describes the required behavior and target artifacts for the planned `task-voice-102` implementation. Component, service, and interface names here are intended implementation targets; they are not a guarantee that those exact symbols already exist in the current codebase before the implementation task begins.
+
 ## Functional Requirements
 
 ### Voice Capture

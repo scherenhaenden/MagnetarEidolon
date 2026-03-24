@@ -7,7 +7,7 @@
 ## Feature Scope
 - Added the `projects/voice-ui-module/` planning set for the voice interaction workstream.
 - Documented Angular module boundaries, SDK interface contracts, backend boundary ownership, browser/runtime constraints, testing strategy, and voice-specific risks.
-- Updated root planning/status/governance docs so `task-voice-101` is `in_review` and `task-voice-102` is unblocked.
+- Updated root planning/status/governance docs so `task-voice-101` is `in_review` and `task-voice-102` is prepared for implementation after acceptance.
 
 ## Merge from master
 - Merged `master` into `copilot/task-voice-101-rescope-ui-foundations` so the branch keeps the current modularized application structure as the baseline.
@@ -36,6 +36,9 @@
 - Clarified that unsupported audio-format handling should map to deterministic user-visible adapter errors.
 - Simplified the highest-probability voice risk wording and clarified the voice-path dependency restriction in the root `PLAN.md`.
 - Normalized the root `STATUS.md` Voice UI note into clearer sentence-style wording.
+- Aligned `task-voice-102` notes across the root plan, voice module plan, and project YAML so the task is consistently treated as planned but blocked until `task-voice-101` is accepted and moved to `done`.
+- Declared `projects/voice-ui-module/STATUS.md` as the canonical source for voice-risk wording and reduced the root/project-yaml copies to summarized references.
+- Added explicit notes in the voice architecture and requirements docs that the named components, services, and SDK interfaces are planned implementation artifacts rather than symbols that already exist in code today.
 
 ## BITACORA.md candidate
 - **2026-03-24 12:35 UTC**: Merged `master` into `copilot/task-voice-101-rescope-ui-foundations`, keeping the current modularized application structure and inherited observability work from `master` while preserving the voice re-scope planning updates. Resolved the sync through root documentation conflict reconciliation in `BITACORA.md` and `STATUS.md`.

@@ -121,7 +121,7 @@ The repository is in a controlled TypeScript-first transition state. The core mi
 | **Chat runtime stabilization** | **in_progress** | The browser chat path now works through the NestJS backend with provider-id handoff and backend-owned provider resolution; LM Studio is working and OpenRouter is now testable, while diagnostics and workflow hardening still remain. |
 | **Provider configuration** | **in_progress** | UI state model, first configuration screen, and a backend-owned provider registry foundation now exist; runtime persistence, richer failover behavior, and template-driven provider onboarding still remain. |
 | **Observability / Replay** | **in_progress** | The observability planning module was created and the Execution Tracer PoC implementation is underway. |
-| **Voice UI** | **in_review** | Re-scope complete; `projects/voice-ui-module/` documents module boundaries, SDK interfaces, browser/runtime constraints, risks, and testing strategy; implementation (`task-voice-102`) is planned. |
+| **Voice UI** | **in_review** | Re-scope complete; `projects/voice-ui-module/` documents module boundaries, SDK interfaces, browser/runtime constraints, risks, and testing strategy. `projects/voice-ui-module/STATUS.md` is the canonical source for voice-risk detail. Implementation (`task-voice-102`) remains blocked until `task-voice-101` is accepted and moved to `done`. |
 
 ## Risks and Mitigations
 
@@ -136,9 +136,9 @@ The repository is in a controlled TypeScript-first transition state. The core mi
 5. **Risk**: API consistency between Node.js and Browser environments for the shared SDK.
    Mitigation: Strict interfaces and environment-specific adapters.
 6. **Risk** (`risk-voice-001`): Browser microphone permissions, local-runtime constraints, and provider compatibility may complicate the first voice implementation.
-   Mitigation: Design for browser-safe capture first; keep adapters isolated behind `VoiceCapturePort` and `TranscriptionPort`; use mocked or file-based audio for staged validation.
+   Mitigation: See `projects/voice-ui-module/STATUS.md` for the canonical voice-risk wording and mitigation detail; root status keeps only the summarized reference.
 7. **Risk** (`risk-voice-002`): `SpeechRecognition` API is absent in Firefox as of early 2026, requiring a feature-detection guard and a backend-routed fallback path.
-   Mitigation: `BrowserSpeechTranscriptionAdapter.isSupported()` guard is defined from the start; backend adapter interface is in the SDK contract.
+   Mitigation: See `projects/voice-ui-module/STATUS.md` for the canonical voice-risk wording and mitigation detail; root status keeps only the summarized reference.
 
 ## Reporting Cadence
 Update at least once per day and immediately after each merged PR.

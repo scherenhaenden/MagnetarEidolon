@@ -4,8 +4,10 @@
 **Progress:** 40%
 `[████████░░░░░░░░░░░░] 40%`
 
+This file is the canonical source for voice-specific risk wording and mitigation detail. Root `STATUS.md` and `projects/magnetar-voice-ui.project.yml` may carry summarized references, but this module status should be treated as authoritative for the voice track.
+
 ## Current State
-The re-scope phase is complete. The voice module architecture, boundaries, browser constraints, SDK interfaces, and testing strategy are documented. The Python/Gradio/Poetry prototype has been fully retired from the roadmap. `task-voice-101` is in review; `task-voice-102` (implementation) is unblocked and planned.
+The re-scope phase is complete. The voice module architecture, boundaries, browser constraints, SDK interfaces, and testing strategy are documented. The Python/Gradio/Poetry prototype has been fully retired from the roadmap. `task-voice-101` is in review; `task-voice-102` is planned but remains blocked until `task-voice-101` is accepted and moved to `done`.
 
 ## Immediate Focus
 - Transition `task-voice-101` from `in_review` to `done` after peer acceptance.

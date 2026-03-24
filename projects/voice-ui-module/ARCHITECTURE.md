@@ -3,6 +3,9 @@
 ## Goal
 Introduce a browser-native voice capture and transcription surface into the Angular product shell that integrates with the existing chat interaction model and respects the `apps/magnetar-ui` → `apps/magnetar-api` → provider backend boundary.
 
+## Planned Artifact Note
+The component names, service names, and SDK interfaces in this document describe the target implementation shape for `task-voice-102`. They are planned artifacts and design contracts for the upcoming implementation phase, not a claim that those exact symbols already exist in the current codebase today.
+
 ## Target Shape
 ```text
 [Voice Composer Button] ──► [VoiceCaptureService]
@@ -40,7 +43,7 @@ Introduce a browser-native voice capture and transcription surface into the Angu
 
 ## Module Boundaries
 
-### Angular Module — `VoiceCaptureModule` (`apps/magnetar-ui`)
+### Angular Module — `VoiceCaptureModule` (`apps/magnetar-ui`, planned)
 | Component / Service | Responsibility |
 | :--- | :--- |
 | `VoiceComposerButtonComponent` | Microphone toggle button inside the chat composer bar. |
@@ -50,7 +53,7 @@ Introduce a browser-native voice capture and transcription surface into the Angu
 | `BackendTranscriptionAdapter` | Sends audio blobs to `apps/magnetar-api` for server-side STT routing. |
 | `VoiceSessionService` | Manages capture state, transcript accumulation, and error recovery. |
 
-### SDK Interfaces — `packages/magnetar-sdk`
+### SDK Interfaces — `packages/magnetar-sdk` (planned)
 The SDK defines stable contracts so adapters and services can be swapped:
 
 ```typescript

@@ -114,7 +114,7 @@ This plan implements the direction defined in `NEW_PLAN.md`: simplicity, human c
 | `task-502` | `ms-07` | ChromaDB memory setup | Jules | done | |
 | `task-601` | `ms-08` | Build CLI with Typer | Jules | done | |
 | `task-voice-101` | `ms-voice-01` | Re-scope voice UI foundations for the TypeScript workspace | Jules | in_review | Architecture, module boundaries, SDK interfaces, browser/runtime constraints, risk mitigations, and testing strategy are documented in `projects/voice-ui-module/`. All Python/Gradio/Poetry assumptions removed. |
-| `task-voice-102` | `ms-voice-01` | Implement voice capture and interaction flow in the TypeScript UI | Jules | planned | Unblocked after task-voice-101 acceptance. Implementation follows `projects/voice-ui-module/ARCHITECTURE.md`. No Python, Gradio, or Poetry dependencies are permitted anywhere in the voice feature path. |
+| `task-voice-102` | `ms-voice-01` | Implement voice capture and interaction flow in the TypeScript UI | Jules | planned | Planned implementation task. It remains blocked until `task-voice-101` is accepted and moved from `in_review` to `done`. Implementation then follows `projects/voice-ui-module/ARCHITECTURE.md`. No Python, Gradio, or Poetry dependencies are permitted anywhere in the voice feature path. |
 
 ## Success Criteria
 - First useful automation in under 15 minutes.
