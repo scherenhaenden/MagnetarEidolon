@@ -62,12 +62,13 @@ The CLI must not duplicate business logic; it should consume the shared SDK/runt
 
 ## Transition Status
 The repository is in an active transition phase:
-- The Python implementation remains available while the TypeScript prototype is being evaluated.
+- The active product path is TypeScript-first: `apps/magnetar-ui` + `apps/magnetar-api` + `packages/magnetar-sdk`.
+- The legacy Python code remains in the repository only as historical reference and limited cross-check context.
 - The TypeScript UI now lives in `apps/magnetar-ui` rather than being treated as a permanent skeleton.
 - The target CLI/Web architecture is `apps/magnetar-ui` + `packages/magnetar-sdk`; extraction of the shared runtime is ongoing.
 - The real web runtime bootstrap is underway: `apps/magnetar-ui` is moving past a placeholder startup and into a runnable Angular workspace around the existing UI.
 - Current planning and testing priorities focus on the TypeScript migration.
-- Once the TypeScript prototype is proven stable, the legacy Python code will be retired.
+- New feature work should target the TypeScript architecture, not the retired Python-first path.
 
 ## Current UI Workspace Startup
 - Local web UI: `cd apps/magnetar-ui && npm install && npm run start`

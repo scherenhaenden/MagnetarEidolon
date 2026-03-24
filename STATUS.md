@@ -34,6 +34,7 @@ Update rule:
 | Observability / Replay | 20% | 15% | 65% | PoC planning active and tracer implementation underway. |
 | UX / Experience Foundation | 65% | 15% | 20% | Shell is real, not fully integrated |
 | Distribution / packaged operations | 60% | 10% | 30% | Usable, not polished |
+| Voice UI | 40% | 0% | 60% | Re-scope complete. Module boundaries, SDK interfaces, browser constraints, and testing strategy are documented. Implementation has not started yet. |
 
 ### Chat Breakdown
 
@@ -68,12 +69,12 @@ Update rule:
 | Observability / Replay | Red | under 40% |
 
 ## Current Direction
-The repository is in a controlled transition state. The core migration to TypeScript has been completed and the shared SDK is operational. The Python implementation remains available only as a historical reference and cross-validation baseline until the TypeScript prototype is declared production-stable. The strategic focus is now the consolidation of the UI in `apps/magnetar-ui` and the final extraction of the shared runtime.
+The repository is in a controlled TypeScript-first transition state. The core migration to TypeScript has been completed and the shared SDK is operational. The legacy Python implementation remains in the repository only as historical reference and limited cross-check context, not as the active product direction. The strategic focus is now the consolidation of the UI in `apps/magnetar-ui`, the NestJS backend boundary in `apps/magnetar-api`, and the final extraction of the shared runtime into `packages/magnetar-sdk`.
 
 ## Immediate Focus
 - Consolidate the rehomed TypeScript UI in `apps/magnetar-ui`.
 - Turn `apps/magnetar-ui` into a genuinely runnable web and CLI surface, not only something that builds and tests.
-- Activate and stabilize a dedicated TypeScript validation pipeline instead of relying only on the legacy Python CI.
+- Activate and stabilize a dedicated TypeScript validation pipeline as the primary validation path for the active product architecture.
 - Execute the shared runtime extraction into `packages/magnetar-sdk` and lock down its initial contract.
 - Continue the first real provider integration path through LM Studio.
 - Define an embedded chat surface so provider testing happens inside the product UI.
@@ -95,6 +96,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | `ms-17` | LM Studio Provider Integration | Ready | 2026-04-29 |
 | `ms-18` | In-App Chat Surface | Ready | 2026-05-02 |
 | `ms-19` | Provider Configuration & Failover | In Progress | 2026-05-06 |
+| `ms-voice-01` | Voice Interaction Re-scope | In Progress | 2026-03-31 |
 | `ms-04` | Project Initialization & Governance | Completed | 2026-05-15 |
 | `ms-05` | Core Architecture Implementation | Completed | 2026-06-01 |
 | `ms-06` | Tool System & OS Integration | Completed | 2026-06-15 |
@@ -119,6 +121,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | **Chat runtime stabilization** | **in_progress** | The browser chat path now works through the NestJS backend with provider-id handoff and backend-owned provider resolution; LM Studio is working and OpenRouter is now testable, while diagnostics and workflow hardening still remain. |
 | **Provider configuration** | **in_progress** | UI state model, first configuration screen, and a backend-owned provider registry foundation now exist; runtime persistence, richer failover behavior, and template-driven provider onboarding still remain. |
 | **Observability / Replay** | **in_progress** | The observability planning module was created and the Execution Tracer PoC implementation is underway. |
+| **Voice UI** | **in_review** | Re-scope complete; `projects/voice-ui-module/` documents module boundaries, SDK interfaces, browser/runtime constraints, risks, and testing strategy. `projects/voice-ui-module/STATUS.md` is the canonical source for voice-risk detail. Implementation (`task-voice-102`) remains blocked until `task-voice-101` is accepted and moved to `done`. |
 
 ## Risks and Mitigations
 
@@ -132,6 +135,10 @@ The repository is in a controlled transition state. The core migration to TypeSc
    Mitigation: Provider-agnostic design that allows switching to stronger models when needed.
 5. **Risk**: API consistency between Node.js and Browser environments for the shared SDK.
    Mitigation: Strict interfaces and environment-specific adapters.
+6. **Risk** (`risk-voice-001`): Browser microphone permissions, local-runtime constraints, and provider compatibility may complicate the first voice implementation.
+   Mitigation: See `projects/voice-ui-module/STATUS.md` for the canonical voice-risk wording and mitigation detail; root status keeps only the summarized reference.
+7. **Risk** (`risk-voice-002`): `SpeechRecognition` API is absent in Firefox as of early 2026, requiring a feature-detection guard and a backend-routed fallback path.
+   Mitigation: See `projects/voice-ui-module/STATUS.md` for the canonical voice-risk wording and mitigation detail; root status keeps only the summarized reference.
 
 ## Reporting Cadence
 Update at least once per day and immediately after each merged PR.
