@@ -7,7 +7,7 @@
 The repository now has the shape needed to stabilize chat properly: Angular UI, NestJS backend-for-frontend, and a working LM Studio path. The browser chat route now goes through the backend, consumes a normalized SSE delta contract, and has been manually validated against the real LM Studio server. The remaining work is now hardening, diagnostics, and configurable model/runtime handling.
 
 ## Immediate Focus
-- Add health/diagnostic endpoints so failures can be localized quickly.
+- Validate the new heartbeat-first backend probe and then extend it into deeper provider diagnostics.
 - Keep the UI dependent only on the backend contract, not provider-specific event shapes.
 - Move model resolution and default/provider selection details fully behind the backend boundary.
 - Finish hardening the root development commands for repeatable chat work.
@@ -18,4 +18,4 @@ The repository now has the shape needed to stabilize chat properly: Angular UI, 
 3. Multi-provider work will become harder if the first BFF contract is tightly coupled to LM Studio.
 
 ## Next Checkpoint
-Reach a repeatable "send prompt, receive streamed response" path through `UI -> backend -> LM Studio` and verify it manually plus automatically.
+Keep the verified `UI -> backend -> LM Studio` chat flow, prove `/api/heartbeat` stays reliable when provider configuration breaks, and then extend diagnostics without making the liveness probe heavy.

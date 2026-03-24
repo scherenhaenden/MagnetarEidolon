@@ -6,8 +6,8 @@ This document provides guidelines for contributing to the MagnetarEidolon projec
 ## Development Environment Setup
 
 ### Prerequisites
-- Node.js 22+
-- npm
+- Python 3.11+
+- Poetry (Dependency Management)
 - Git
 
 ### Installation
@@ -18,43 +18,24 @@ This document provides guidelines for contributing to the MagnetarEidolon projec
     ```
 2.  **Install Dependencies**:
     ```bash
-    npm run setup
+    poetry install
     ```
-3.  **Run the Main Development Surface**:
+3.  **Activate Virtual Environment**:
     ```bash
-    npm run dev
+    poetry shell
     ```
 
 ## Code Style & Standards
 
-### TypeScript / Angular / NestJS
-- **Architecture**: Follow the shared TypeScript product architecture in `README.md` and `ARCHITECTURE.md`: Angular UI in `apps/magnetar-ui`, NestJS backend in `apps/magnetar-api`, and shared runtime code in `packages/magnetar-sdk`.
-- **Implementation Style**: Keep runtime and domain logic OOP-first, prefer pure methods and pure stateless helpers where possible, and isolate side effects at clear boundary layers.
-- **Type Safety**: Keep `typecheck` clean in both app workspaces before opening a PR.
+### Python
+- **Formatter**: Use `black` for code formatting.
+- **Linter**: Use `ruff` for linting.
+- **Type Checking**: Use `mypy` for static type checking.
 
-### Validation Commands
-Use the repository root wrappers unless you are working on a workspace-specific issue:
-
+### Pre-commit Hooks
+We recommend installing pre-commit hooks to automate checks:
 ```bash
-npm run validate
-npm run test
-npm run typecheck
-npm run build
-```
-
-Useful direct workspace commands:
-
-```bash
-# Commands for the Angular UI workspace (run from within apps/magnetar-ui)
-# Note: `npm run start` is a long-running process. Run the other commands in a new terminal.
-npm run start
-npm run cli:dev -- about
-npm run test:ci
-
-# Commands for the NestJS API workspace (run from within apps/magnetar-api)
-# Note: `npm run start:dev` is a long-running process. Run the other commands in a new terminal.
-npm run start:dev
-npm run test
+pre-commit install
 ```
 
 ## Contribution Workflow
@@ -76,7 +57,6 @@ npm run test
 - Includes relevant `BITACORA.md` entries for traceability.
 - Ensures `STATUS.md` and `PLAN.md` are kept aligned with the changes.
 - Documents any new blockers and proposed mitigation in `BLOCKERS.md`.
-- Includes concrete validation evidence from the root scripts or the affected workspace scripts.
 
 ## Reporting Issues
 Please use the GitHub Issue Tracker for general issues or update `BLOCKERS.md` for critical project impediments.
