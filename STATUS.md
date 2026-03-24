@@ -31,7 +31,7 @@ Update rule:
 | Chat runtime stabilization | 68% | 12% | 20% | Backend-routed chat transport now resolves providers through the backend registry, works against LM Studio, and exposes an OpenRouter test path; diagnostics and workflow hardening still remain |
 | Memory inspector | 45% | 10% | 45% | Basic surface exists, real workflow not done |
 | Trust / Policy Center | 35% | 10% | 55% | Mostly planned |
-| Observability / Replay | 15% | 5% | 80% | Early-stage only |
+| Observability / Replay | 20% | 15% | 65% | PoC planning active and tracer implementation underway. |
 | UX / Experience Foundation | 65% | 15% | 20% | Shell is real, not fully integrated |
 | Distribution / packaged operations | 60% | 10% | 30% | Usable, not polished |
 
@@ -118,6 +118,7 @@ The repository is in a controlled transition state. The core migration to TypeSc
 | **In-app chat** | **in_progress** | Chat tab, state service, real LM Studio streaming, and a NestJS BFF path now exist; richer rendering and production validation still remain. |
 | **Chat runtime stabilization** | **in_progress** | The browser chat path now works through the NestJS backend with provider-id handoff and backend-owned provider resolution; LM Studio is working and OpenRouter is now testable, while diagnostics and workflow hardening still remain. |
 | **Provider configuration** | **in_progress** | UI state model, first configuration screen, and a backend-owned provider registry foundation now exist; runtime persistence, richer failover behavior, and template-driven provider onboarding still remain. |
+| **Observability / Replay** | **in_progress** | The observability planning module was created and the Execution Tracer PoC implementation is underway. |
 
 ## Risks and Mitigations
 
